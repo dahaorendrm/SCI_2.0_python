@@ -182,8 +182,8 @@ if __name__ == '__main__':
 
 
     tic = time.perf_counter()
-    a_pool = multiprocessing.Pool()
-    path = 'G:/My Drive/PHD_Research/data/DAVIS/JPEGImages/test/'
+    a_pool = multiprocessing.Pool(4)
+    path = '/work/ececis_research/X_Ma/data/DAVIS/480p/'
     entries = os.listdir(path)
     entries = [path+entry for entry in entries]
     result = a_pool.map(entry_process, entries)
