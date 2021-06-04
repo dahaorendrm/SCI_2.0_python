@@ -1,0 +1,13 @@
+/results
+/dataset
+/train/data
+*/__pycache__/*
+*/denoiser/__pycache__/*
+/temp
+*.qs
+*.out
+*.tar
+*.pth
+*.pyc
+*.swp
+*.npy

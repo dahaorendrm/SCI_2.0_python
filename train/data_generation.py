@@ -1,0 +1,209 @@
+import scipy.io as scio
+#from forward_model import lesti
+import os
+import numpy as np
+from skimage import color as skic
+from skimage import transform as skitrans
+from skimage import io as skio
+import tifffile,pickle
+import multiprocessing,threading
+import PIL
+import itertools as itert
+import time
+from func import utils,recon_model,result,measurement
+from collections import namedtuple
+
+MODEL = 'chasti_sst'
+MASK = scio.loadmat('lesti_mask.mat')['mask']
+def compressive_model(input):
+    '''
+        <model> + gaptv
+    '''
+    global MODEL
+    if MODEL is 'cacti':
+        mask = scio.loadmat('cacti_mask.mat')['mask']
+        input = rgb2gray(input)
+        return np.mean(mask*input,2)
+
+    if MODEL is 'cassi':
+        mask = scio.loadmat('cassi_mask.mat')['mask']
+        input = rgb2gray(input)
+        assert MASK.ndim is 2
+        mask = MASK[:,:,np.newaxis]
+        temp = mask*input
+        temp = utils.shifter(temp,0)
+        return np.mean(temp,2)
+
+    if MODEL is 'chasti_sst':
+        data = (
+        input,
+        MASK #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
+        )
+        mea = measurement.Measurement(model = 'chasti_sst', dim = 3, inputs=data)
+        model = recon_model.ReModel('gap','tv_chambolle')
+        model.config({'lambda': 1, 'ASSESE': 0, 'ACC': True,
+                'ITERs': 30, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
+                'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7}})
+        re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
+        return re
+    else:
+        Error(' ')
+
+def rgb2gray(image):
+    result = []
+    for ind in range(image.shape[3]):
+        result.append(skic.rgb2ycbcr(image[:,:,:,ind]))
+    result = np.asarray(result)
+    result = np.moveaxis(result,0,-1)
+    return result
+
+
+
+def generate_crops(block_im,num_crops,ind_r,ind_c):
+    combi = []
+    result = []
+    #ind_r = [0,128,223]
+    #ind_c = [0,128,256,384,512,597]
+    CROP_SIZE = 256
+    combo_li = itert.product(ind_r,ind_c)
+    block_mean = np.mean(block_im,-1, keepdims=True)
+    block_mo = block_im - block_mean
+    block_mo = np.square(block_mo)
+    block_sigma = np.mean(block_mo,-1)
+    block_dict = {combo:0 for combo in combo_li}
+    for kx,ky in block_dict:
+        crop = block_sigma[kx:kx+CROP_SIZE,ky:ky+CROP_SIZE,:]
+        block_dict[(kx,ky)] = np.amax(crop) - np.amin(crop)
+    for _ in range(num_crops):
+        temp = max(block_dict, key=block_dict.get)
+        block_dict.pop(temp)
+        print(temp)
+        result.append(block_im[temp[0]:temp[0]+CROP_SIZE,temp[1]:temp[1]+CROP_SIZE,...])
+    return result
+    #return block_im
+
+def save_crops(crops,crops_mea,index,fname,transform_type=''):
+    if not os.path.exists('data'):
+        try:
+            os.mkdir('data')
+            os.mkdir('data/gt')
+            os.mkdir('data/mea')
+        except:
+            pass
+    if not os.path.exists('data/gt'):
+        try:
+            os.mkdir('data/gt')
+        except:
+            pass
+    if not os.path.exists('data/mea'):
+        try:
+            os.mkdir('data/mea')
+        except:
+            pass
+    # # pickle
+    # for ind,crop in enumerate(crops):
+    #     name = 'data/gt' + '_'.join((str(index),fname,transform_type))+'.pickle'
+    #     pickle.dump( crop, open( name, "wb" ) )
+    #     name = 'data/mea' + '_'.join((str(index),fname,transform_type))+'.pickle'
+    #     pickle.dump( crops_mea[ind], open( name, "wb" ) )
+    #     index+=1
+    # tiff
+    for ind,crop in enumerate(crops):
+        print('Crop shape is'+str(crop.shape))
+        name = 'data/gt/' + '_'.join((fname,str(index),transform_type))+'.tiff'
+        tifffile.imwrite(name,crop)
+        name = 'data/mea/' + '_'.join((fname,str(index),transform_type))+'.tiff'
+        tifffile.imwrite(name,crops_mea[ind])
+        index+=1
+
+def entry_process(path):
+    COMP_FRAME = 8
+    name_f = os.listdir(path)
+    output_i = 0
+    for ind in range(0,len(name_f)-COMP_FRAME,COMP_FRAME):
+        pic_block = []
+        for ind_im in range(ind,ind+COMP_FRAME):
+            temp = np.asarray(PIL.Image.open(path+'/'+name_f[ind_im]))
+            # temp = rgb2gray(temp)
+            pic_block.append(temp) # load a sub-video
+        pic_block = np.asarray(pic_block)
+        pic_block = np.moveaxis(pic_block,0,-1)
+        ind_r = [0,128,223]
+        ind_c = [0,128,256,384,512,597]
+        li_crops = generate_crops(pic_block,7,ind_r,ind_c)# generate crops based on a video
+        pic_block_down = skitrans.rescale(pic_block,0.6,multichannel=True, # downscale the sub-video
+                                    anti_aliasing=True,preserve_range=True)
+        ind_r = [0]
+        ind_c = [0,127,249]
+        li_crops.extend(generate_crops(pic_block_down,2,ind_r,ind_c))# generate crops based on a downscaled video
+
+        len_crops = len(li_crops)
+        li_path = path.split('/')
+        li_name_f = name_f[ind].split('.') # have the saving file name
+        file_name = ''.join((li_path[-1],li_name_f[0]))
+        li_crops_mea = [compressive_model(crop) for crop in li_crops] # generate input measurement
+        t1 = threading.Thread( target=save_crops, args=(li_crops, li_crops_mea, output_i,file_name,) )
+        t1.start()
+        output_i = output_i+len_crops
+
+        li_crops_mirror = [np.fliplr(crop) for crop in li_crops]
+        li_crops_mirror_mea = [compressive_model(crop) for crop in li_crops_mirror]
+        t2 = threading.Thread( target=save_crops, args=(li_crops_mirror, li_crops_mirror_mea, output_i, file_name, 'fliplr',))
+        t2.start()
+        output_i = output_i+len_crops
+
+        li_crops_rotate = [np.rot90(crop) for crop in li_crops]
+        li_crops_rotate_mea = [compressive_model(crop) for crop in li_crops_rotate]
+        t3 = threading.Thread( target=save_crops, args=(li_crops_rotate, li_crops_rotate_mea, output_i, file_name, 'rot90',))
+        t3.start()
+        output_i = output_i+len_crops
+
+        li_crops_mirror_rotate = [np.rot90(crop) for crop in li_crops_mirror]
+        li_crops_mirror_rotate_mea = [compressive_model(crop)
+                                             for crop in li_crops_mirror_rotate]
+        t4 = threading.Thread( target=save_crops, args=(li_crops_mirror_rotate, li_crops_mirror_rotate_mea, output_i, file_name, 'fliplr+rot90',))
+        t4.start()
+        output_i = output_i+len_crops
+
+        # save_crops(li_crops,li_crops_mea,output_i,file_name)
+        # output_i = output_i+9
+        # save_crops(li_crops_mirror,li_crops_mirror_mea, output_i, file_name, 'fliplr')
+        # output_i = output_i+9
+        # save_crops(li_crops_rotate,li_crops_rotate_mea, output_i, file_name, 'rot90')
+        # output_i = output_i+9
+        # save_crops(li_crops_mirror_rotate,li_crops_mirror_rotate_mea, output_i, file_name, 'fliplr+rot90')
+        # output_i = output_i+9
+
+if __name__ == '__main__':
+    # path = 'G:/My Drive/PHD_Research/data/DAVIS/JPEGImages/test/bear'
+    # entry_process(path)
+
+
+
+
+    tic = time.perf_counter()
+    a_pool = multiprocessing.Pool()
+    path = 'G:/My Drive/PHD_Research/data/DAVIS/JPEGImages/test/'
+    entries = os.listdir(path)
+    entries = [path+entry for entry in entries]
+    result = a_pool.map(entry_process, entries)
+    toc = time.perf_counter()
+    print(f"The code run in {toc - tic:0.4f} seconds")
+
+
+# <codecell>
+# from skimage import io as skio
+# import tifffile
+# import numpy as np
+# im = tifffile.imread('data/gt/bear00000_0_.tiff')
+# im = skio.imread('data/mea/bear00000_0_.tiff',plugin='tifffile')
+# im.shape
+# skio.imshow(im,cmap='gray')
+# im = im[:,:,np.newaxis]
+# im.shape
+# im = np.tile(im,(1,1,6))
+# tifffile.imwrite('test.tiff',im, photometric='minisblack') #
+#
+# im = tifffile.imread('test.tiff')
+# im.shape
+#help(tifffile.imread)
