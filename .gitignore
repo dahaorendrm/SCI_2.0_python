@@ -3,7 +3,7 @@
 /train/data
 */__pycache__/*
 */denoiser/__pycache__/*
-/temp
+/train/temp
 *.qs
 *.out
 *.tar
