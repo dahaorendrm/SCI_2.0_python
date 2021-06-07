@@ -109,15 +109,14 @@ def save_crops(crops,crops_mea,index,fname,transform_type=''):
     #     index+=1
     # tiff
     for ind,crop in enumerate(crops):
-        print('*****************************DATA output index: '+str(index)+'/32,400***********************')
-        name = 'data/gt/' + '_'.join((str(index),fname,transform_type))+'.tiff'
+        print('Crop shape is'+str(crop.shape))
+        name = 'data/gt/' + '_'.join((fname,str(index),transform_type))+'.tiff'
         tifffile.imwrite(name,crop)
-        name = 'data/mea/' + '_'.join((str(index),fname,transform_type))+'.tiff'
+        name = 'data/mea/' + '_'.join((fname,str(index),transform_type))+'.tiff'
         tifffile.imwrite(name,crops_mea[ind])
         index+=1
 
-def entry_process(path):
-    COMP_FRAME = 8
+def entry_process(path,COMP_FRAME):
     name_f = os.listdir(path)
     output_i = 0
     for ind in range(0,len(name_f)-COMP_FRAME,COMP_FRAME):
@@ -177,18 +176,17 @@ def entry_process(path):
 if __name__ == '__main__':
     # path = 'G:/My Drive/PHD_Research/data/DAVIS/JPEGImages/test/bear'
     # entry_process(path)
-
-
-
-
-    tic = time.perf_counter()
-    a_pool = multiprocessing.Pool(4)
-    path = '/work/ececis_research/X_Ma/data/DAVIS/480p/'
+    COMP_FRAME = 9
+    path = '/work/ececis_research/X_Ma/data/DAVIS/test/'
     entries = os.listdir(path)
-    entries = [path+entry for entry in entries]
-    result = a_pool.map(entry_process, entries)
+    entries_ = [(path+entry,COMP_FRAME) for entry in entries]
+    ind_id = int(os.getenv('SLURM_ARRAY_TASK_ID'))
+    tic = time.perf_counter()
+    entry_process(entries_[ind_id])
+    #a_pool = multiprocessing.Pool(4)
+    #result = a_pool.map(entry_process, entries)
     toc = time.perf_counter()
-    print(f"The code run in {toc - tic:0.4f} seconds")
+    print(f"This code of {entries[ind_id]:s} run in {toc - tic:0.4f} seconds")
 
 
 # <codecell>
