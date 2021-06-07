@@ -135,35 +135,40 @@ def entry_process(path,COMP_FRAME):
         ind_r = [0]
         ind_c = [0,127,249]
         li_crops.extend(generate_crops(pic_block_down,2,ind_r,ind_c))# generate crops based on a downscaled video
-
         len_crops = len(li_crops)
         li_path = path.split('/')
         li_name_f = name_f[ind].split('.') # have the saving file name
         file_name = ''.join((li_path[-1],li_name_f[0]))
-        li_crops_mea = [compressive_model(crop) for crop in li_crops] # generate input measurement
+        pool = multiprocessing.Pool()
+
+        li_crops_mea = pool.map(compressive_model, li_crops)
+        #li_crops_mea = [compressive_model(crop) for crop in li_crops] # generate input measurement
         t1 = threading.Thread( target=save_crops, args=(li_crops, li_crops_mea, output_i,file_name,) )
-        t1.start()
         output_i = output_i+len_crops
 
         li_crops_mirror = [np.fliplr(crop) for crop in li_crops]
-        li_crops_mirror_mea = [compressive_model(crop) for crop in li_crops_mirror]
+        li_crops_mirror_mea = pool.map(compressive_model, li_crops_mirror)
+        #li_crops_mirror_mea = [compressive_model(crop) for crop in li_crops_mirror]
         t2 = threading.Thread( target=save_crops, args=(li_crops_mirror, li_crops_mirror_mea, output_i, file_name, 'fliplr',))
-        t2.start()
         output_i = output_i+len_crops
 
         li_crops_rotate = [np.rot90(crop) for crop in li_crops]
-        li_crops_rotate_mea = [compressive_model(crop) for crop in li_crops_rotate]
+        li_crops_rotate_mea = pool.map(compressive_model, li_crops_rotate)
+        #li_crops_rotate_mea = [compressive_model(crop) for crop in li_crops_rotate]
         t3 = threading.Thread( target=save_crops, args=(li_crops_rotate, li_crops_rotate_mea, output_i, file_name, 'rot90',))
-        t3.start()
         output_i = output_i+len_crops
 
         li_crops_mirror_rotate = [np.rot90(crop) for crop in li_crops_mirror]
-        li_crops_mirror_rotate_mea = [compressive_model(crop)
-                                             for crop in li_crops_mirror_rotate]
+        li_crops_mirror_rotate_mea = pool.map(compressive_model, li_crops_mirror_rotate)
+        #li_crops_mirror_rotate_mea = [compressive_model(crop)
+        #                                     for crop in li_crops_mirror_rotate]
         t4 = threading.Thread( target=save_crops, args=(li_crops_mirror_rotate, li_crops_mirror_rotate_mea, output_i, file_name, 'fliplr+rot90',))
-        t4.start()
         output_i = output_i+len_crops
 
+        t1.start()
+        t2.start()
+        t3.start()
+        t4.start()
         # save_crops(li_crops,li_crops_mea,output_i,file_name)
         # output_i = output_i+9
         # save_crops(li_crops_mirror,li_crops_mirror_mea, output_i, file_name, 'fliplr')
