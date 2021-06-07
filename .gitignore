@@ -4,6 +4,7 @@
 */__pycache__/*
 */denoiser/__pycache__/*
 /train/temp
+/temp
 *.qs
 *.out
 *.tar
@@ -11,3 +12,4 @@
 *.pyc
 *.swp
 *.npy
+*.sh
