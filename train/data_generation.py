@@ -116,7 +116,7 @@ def save_crops(crops,crops_mea,index,fname,transform_type=''):
         tifffile.imwrite(name,crops_mea[ind])
         index+=1
 
-def entry_process(path,COMP_FRAME):
+def entry_process(path,COMP_FRAMEi=8):
     name_f = os.listdir(path)
     output_i = 0
     for ind in range(0,len(name_f)-COMP_FRAME,COMP_FRAME):
@@ -187,7 +187,7 @@ if __name__ == '__main__':
     entries_ = [(path+entry,COMP_FRAME) for entry in entries]
     ind_id = int(os.getenv('SLURM_ARRAY_TASK_ID'))
     tic = time.perf_counter()
-    entry_process(entries_[ind_id])
+    entry_process(*entries_[ind_id])
     #a_pool = multiprocessing.Pool(4)
     #result = a_pool.map(entry_process, entries)
     toc = time.perf_counter()
