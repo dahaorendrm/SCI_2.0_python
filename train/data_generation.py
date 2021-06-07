@@ -109,10 +109,10 @@ def save_crops(crops,crops_mea,index,fname,transform_type=''):
     #     index+=1
     # tiff
     for ind,crop in enumerate(crops):
-        print('Crop shape is'+str(crop.shape))
-        name = 'data/gt/' + '_'.join((fname,str(index),transform_type))+'.tiff'
+        print('*****************************DATA output index: '+str(index)+'/32,400***********************')
+        name = 'data/gt/' + '_'.join((str(index),fname,transform_type))+'.tiff'
         tifffile.imwrite(name,crop)
-        name = 'data/mea/' + '_'.join((fname,str(index),transform_type))+'.tiff'
+        name = 'data/mea/' + '_'.join((str(index),fname,transform_type))+'.tiff'
         tifffile.imwrite(name,crops_mea[ind])
         index+=1
 

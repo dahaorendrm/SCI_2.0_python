@@ -13,7 +13,7 @@
 # SBATCH --partition=_workgroup_
 # SBATCH --gres=gpu
 
-#SBATCH --time=1-1:00:00
+#SBATCH --time=7-0:00:00
 # SBATCH --output=ArraySCI%A-%a.out
 #SBATCH --mail-user='xmdrm@udel.edu'
 #SBATCH --mail-type=END,FAIL,TIME_LIMIT_90
