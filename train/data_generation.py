@@ -45,7 +45,7 @@ def compressive_model(input):
                 'ITERs': 30, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
                 'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7}})
         re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
-        return re
+        return mea,re
     else:
         Error(' ')
 
@@ -113,8 +113,11 @@ def save_crops(crops,crops_mea,index,fname,transform_type=''):
     for ind,crop in enumerate(crops):
         name = 'data/gt/' + '_'.join((fname,str(index),transform_type))+'.tiff'
         tifffile.imwrite(name,crop)
-        name = 'data/mea/' + '_'.join((fname,str(index),transform_type))+'.tiff'
-        tifffile.imwrite(name,crops_mea[ind])
+        name = 'data/feature/' + '_'.join((fname,str(index),transform_type))+'.tiff'
+        temp = crops_mea[ind]
+        temp[0] = temp[0][...,np.newaxis]
+        temp = np.concatenate(temp, axis=2)
+        tifffile.imwrite(name,temp)
         index+=1
 
 def entry_process(path,COMP_FRAME):
@@ -141,7 +144,6 @@ def entry_process(path,COMP_FRAME):
         li_name_f = name_f[ind].split('.') # have the saving file name
         #file_name = ''.join((li_path[-1],li_name_f[0]))
         file_name = li_path[-1]
-        pool = multiprocessing.Pool()
 
 
         # procf1 = lambda li_crops : pool.map(compressive_model, li_crops)
@@ -158,9 +160,10 @@ def entry_process(path,COMP_FRAME):
         num_crops.append(len(li_all_crops))
         li_all_crops.extend([np.fliplr(np.rot90(crop)) for crop in li_crops])
         num_crops.append(len(li_all_crops))
-        li_all_crops_mea = pool.map(compressive_model, li_all_crops)
 
-        save_crops(li_all_crops,li_all_crops_mea,output_i,file_name)
+        pool = multiprocessing.Pool()
+        li_all_crops_data = pool.map(compressive_model, li_all_crops) # contain (mea, gaptv_result)
+        save_crops(li_all_crops,li_all_crops_data,output_i,file_name)
         output_i += len_crops*4
 
         # li_crops_mea = pool.map(compressive_model, li_crops)
