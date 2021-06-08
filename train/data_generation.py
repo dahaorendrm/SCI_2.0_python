@@ -158,21 +158,34 @@ def entry_process(path,COMP_FRAME):
         li_crops_mirror_rotate_mea = pool.map(compressive_model, li_crops_mirror_rotate)
         #li_crops_mirror_rotate_mea = [compressive_model(crop)
         #                                     for crop in li_crops_mirror_rotate]
-
-
-        t1 = threading.Thread( target=save_crops, args=(li_crops, li_crops_mea, output_i,file_name,) )
-        t1.start()
+        poolinput = []
+        poolinput.append((li_crops, li_crops_mea, output_i,file_name))
         output_i = output_i+len_crops
-        t2 = threading.Thread( target=save_crops, args=(li_crops_mirror, li_crops_mirror_mea, output_i, file_name, 'fliplr',))
-        t2.start()
+        poolinput.append((li_crops_mirror, li_crops_mirror_mea, output_i, file_name, 'fliplr'))
         output_i = output_i+len_crops
-        t3 = threading.Thread( target=save_crops, args=(li_crops_rotate, li_crops_rotate_mea, output_i, file_name, 'rot90',))
-        t3.start()
+        poolinput.append((li_crops_rotate, li_crops_rotate_mea, output_i, file_name, 'rot90'))
         output_i = output_i+len_crops
-        t4 = threading.Thread( target=save_crops, args=(li_crops_mirror_rotate, li_crops_mirror_rotate_mea, output_i, file_name, 'fliplr+rot90',))
-        t4.start()
+        poolinput.append((li_crops_mirror_rotate, li_crops_mirror_rotate_mea, output_i, file_name, 'fliplr+rot90'))
         output_i = output_i+len_crops
 
+        pool.map(save_crops,poolinput)
+
+        # t1 = threading.Thread( target=save_crops, args=(li_crops, li_crops_mea, output_i,file_name,) )
+        # t1.start()
+        # output_i = output_i+len_crops
+        # t2 = threading.Thread( target=save_crops, args=(li_crops_mirror, li_crops_mirror_mea, output_i, file_name, 'fliplr',))
+        # t2.start()
+        # output_i = output_i+len_crops
+        # t3 = threading.Thread( target=save_crops, args=(li_crops_rotate, li_crops_rotate_mea, output_i, file_name, 'rot90',))
+        # t3.start()
+        # output_i = output_i+len_crops
+        # t4 = threading.Thread( target=save_crops, args=(li_crops_mirror_rotate, li_crops_mirror_rotate_mea, output_i, file_name, 'fliplr+rot90',))
+        # t4.start()
+        # output_i = output_i+len_crops
+        # t1.join()
+        # t2.join()
+        # t3.join()
+        # t4.join()
 
         # save_crops(li_crops,li_crops_mea,output_i,file_name)
         # output_i = output_i+9
@@ -192,7 +205,7 @@ if __name__ == '__main__':
     entries_ = [(path+entry,COMP_FRAME) for entry in entries]
     ind_id = int(os.getenv('SLURM_ARRAY_TASK_ID'))
     tic = time.perf_counter()
-    entry_process(entries_[ind_id])
+    entry_process(*entries_[ind_id])
     #a_pool = multiprocessing.Pool(4)
     #result = a_pool.map(entry_process, entries)
     toc = time.perf_counter()
