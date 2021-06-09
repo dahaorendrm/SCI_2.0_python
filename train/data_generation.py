@@ -45,7 +45,9 @@ def compressive_model(input):
                 'ITERs': 30, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
                 'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7}})
         re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
-        return mea,re
+        re = np.array(re)
+        print('shape of re is '+str(re.shape))
+        return (mea,re)
     else:
         Error(' ')
 
