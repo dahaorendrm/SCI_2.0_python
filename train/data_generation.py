@@ -46,7 +46,8 @@ def compressive_model(input):
                 'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7}})
         re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
         re = np.array(re)
-        print('shape of re is '+str(re.shape))
+        mea = np.array(mea)
+        print('shape of re is '+str(mea.shape))
         return (mea,re)
     else:
         Error(' ')
@@ -84,6 +85,9 @@ def generate_crops(block_im,num_crops,ind_r,ind_c):
     return result
     #return block_im
 
+def save_tiff(name, crop):
+
+
 def save_crops(crops,crops_mea,index,fname,transform_type=''):
     if not os.path.exists('data'):
         try:
@@ -111,16 +115,36 @@ def save_crops(crops,crops_mea,index,fname,transform_type=''):
     #     pickle.dump( crops_mea[ind], open( name, "wb" ) )
     #     index+=1
     # tiff
+    save_tiff = lambda name,crop: tifffile.imwrite(name,crop)
+    threads = []
     print("'"+'_'.join((fname,str(index),transform_type))+'.tiff'+"'"+' saved with '+str(len(crops))+' crops.' )
+
     for ind,crop in enumerate(crops):
         name = 'data/gt/' + '_'.join((fname,str(index),transform_type))+'.tiff'
-        tifffile.imwrite(name,crop)
+        t1 = threading.Thread(target=save_tiff,args=[name,crop])
+        t1.start()
+        threads.append(t1)
         name = 'data/feature/' + '_'.join((fname,str(index),transform_type))+'.tiff'
         temp = crops_mea[ind]
         temp[0] = temp[0][...,np.newaxis]
         temp = np.concatenate(temp, axis=2)
-        tifffile.imwrite(name,temp)
+        t2 = threading.Thread(target=save_tiff,args=[name,temp])
+        t2.start()
+        threads.append(t2)
         index+=1
+
+    for thread in threads:
+        thread.join()
+
+
+        # name = 'data/gt/' + '_'.join((fname,str(index),transform_type))+'.tiff'
+        # tifffile.imwrite(name,crop)
+        # name = 'data/feature/' + '_'.join((fname,str(index),transform_type))+'.tiff'
+        # temp = crops_mea[ind]
+        # temp[0] = temp[0][...,np.newaxis]
+        # temp = np.concatenate(temp, axis=2)
+        # tifffile.imwrite(name,temp)
+        # index+=1
 
 def entry_process(path,COMP_FRAME):
     name_f = os.listdir(path)
