@@ -46,8 +46,8 @@ def compressive_model(input):
                 'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7}})
         re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
         re = np.array(re)
-        mea = np.array(mea)
-        print('shape of re is '+str(mea.shape))
+        mea = np.array(mea.mea)
+        print('shape of mea is '+str(mea.shape))
         return (mea,re)
     else:
         Error(' ')
@@ -85,15 +85,12 @@ def generate_crops(block_im,num_crops,ind_r,ind_c):
     return result
     #return block_im
 
-def save_tiff(name, crop):
-
-
 def save_crops(crops,crops_mea,index,fname,transform_type=''):
     if not os.path.exists('data'):
         try:
             os.mkdir('data')
             os.mkdir('data/gt')
-            os.mkdir('data/mea')
+            os.mkdir('data/input')
         except:
             pass
     else:
@@ -102,9 +99,9 @@ def save_crops(crops,crops_mea,index,fname,transform_type=''):
                 os.mkdir('data/gt')
             except:
                 pass
-        if not os.path.exists('data/mea'):
+        if not os.path.exists('data/input'):
             try:
-                os.mkdir('data/mea')
+                os.mkdir('data/input')
             except:
                 pass
     # # pickle
@@ -124,10 +121,10 @@ def save_crops(crops,crops_mea,index,fname,transform_type=''):
         t1 = threading.Thread(target=save_tiff,args=[name,crop])
         t1.start()
         threads.append(t1)
-        name = 'data/feature/' + '_'.join((fname,str(index),transform_type))+'.tiff'
+        name = 'data/input/' + '_'.join((fname,str(index),transform_type))+'.tiff'
         temp = crops_mea[ind]
-        temp[0] = temp[0][...,np.newaxis]
-        temp = np.concatenate(temp, axis=2)
+        temp_ = temp[0][...,np.newaxis]
+        temp = np.concatenate((temp_,temp[1]), axis=2)
         t2 = threading.Thread(target=save_tiff,args=[name,temp])
         t2.start()
         threads.append(t2)
