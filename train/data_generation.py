@@ -46,8 +46,9 @@ def compressive_model(input):
                 'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7}})
         re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
         re = np.array(re)
-        mea = np.array(mea.mea)
-        print('shape of mea is '+str(mea.shape))
+        re[re<0] = 0
+        mea = np.array(mea)
+        # print('shape of re is '+str(mea.shape))
         return (mea,re)
     else:
         Error(' ')
@@ -80,7 +81,7 @@ def generate_crops(block_im,num_crops,ind_r,ind_c):
     for _ in range(num_crops):
         temp = max(block_dict, key=block_dict.get)
         block_dict.pop(temp)
-        print(temp)
+        # print(temp)
         result.append(block_im[temp[0]:temp[0]+CROP_SIZE,temp[1]:temp[1]+CROP_SIZE,...])
     return result
     #return block_im
@@ -90,7 +91,7 @@ def save_crops(crops,crops_mea,index,fname,transform_type=''):
         try:
             os.mkdir('data')
             os.mkdir('data/gt')
-            os.mkdir('data/input')
+            os.mkdir('data/mea')
         except:
             pass
     else:
@@ -99,9 +100,9 @@ def save_crops(crops,crops_mea,index,fname,transform_type=''):
                 os.mkdir('data/gt')
             except:
                 pass
-        if not os.path.exists('data/input'):
+        if not os.path.exists('data/mea'):
             try:
-                os.mkdir('data/input')
+                os.mkdir('data/mea')
             except:
                 pass
     # # pickle
@@ -121,10 +122,10 @@ def save_crops(crops,crops_mea,index,fname,transform_type=''):
         t1 = threading.Thread(target=save_tiff,args=[name,crop])
         t1.start()
         threads.append(t1)
-        name = 'data/input/' + '_'.join((fname,str(index),transform_type))+'.tiff'
+        name = 'data/feature/' + '_'.join((fname,str(index),transform_type))+'.tiff'
         temp = crops_mea[ind]
-        temp_ = temp[0][...,np.newaxis]
-        temp = np.concatenate((temp_,temp[1]), axis=2)
+        temp[0] = temp[0][...,np.newaxis]
+        temp = np.concatenate(temp, axis=2)
         t2 = threading.Thread(target=save_tiff,args=[name,temp])
         t2.start()
         threads.append(t2)
@@ -157,8 +158,10 @@ def entry_process(path,COMP_FRAME):
         ind_r = [0,128,223]
         ind_c = [0,128,256,384,512,597]
         li_crops = generate_crops(pic_block,7,ind_r,ind_c)# generate crops based on a video
-        pic_block_down = skitrans.rescale(pic_block,0.6,multichannel=True, # downscale the sub-video
+        pic_block_down = np.reshape(pic_block,(*pic_block.shape[0:2],np.prod(pic_block.shape[2:])))
+        pic_block_down = skitrans.rescale(pic_block_down,0.6,multichannel=True, # downscale the sub-video
                                     anti_aliasing=True,preserve_range=True)
+        pic_block_down = np.reshape(pic_block_down,(*pic_block_down.shape[0:2],*pic_block.shape[2:]))
         ind_r = [0]
         ind_c = [0,127,249]
         li_crops.extend(generate_crops(pic_block_down,2,ind_r,ind_c))# generate crops based on a downscaled video
@@ -248,10 +251,11 @@ if __name__ == '__main__':
     # path = 'G:/My Drive/PHD_Research/data/DAVIS/JPEGImages/test/bear'
     # entry_process(path)
     COMP_FRAME = 9
-    path = '/work/ececis_research/X_Ma/data/DAVIS/test/'
+    path = 'G:/My Drive/PHD_Research/data/DAVIS/JPEGImages/test/'
     entries = os.listdir(path)
     entries_ = [(path+entry,COMP_FRAME) for entry in entries]
-    ind_id = int(os.getenv('SLURM_ARRAY_TASK_ID'))
+    #ind_id = int(os.getenv('SLURM_ARRAY_TASK_ID'))
+    ind_id = 0
     tic = time.perf_counter()
     entry_process(*entries_[ind_id])
     #a_pool = multiprocessing.Pool(4)
@@ -264,10 +268,19 @@ if __name__ == '__main__':
 # from skimage import io as skio
 # import tifffile
 # import numpy as np
-# im = tifffile.imread('data/gt/bear00000_0_.tiff')
-# im = skio.imread('data/mea/bear00000_0_.tiff',plugin='tifffile')
+#
+# im_gt = tifffile.imread('G:/My Drive/PHD_Research/SCI_2.0_python/train/data/gt/bear_25_.tiff')
+# im_gt.shape
+# skio.imshow(im_gt[:,:,2,5],cmap='gray')
+#
+#
+# im = tifffile.imread('G:/My Drive/PHD_Research/SCI_2.0_python/train/data/input/bear_0_.tiff')
 # im.shape
-# skio.imshow(im,cmap='gray')
+# im[im<0] = 0
+# skio.imshow(im[:,:,6],cmap='gray')
+#
+#
+#
 # im = im[:,:,np.newaxis]
 # im.shape
 # im = np.tile(im,(1,1,6))
@@ -275,5 +288,4 @@ if __name__ == '__main__':
 #
 # im = tifffile.imread('test.tiff')
 # im.shape
-#help(tifffile.imread)
-# <codecell>
+# help(tifffile.imread)
