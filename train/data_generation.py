@@ -47,7 +47,7 @@ def compressive_model(input):
         re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
         re = np.array(re)
         re[re<0] = 0
-        mea = np.array(mea)
+        mea = np.array(mea.mea)
         # print('shape of re is '+str(mea.shape))
         return (mea,re)
     else:
