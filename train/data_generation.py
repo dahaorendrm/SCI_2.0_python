@@ -91,7 +91,7 @@ def save_crops(crops,crops_mea,index,fname,transform_type=''):
         try:
             os.mkdir('data')
             os.mkdir('data/gt')
-            os.mkdir('data/mea')
+            os.mkdir('data/feature')
         except:
             pass
     else:
@@ -100,9 +100,9 @@ def save_crops(crops,crops_mea,index,fname,transform_type=''):
                 os.mkdir('data/gt')
             except:
                 pass
-        if not os.path.exists('data/mea'):
+        if not os.path.exists('data/feature'):
             try:
-                os.mkdir('data/mea')
+                os.mkdir('data/feature')
             except:
                 pass
     # # pickle
