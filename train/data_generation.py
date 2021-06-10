@@ -251,7 +251,7 @@ if __name__ == '__main__':
     # path = 'G:/My Drive/PHD_Research/data/DAVIS/JPEGImages/test/bear'
     # entry_process(path)
     COMP_FRAME = 9
-    path = 'G:/My Drive/PHD_Research/data/DAVIS/JPEGImages/test/'
+    path = '/work/ececis_research/X_Ma/data/DAVIS/test/'
     entries = os.listdir(path)
     entries_ = [(path+entry,COMP_FRAME) for entry in entries]
     #ind_id = int(os.getenv('SLURM_ARRAY_TASK_ID'))
