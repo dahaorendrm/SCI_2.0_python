@@ -124,8 +124,8 @@ def save_crops(crops,crops_mea,index,fname,transform_type=''):
         threads.append(t1)
         name = 'data/feature/' + '_'.join((fname,str(index),transform_type))+'.tiff'
         temp = crops_mea[ind]
-        temp[0] = temp[0][...,np.newaxis]
-        temp = np.concatenate(temp, axis=2)
+        temp_ = temp[0][...,np.newaxis]
+        temp = np.concatenate((temp_,temp[1]), axis=2)
         t2 = threading.Thread(target=save_tiff,args=[name,temp])
         t2.start()
         threads.append(t2)
