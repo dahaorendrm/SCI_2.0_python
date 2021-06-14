@@ -118,11 +118,11 @@ def save_crops(crops,crops_mea,index,fname,transform_type=''):
     print("'"+'_'.join((fname,str(index),transform_type))+'.tiff'+"'"+' saved with '+str(len(crops))+' crops.' )
     threads = []
     for ind,crop in enumerate(crops):
-        name = 'data/gt/' + '_'.join((fname,str(index),transform_type))+'.tiff'
+        name = 'data/gt/' + '_'.join((fname,'%.4d'%(index),transform_type))+'.tiff'
         t1 = threading.Thread(target=save_tiff,args=[name,crop])
         t1.start()
         threads.append(t1)
-        name = 'data/feature/' + '_'.join((fname,str(index),transform_type))+'.tiff'
+        name = 'data/feature/' + '_'.join((fname,'%.4d'%(index),transform_type))+'.tiff'
         temp = crops_mea[ind]
         temp_ = temp[0][...,np.newaxis]
         temp = np.concatenate((temp_,temp[1]), axis=2)
@@ -133,7 +133,7 @@ def save_crops(crops,crops_mea,index,fname,transform_type=''):
 
     for thread in threads:
         thread.join()
-
+    print(f'All {len(threads)} threads are released.')
 
         # name = 'data/gt/' + '_'.join((fname,str(index),transform_type))+'.tiff'
         # tifffile.imwrite(name,crop)
@@ -188,7 +188,10 @@ def entry_process(path,COMP_FRAME):
         num_crops.append(len(li_all_crops))
 
         pool = multiprocessing.Pool()
+        print(f'Start multiprocessing with {len(li_all_crops)} datasets...')
         li_all_crops_data = pool.map(compressive_model, li_all_crops) # contain (mea, gaptv_result)
+        print(f'Finished multiprocessing.{len(li_all_crops_data)} datasets are created.')
+        #print(f'{}')
         save_crops(li_all_crops,li_all_crops_data,output_i,file_name)
         output_i += len_crops*4
 
@@ -254,8 +257,8 @@ if __name__ == '__main__':
     path = '/work/ececis_research/X_Ma/data/DAVIS/test/'
     entries = os.listdir(path)
     entries_ = [(path+entry,COMP_FRAME) for entry in entries]
-    #ind_id = int(os.getenv('SLURM_ARRAY_TASK_ID'))
-    ind_id = 0
+    ind_id = int(os.getenv('SLURM_ARRAY_TASK_ID'))
+    #ind_id = 0
     tic = time.perf_counter()
     entry_process(*entries_[ind_id])
     #a_pool = multiprocessing.Pool(4)
