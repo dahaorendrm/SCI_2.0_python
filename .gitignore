@@ -5,11 +5,10 @@
 */denoiser/__pycache__/*
 /train/temp
 /temp
-*.qs
 *.out
 *.tar
 *.pth
 *.pyc
 *.swp
 *.npy
-*.sh
+
