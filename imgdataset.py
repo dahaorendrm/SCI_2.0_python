@@ -13,7 +13,7 @@ class Imgdataset(Dataset):
         self.data = []
         if os.path.exists(path):
             groung_truth_path = path + '/gt'
-            measurement_path = path + '/input'
+            measurement_path = path + '/feature'
 
             if os.path.exists(groung_truth_path) and os.path.exists(measurement_path):
                 groung_truth = os.listdir(groung_truth_path)

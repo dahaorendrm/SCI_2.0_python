@@ -1,4 +1,4 @@
-from imgdata import Imgdataset
+from imgdataset import Imgdataset
 import torch
 import torch.nn as nn
 from networks.chasti_network import CHASTINET
@@ -10,7 +10,7 @@ learning_rate = 0.003
 
 path = '/train/data'
 dataset = Imgdataset(path)
-train_dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+train_dataloader = DataLoader(dataset[:8], batch_size=batch_size, shuffle=True)
 #test_dataloader = DataLoader(test_data, batch_size=4, shuffle=True)
 
 # data transfer?
@@ -34,61 +34,76 @@ def update_lr(optimizer, lr):
         param_group['lr'] = lr
 
 # Train the model
-MASK = scio.loadmat('lesti_mask.mat')['mask']
-total_step = len(train_dataloader)
-curr_lr = learning_rate
-for epoch in range(num_epochs):
-    for ind_batch, (gts, inputs) in enumerate(train_dataloader): # batch,weight,height,channel
-        mea = inputs[...,0]
-        img_ns = inputs[...,1:]
-        masks = torch.tensor(MASK[...,:img_ns.size()[-1]])
-        masks = mask.repeat(img_ns.size()[0],1,1,1)
-        img_n_codes = img_ns*mask
-        output = []
-        for ind in range(img_ns.size()[-1]):
-            #gt = gts[...,ind]
-            img_n = img_ns[...,ind]
-            img_n_code_begin = img_n_codes[...,:ind]
-            img_n_code_end = img_n_codes[...,ind+1:]
-            mask = masks[...,ind]
-            input = torch.cat((img_n,mea,mask,img_n_code_begin,img_n_code_end),dim=3)
-            # Forward pass
-            input = torch.moveaxis(input,-1,1)
-            input = input.to(device)
-            output.append(model(input))
-        output = torch.Tensor(output)
-        output = torch.moveaxis(output,0,-1)
+def train():
+    MASK = scio.loadmat('lesti_mask.mat')['mask']
+    total_step = len(train_dataloader)
+    curr_lr = learning_rate
+    for epoch in range(num_epochs):
+        for ind_batch, (gts, inputs) in enumerate(train_dataloader): # batch,weight,height,channel
+            mea = inputs[...,0] # mea normalize???????????????????????????????????????????? from birnet
+            img_ns = inputs[...,1:]
+            masks = torch.tensor(MASK[...,:img_ns.size()[-1]])
+            masks = mask.repeat(img_ns.size()[0],1,1,1)
+            img_n_codes = img_ns*mask
+            output = []
+            for ind in range(img_ns.size()[-1]):
+                #gt = gts[...,ind]
+                img_n = img_ns[...,ind]
+                img_n_code_begin = img_n_codes[...,:ind]
+                img_n_code_end = img_n_codes[...,ind+1:]
+                mask = masks[...,ind]
+                input = torch.cat((img_n,mea,mask,img_n_code_begin,img_n_code_end),dim=3)
+                # Forward pass
+                input = torch.moveaxis(input,-1,1)
+                input = input.to(device)
+                output.append(model(input))
+            output = torch.Tensor(output)
+            output = torch.moveaxis(output,0,-1)
 
-        loss = criterion(output, gts)
+            gts_ = []
+            ind_c = 0
+            for ind in range(gts.size()[-1]):
+                temp = gts[...,ind_c,ind]
+                gts_.append(temp)
+                ind_c = ind_c+1 if ind_c<2 else 0
+            gts = torch.Tensor(gts_)
+            gts = torch.moveaxis(gts,0,-1)
+            print('gts shape is' + str(gts.size()))
 
-        # Backward and optimize
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+            gts = gts.to(device)
+            loss = criterion(output, gts) # probably loss per frame/ add all frames loss together
 
-        if (i+1) % 100 == 0:
-            print ("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
-                   .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
+            # Backward and optimize
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
 
-    # Decay learning rate
-    if (epoch+1) % 20 == 0:
-        curr_lr /= 3
-        update_lr(optimizer, curr_lr)
+            if (i+1) % 100 == 0:
+                print ("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
+                       .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
 
-# # Test the model
-# model.eval()
-# with torch.no_grad():
-#     correct = 0
-#     total = 0
-#     for images, labels in test_loader:
-#         images = images.to(device)
-#         labels = labels.to(device)
-#         outputs = model(images)
-#         _, predicted = torch.max(outputs.data, 1)
-#         total += labels.size(0)
-#         correct += (predicted == labels).sum().item()
-#
-#     print('Accuracy of the model on the test images: {} %'.format(100 * correct / total))
-#
-# # Save the model checkpoint
-# torch.save(model.state_dict(), 'resnet.ckpt')
+        # Decay learning rate
+        if (epoch+1) % 20 == 0:
+            curr_lr /= 3
+            update_lr(optimizer, curr_lr)
+
+def test():
+    # Test the model #############################################################
+    model.eval()
+    with torch.no_grad():
+        correct = 0
+        total = 0
+        for images, labels in test_loader:
+            images = images.to(device)
+            labels = labels.to(device)
+            outputs = model(images)
+            _, predicted = torch.max(outputs.data, 1)
+            total += labels.size(0)
+            correct += (predicted == labels).sum().item()
+
+        print('Accuracy of the model on the test images: {} %'.format(100 * correct / total))
+
+    # Save the model checkpoint
+    torch.save(model.state_dict(), 'resnet.ckpt')
+if __name__ == '__main__':
+    train()
