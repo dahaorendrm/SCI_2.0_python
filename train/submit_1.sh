@@ -17,7 +17,7 @@
 # SBATCH --output=ArraySCI%A-%a.out
 #SBATCH --mail-user='xmdrm@udel.edu'
 #SBATCH --mail-type=END,FAIL,TIME_LIMIT_90
-#SBATCH --array=0-3
+#SBATCH --array=11-25
 
 # export OMP_NUM_THREADS=4
 
