@@ -11,7 +11,7 @@ class CHASTINET(torch.nn.Module):
     def __init__(self):
 
         # base class initialization
-        super(DAIN, self).__init__()
+        super(CHASTINET, self).__init__()
 
         #*********************************************
         self.ResNet = Resblock.__dict__['MultipleBasicBlock_4'](11,128)
