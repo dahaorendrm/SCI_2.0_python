@@ -147,6 +147,7 @@ def save_crops(crops,crops_mea,index,fname,transform_type=''):
 def entry_process(path,COMP_FRAME):
     name_f = os.listdir(path)
     output_i = 0
+    pool = multiprocessing.Pool()
     for ind in range(0,len(name_f)-COMP_FRAME,COMP_FRAME):
         pic_block = []
         for ind_im in range(ind,ind+COMP_FRAME):
@@ -186,8 +187,7 @@ def entry_process(path,COMP_FRAME):
         num_crops.append(len(li_all_crops))
         li_all_crops.extend([np.fliplr(np.rot90(crop)) for crop in li_crops])
         num_crops.append(len(li_all_crops))
-
-        pool = multiprocessing.Pool()
+        
         print(f'Start multiprocessing with {len(li_all_crops)} datasets...')
         li_all_crops_data = pool.map(compressive_model, li_all_crops) # contain (mea, gaptv_result)
         print(f'Finished multiprocessing.{len(li_all_crops_data)} datasets are created.')
@@ -254,7 +254,7 @@ if __name__ == '__main__':
     # path = 'G:/My Drive/PHD_Research/data/DAVIS/JPEGImages/test/bear'
     # entry_process(path)
     COMP_FRAME = 9
-    path = '/work/ececis_research/X_Ma/data/DAVIS/test/'
+    path = '/work/ececis_research/X_Ma/data/DAVIS/480p/'
     entries = os.listdir(path)
     entries_ = [(path+entry,COMP_FRAME) for entry in entries]
     ind_id = int(os.getenv('SLURM_ARRAY_TASK_ID'))
@@ -264,7 +264,8 @@ if __name__ == '__main__':
     #a_pool = multiprocessing.Pool(4)
     #result = a_pool.map(entry_process, entries)
     toc = time.perf_counter()
-    print(f"This code of {entries[ind_id]:s} run in {toc - tic:0.4f} seconds")
+    print(f"This code of {entries[ind_id]:s} run in {toc - tic:0.4f} seconds",flush=True)
+    
 
 
 # <codecell>
