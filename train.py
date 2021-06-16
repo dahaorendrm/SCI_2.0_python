@@ -5,6 +5,7 @@ from networks.chasti_network import CHASTINET
 import scipy.io as scio
 from torch.utils.data import DataLoader
 import numpy as np
+import os
 num_epochs = 100
 batch_size = 4
 learning_rate = 0.003
@@ -94,7 +95,17 @@ def train():
             if (ind_batch) % 10 == 0:
                 print ("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
                        .format(epoch+1, num_epochs, ind_batch+1, total_step, loss.item()))
+        if epoch == 1:
+            save_path = './train'
+            # delete the pre validation weights for cleaner workspace
+            if not os.path.exists(save_path+"/epoch"):
+                os.mkdir(save_path+"/epoch")
+            if os.path.exists(save_path + "/epoch" + str(0) +".pth" ):
+                os.remove(save_path + "/epoch" + str(0) +".pth")
 
+        if os.path.exists(save_path + "/epoch" + str(epoch-1) +".pth"):
+            os.remove(save_path + "/epoch" + str(epoch-1) +".pth")
+        torch.save(model.state_dict(), save_path + "/epoch" + str(epoch) +".pth")
         # Decay learning rate
         if (epoch+1) % 20 == 0:
             curr_lr /= 3
