@@ -16,11 +16,11 @@ class Imgdataset(Dataset):
             measurement_path = path + '/feature'
             if os.path.exists(ground_truth_path) and os.path.exists(measurement_path):
                 feature_names = os.listdir(ground_truth_path)
-                #mea_names = os.listdir(measurement_path)
-                #self.data = [{'groung_truth': groung_truth_path + '/' + groung_truth[i],
-                #              'measurement': measurement_path + '/' + measurement[i]} for i in range(len(groung_truth))]
+                mea_names = os.listdir(measurement_path)
                 self.data = [{'ground_truth': ground_truth_path + '/' + feature_names[i],
-                     'measurement': measurement_path + '/' + feature_names[i]} for i in range(MAXLEN)]
+                              'measurement': measurement_path + '/' + feature_names[i]} for i in range(len(feature_names))]
+                #self.data = [{'ground_truth': ground_truth_path + '/' + feature_names[i],
+                #     'measurement': measurement_path + '/' + feature_names[i]} for i in range(MAXLEN)]
                 #print(f"test: {self.data[10]['ground_truth']}")
             else:
                 raise FileNotFoundError('path doesnt exist!')

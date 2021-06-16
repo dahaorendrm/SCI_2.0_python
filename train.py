@@ -27,6 +27,7 @@ train_dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 #    print(f'Inter {ind} ,shape of gt is {gts.size()}, shape of inputs is {inputs.size()}')
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+print(f'Device: {device}')
 model = CHASTINET().to(device)
 print(model)
 criterion = nn.MSELoss()
@@ -57,30 +58,30 @@ def train():
                 img_n_code_begin = img_n_codes[...,:ind]
                 img_n_code_end = img_n_codes[...,ind+1:]
                 mask = masks[...,ind:ind+1]
-                print(f'Shape of img_n: {img_n.size()}, img_n_code_begin: {img_n_code_begin.size()}, /nimg_n_code_end: {img_n_code_end.size()}, mask: {mask.size()}, mea: {mea.size()}')
+                #print(f'Shape of img_n: {img_n.size()}, img_n_code_begin: {img_n_code_begin.size()}, /nimg_n_code_end: {img_n_code_end.size()}, mask: {mask.size()}, mea: {mea.size()}')
                 cat_input = torch.cat((img_n,mea,mask,img_n_code_begin,img_n_code_end),dim=3)
                 # Forward pass
                 cat_input = np.array(cat_input)
                 cat_input = np.moveaxis(cat_input,-1,1)
                 cat_input = torch.from_numpy(cat_input).float()
-                print(f'Shap of cat_input is {cat_input.size()}')
+                #print(f'Shap of cat_input is {cat_input.size()}')
                 #cat_input = torch.movedim(cat_input,-1,1)
                 cat_input = cat_input.to(device)
                 output_ = model(cat_input)
-                print(f'Shap of single output is {output_.size()}')
+                #print(f'Shap of single output is {output_.size()}')
                 output.append(output_)
-            output = torch.stack(output,3)
+            output = torch.cat(output,1)
             #output = torch.moveaxis(output,0,-1)
-            print(f'output shape is {output.size()}')
+            #print(f'output shape is {output.size()}')
             gts_ = []
             ind_c = 0
             for ind in range(gts.size()[-1]):
                 temp = gts[...,ind_c,ind]
                 gts_.append(temp)
                 ind_c = ind_c+1 if ind_c<2 else 0
-            gts = torch.stack(gts_,3)
+            gts = torch.stack(gts_,1)
             #gts = torch.moveaxis(gts,0,-1)
-            print('gts shape is' + str(gts.size()))
+            #print('gts shape is' + str(gts.size()))
 
             gts = gts.to(device)
             loss = criterion(output, gts) # probably loss per frame/ add all frames loss together
@@ -90,9 +91,9 @@ def train():
             loss.backward()
             optimizer.step()
 
-            if (i+1) % 100 == 0:
+            if (ind_batch) % 10 == 0:
                 print ("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
-                       .format(epoch+1, num_epochs, i+1, total_step, loss.item()))
+                       .format(epoch+1, num_epochs, ind_batch+1, total_step, loss.item()))
 
         # Decay learning rate
         if (epoch+1) % 20 == 0:
