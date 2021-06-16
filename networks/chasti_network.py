@@ -50,5 +50,5 @@ class CHASTINET(torch.nn.Module):
         -----------
         """
         device = torch.cuda.current_device()
-        cur_output_rectified = self.rectifyNet(ResNet) + cur_output[:,0,...]
+        cur_output_rectified = self.ResNet(input) + input[:,0,...]
         return cur_output_rectified

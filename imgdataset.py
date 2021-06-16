@@ -38,8 +38,8 @@ class Imgdataset(Dataset):
         #print(f'Path of gt is {ground_truth}')
         gt = tifffile.imread(ground_truth)
         meas = tifffile.imread(measurement)
-        gt = torch.from_numpy(gt).double()
-        meas = torch.from_numpy(meas).double()
+        gt = torch.from_numpy(gt).float()
+        meas = torch.from_numpy(meas).float()
         #gt = torch.from_numpy(gt / 255)
         #meas = torch.from_numpy(meas / 255)
 

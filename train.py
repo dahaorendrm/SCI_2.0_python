@@ -28,6 +28,7 @@ train_dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = CHASTINET().to(device)
+print(model)
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
 
@@ -45,13 +46,13 @@ def train():
         for ind_batch, (gts, inputs) in enumerate(train_dataloader): # batch,weight,height,channel
             mea = inputs[...,0] # mea normalize???????????????????????????????????????????? from birnet
             img_ns = inputs[...,1:]
-            masks = torch.tensor(MASK[...,:img_ns.size()[-1]]).double()
+            masks = torch.tensor(MASK[...,:img_ns.size()[-1]]).float()
             masks = masks.repeat(img_ns.size()[0],1,1,1)
             img_n_codes = img_ns*masks
             output = []
+            mea = torch.unsqueeze(mea,3)
             for ind in range(img_ns.size()[-1]):
                 #gt = gts[...,ind]
-                mea = torch.unsqueeze(mea,3)
                 img_n = img_ns[...,ind:ind+1]
                 img_n_code_begin = img_n_codes[...,:ind]
                 img_n_code_end = img_n_codes[...,ind+1:]
@@ -62,21 +63,21 @@ def train():
                 print(f'Shap of cat_input is {cat_input.size()}')
                 cat_input = np.array(cat_input)
                 cat_input = np.moveaxis(cat_input,-1,1)
-                cat_input = torch.from_numpy(cat_input).double()
+                cat_input = torch.from_numpy(cat_input).float()
                 #cat_input = torch.movedim(cat_input,-1,1)
                 cat_input = cat_input.to(device)
                 output.append(model(cat_input))
-            output = torch.Tensor(output)
-            output = torch.moveaxis(output,0,-1)
-
+            output = torch.stack(output,3)
+            #output = torch.moveaxis(output,0,-1)
+            print(f'output shape is {output.size()}')
             gts_ = []
             ind_c = 0
             for ind in range(gts.size()[-1]):
                 temp = gts[...,ind_c,ind]
                 gts_.append(temp)
                 ind_c = ind_c+1 if ind_c<2 else 0
-            gts = torch.Tensor(gts_)
-            gts = torch.moveaxis(gts,0,-1)
+            gts = torch.stack(gts_,3)
+            #gts = torch.moveaxis(gts,0,-1)
             print('gts shape is' + str(gts.size()))
 
             gts = gts.to(device)
