@@ -15,7 +15,7 @@ class BasicBlock(nn.Module):
         super(BasicBlock, self).__init__()
         self.conv1 = conv3x3(inplanes, planes,dilation, stride)
         # self.bn1 = nn.BatchNorm2d(planes)
-        self.relu = nn.ReLU(inplace=True)
+        self.relu = nn.LeakyReLU(inplace=True)
         self.conv2 = conv3x3(planes, planes)
         # self.bn2 = nn.BatchNorm2d(planes)
         self.downsample = downsample
@@ -60,7 +60,7 @@ class MultipleBasicBlock(nn.Module):
         self.block1= nn.Sequential(*[
             nn.Conv2d(input_feature, intermediate_feature,
                       kernel_size=7, stride=1, padding=3, bias=True),
-            nn.ReLU(inplace=True)
+            nn.LeakyReLU(inplace=True)
         ])
 
         # for i in range(1, num_blocks):
