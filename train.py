@@ -60,10 +60,10 @@ def train():
                 print(f'Shape of img_n: {img_n.size()}, img_n_code_begin: {img_n_code_begin.size()}, /nimg_n_code_end: {img_n_code_end.size()}, mask: {mask.size()}, mea: {mea.size()}')
                 cat_input = torch.cat((img_n,mea,mask,img_n_code_begin,img_n_code_end),dim=3)
                 # Forward pass
-                print(f'Shap of cat_input is {cat_input.size()}')
                 cat_input = np.array(cat_input)
                 cat_input = np.moveaxis(cat_input,-1,1)
                 cat_input = torch.from_numpy(cat_input).float()
+                print(f'Shap of cat_input is {cat_input.size()}')
                 #cat_input = torch.movedim(cat_input,-1,1)
                 cat_input = cat_input.to(device)
                 output_ = model(cat_input)
