@@ -15,8 +15,8 @@ class Imgdataset(Dataset):
             ground_truth_path = path + '/gt'
             measurement_path = path + '/feature'
             if os.path.exists(ground_truth_path) and os.path.exists(measurement_path):
-                feature_names = os.listdir(ground_truth_path)
-                mea_names = os.listdir(measurement_path)
+                gt_names = os.listdir(ground_truth_path)
+                feature_names = os.listdir(measurement_path)
                 self.data = [{'ground_truth': ground_truth_path + '/' + feature_names[i],
                               'measurement': measurement_path + '/' + feature_names[i]} for i in range(len(feature_names))]
                 #self.data = [{'ground_truth': ground_truth_path + '/' + feature_names[i],
@@ -32,9 +32,9 @@ class Imgdataset(Dataset):
         #print(f'Data length :{len(self.data)}')
         #print(f'Data length 2:{len(self.data[0])}')
         #print(self.data)
-        ground_truth = self.data[index]['ground_truth'] 
+        ground_truth = self.data[index]['ground_truth']
         measurement = self.data[index]['measurement']
-        
+
         #print(f'Path of gt is {ground_truth}')
         gt = tifffile.imread(ground_truth)
         meas = tifffile.imread(measurement)
