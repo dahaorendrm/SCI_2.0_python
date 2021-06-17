@@ -8,7 +8,7 @@ import numpy as np
 import os
 num_epochs = 100
 batch_size = 4
-learning_rate = 0.003
+learning_rate = 0.001
 
 path = './train/data'
 dataset = Imgdataset(path)
@@ -80,7 +80,7 @@ def train():
                 temp = gts[...,ind_c,ind]
                 gts_.append(temp)
                 ind_c = ind_c+1 if ind_c<2 else 0
-            gts = torch.stack(gts_,1)
+            gts = torch.stack(gts_,1)/255.
             #gts = torch.moveaxis(gts,0,-1)
             #print('gts shape is' + str(gts.size()))
 
@@ -95,8 +95,8 @@ def train():
             if (ind_batch) % 10 == 0:
                 print ("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
                        .format(epoch+1, num_epochs, ind_batch+1, total_step, loss.item()))
+        save_path = './train'
         if epoch == 1:
-            save_path = './train'
             # delete the pre validation weights for cleaner workspace
             if not os.path.exists(save_path+"/epoch"):
                 os.mkdir(save_path+"/epoch")
