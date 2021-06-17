@@ -260,6 +260,7 @@ if __name__ == '__main__':
     entries_ = [(path+entry,COMP_FRAME) for entry in entries]
     ind_id = int(os.getenv('SLURM_ARRAY_TASK_ID'))
     #ind_id = 0
+    print(f'We are processing dataset {entries_[ind_id][0]}')
     tic = time.perf_counter()
     entry_process(*entries_[ind_id])
     #a_pool = multiprocessing.Pool(4)

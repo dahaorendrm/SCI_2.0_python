@@ -12,7 +12,7 @@ learning_rate = 0.001
 
 path = './train/data'
 dataset = Imgdataset(path)
-train_dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+train_dataloader = DataLoader(dataset, num_workers=2, batch_size=batch_size, shuffle=True)
 #test_dataloader = DataLoader(test_data, batch_size=4, shuffle=True)
 
 # data transfer?
