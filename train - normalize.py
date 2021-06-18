@@ -12,7 +12,7 @@ learning_rate = 0.001
 
 path = './train/data'
 dataset = Imgdataset(path)
-train_dataloader = DataLoader(dataset, num_workers=2, batch_size=batch_size, shuffle=True)
+train_dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 #test_dataloader = DataLoader(test_data, batch_size=4, shuffle=True)
 
 # data transfer?
@@ -39,6 +39,11 @@ def update_lr(optimizer, lr):
     for param_group in optimizer.param_groups:
         param_group['lr'] = lr
 
+def normalizer(imgs,masks):
+    mask_s = torch.sum(masks,3)
+    mask_s[mask_s==0] = 1
+    imgs = imgs/mask_s
+    return imgs
 # Train the model
 def train():
     MASK = scio.loadmat('./train/lesti_mask.mat')['mask']
@@ -46,18 +51,19 @@ def train():
     curr_lr = learning_rate
     for epoch in range(num_epochs):
         for ind_batch, (gts, inputs) in enumerate(train_dataloader): # batch,weight,height,channel
-            mea = inputs[...,0] # mea normalize???????????????????????????????????????????? from birnet
+            mea = inputs[...,0]
             img_ns = inputs[...,1:]
             masks = torch.tensor(MASK[...,:img_ns.size()[-1]]).float()
             masks = masks.repeat(img_ns.size()[0],1,1,1)
-            img_n_codes = img_ns*masks
+            img_n_codes = img_ns*masks # may be not with mask?????????????????????????????????????????????
             output = []
+            mea = normalizer(mea,masks)
             mea = torch.unsqueeze(mea,3)
             for ind in range(img_ns.size()[-1]):
                 #gt = gts[...,ind]
                 img_n = img_ns[...,ind:ind+1]
-                img_n_code_begin = img_n_codes[...,:ind]
-                img_n_code_end = img_n_codes[...,ind+1:]
+                img_n_code_begin = img_n_codes[...,:ind] #
+                img_n_code_end = img_n_codes[...,ind+1:] # maybe sum this two line together, then normalize?????????????????????????
                 mask = masks[...,ind:ind+1]
                 #print(f'Shape of img_n: {img_n.size()}, img_n_code_begin: {img_n_code_begin.size()}, /nimg_n_code_end: {img_n_code_end.size()}, mask: {mask.size()}, mea: {mea.size()}')
                 cat_input = torch.cat((img_n,mea,mask,img_n_code_begin,img_n_code_end),dim=3)
@@ -95,17 +101,11 @@ def train():
             if (ind_batch) % 10 == 0:
                 print ("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
                        .format(epoch+1, num_epochs, ind_batch+1, total_step, loss.item()))
-        save_path = './train'
-        if epoch == 1:
-            # delete the pre validation weights for cleaner workspace
-            if not os.path.exists(save_path+"/epoch"):
-                os.mkdir(save_path+"/epoch")
-            if os.path.exists(save_path + "/epoch" + str(0) +".pth" ):
-                os.remove(save_path + "/epoch" + str(0) +".pth")
+        save_path = './train/epoch_normalize/'
 
-        if os.path.exists(save_path + "/epoch" + str(epoch-1) +".pth"):
-            os.remove(save_path + "/epoch" + str(epoch-1) +".pth")
-        torch.save(model.state_dict(), save_path + "/epoch" + str(epoch) +".pth")
+        if not os.path.exists(save_path):
+            os.mkdir(save_path)
+        torch.save(model.state_dict(), save_path + str(epoch) +".pth")
         # Decay learning rate
         if (epoch+1) % 20 == 0:
             curr_lr /= 3

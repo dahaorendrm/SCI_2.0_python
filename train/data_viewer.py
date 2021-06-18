@@ -6,7 +6,7 @@ import tifffile,pickle
 import numpy as np
 import matplotlib.pyplot as plt
 
-IND = 45
+IND = 650
 ground_truth_path = 'data/gt'
 feature_path = 'data/feature'
 

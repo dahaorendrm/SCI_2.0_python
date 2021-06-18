@@ -8,13 +8,13 @@ import Resblock
 
 
 class CHASTINET(torch.nn.Module):
-    def __init__(self):
+    def __init__(self,input_layers,hidden_layers):
 
         # base class initialization
         super(CHASTINET, self).__init__()
 
         #*********************************************
-        self.ResNet = Resblock.__dict__['MultipleBasicBlock_4'](11,128)
+        self.ResNet = Resblock.__dict__['MultipleBasicBlock_4'](input_layers,hidden_layers)
 
         self._initialize_weights()
 
