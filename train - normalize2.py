@@ -102,7 +102,7 @@ def train():
             if (ind_batch) % 10 == 0:
                 print ("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
                        .format(epoch+1, num_epochs, ind_batch+1, total_step, loss.item()))
-        save_path = './train/epoch_normalize/'
+        save_path = './train/epoch_normalize2/'
 
         if not os.path.exists(save_path):
             os.mkdir(save_path)
