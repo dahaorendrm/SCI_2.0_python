@@ -97,17 +97,11 @@ def train():
             if (ind_batch) % 10 == 0:
                 print ("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
                        .format(epoch+1, num_epochs, ind_batch+1, total_step, loss.item()))
-        save_path = './train'
-        if epoch == 1:
-            # delete the pre validation weights for cleaner workspace
-            if not os.path.exists(save_path+"/epoch"):
-                os.mkdir(save_path+"/epoch")
-            if os.path.exists(save_path + "/epoch" + str(0) +".pth" ):
-                os.remove(save_path + "/epoch" + str(0) +".pth")
+        save_path = './train/epoch/'
 
-        if os.path.exists(save_path + "/epoch" + str(epoch-1) +".pth"):
-            os.remove(save_path + "/epoch" + str(epoch-1) +".pth")
-        torch.save(model.state_dict(), save_path + "/epoch" + str(epoch) +".pth")
+        if not os.path.exists(save_path):
+            os.mkdir(save_path)
+        torch.save(model.state_dict(), save_path + str(epoch) +".pth")
         # Decay learning rate
         if (epoch+1) % 20 == 0:
             curr_lr /= 3
