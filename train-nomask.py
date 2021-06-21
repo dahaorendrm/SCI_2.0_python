@@ -8,7 +8,7 @@ import numpy as np
 import os
 num_epochs = 100
 batch_size = 4
-learning_rate = 0.001
+learning_rate = 0.0005
 
 path = './train/data'
 dataset = Imgdataset(path)
