@@ -26,10 +26,12 @@ train_dataloader = DataLoader(dataset, num_workers=2, batch_size=batch_size, shu
 
 #for ind,(gts,inputs) in enumerate(train_dataloader):
 #    print(f'Inter {ind} ,shape of gt is {gts.size()}, shape of inputs is {inputs.size()}')
-
+#torch.cuda.empty_cache()
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+#print(torch.cuda.memory_summary(device=device, abbreviated=False))
 print(f'Device: {device}')
 model = CHASTINET(11,128).to(device)
+#print(torch.cuda.memory_snapshot())
 print(model)
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
