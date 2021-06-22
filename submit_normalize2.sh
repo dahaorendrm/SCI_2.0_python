@@ -9,8 +9,8 @@
 # SBATCH --mem-per-cpu=10G
 
 #SBATCH --job-name=chasti_train_leakyrelu
-#SBATCH --partition=standard
-# SBATCH --partition=_workgroup_
+# SBATCH --partition=standard
+#SBATCH --partition=_workgroup_
 #SBATCH --gres=gpu
 
 #SBATCH --time=2-10:00:00
