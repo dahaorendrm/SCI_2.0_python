@@ -6,46 +6,19 @@ import scipy.io as scio
 from torch.utils.data import DataLoader
 import numpy as np
 import os
-num_epochs = 100
-batch_size = 4
-learning_rate = 0.0005
+from tuils import calculate_psnr,calculate_ssim
+import pickle
 
 
-#test_dataloader = DataLoader(test_data, batch_size=4, shuffle=True)
-
-# data transfer?
-# transformed_dataset = FaceLandmarksDataset(csv_file='data/faces/face_landmarks.csv',
-#                                            root_dir='data/faces/',
-#                                            transform=transforms.Compose([
-#                                                Rescale(256),
-#                                                RandomCrop(224),
-#                                                ToTensor()
-#                                            ]))
-
-#for ind,(gts,inputs) in enumerate(train_dataloader):
-#    print(f'Inter {ind} ,shape of gt is {gts.size()}, shape of inputs is {inputs.size()}')
-#torch.cuda.empty_cache()
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-#print(torch.cuda.memory_summary(device=device, abbreviated=False))
-print(f'Device: {device}')
 model = CHASTINET(11,128).to(device)
-#print(torch.cuda.memory_snapshot())
-print(model)
-criterion = nn.MSELoss()
-optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
+epoch_ind = 4
+model = torch.load('./train/epoch' + "/{}.pth".format(epoch_ind))
 
-# For updating learning rate
-def update_lr(optimizer, lr):
-    for param_group in optimizer.param_groups:
-        param_group['lr'] = lr
-
-# Train the model
-def train(data_loader):
+def test(test_dataloader):
     MASK = scio.loadmat('./train/lesti_mask.mat')['mask']
-    total_step = len(data_loader)
-    curr_lr = learning_rate
-    for epoch in range(num_epochs):
-        for ind_batch, (gts, inputs) in enumerate(data_loader): # batch,weight,height,channel
+    for ind_data, (gts, inputs) in enumerate(test_dataloader):
+        with torch.no_grad():
             mea = inputs[...,0] # mea normalize???????????????????????????????????????????? from birnet
             img_ns = inputs[...,1:]
             masks = torch.tensor(MASK[...,:img_ns.size()[-1]]).float()
@@ -83,31 +56,18 @@ def train(data_loader):
             gts = torch.stack(gts_,1)/255.
             #gts = torch.moveaxis(gts,0,-1)
             #print('gts shape is' + str(gts.size()))
-
-            gts = gts.to(device)
-            loss = criterion(output, gts) # probably loss per frame/ add all frames loss together
-
-            # Backward and optimize
-            optimizer.zero_grad()
-            loss.backward()
-            optimizer.step()
-
-            if (ind_batch) % 10 == 0:
-                print ("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
-                       .format(epoch+1, num_epochs, ind_batch+1, total_step, loss.item()))
-        save_path = './train/epoch/'
-
-        if not os.path.exists(save_path):
-            os.mkdir(save_path)
-        torch.save(model.state_dict(), save_path + str(epoch) +".pth")
-        # Decay learning rate
-        if (epoch+1) % 20 == 0:
-            curr_lr /= 3
-            update_lr(optimizer, curr_lr)
+            output = output.cpu()
+            psnr = calculate_psnr(output,gts)
+            print(f'Data {ind_data} PSNR is {}.')
+            output = output.numpy()
+            if not os.path.exists('test/result'):
+                os.mkdir('test/result')
+            with open("test/result/testresult_{ind_data}.pickle","wb") as f:
+                np.save(f, output)
 
 
 if __name__ == '__main__':
-    path = './train/data'
-    dataset = Imgdataset(path)
-    train_dataloader = DataLoader(dataset, num_workers=2, batch_size=batch_size, shuffle=True)
-    train()
+    test_path = 'test/data'
+    dataset = Imgdataset(test_path)
+    test_dataloader = DataLoader(dataset)
+    test(test_dataloader)
