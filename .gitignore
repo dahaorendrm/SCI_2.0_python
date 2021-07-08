@@ -11,4 +11,5 @@
 *.pyc
 *.swp
 *.npy
-
+*.pickle
+*.tiff

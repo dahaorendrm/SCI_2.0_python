@@ -62,9 +62,11 @@ def train():
             for ind in range(img_ns.size()[-1]):
                 #gt = gts[...,ind]
                 img_n = img_ns[...,ind:ind+1]
-                img_n_code = torch.sum(img_n_codes[...,:ind],-1, keepdim=True) + torch.sum(img_n_codes[...,ind+1:],-1, keepdim=True) # sum this two line together, then normalize
-                mask_code = torch.sum(mask[...,:ind],-1, keepdim=True) + torch.sum(mask[...,ind+1:],-1, keepdim=True)
-                img_n_code_s = normalizer(img_n_code,mask_code)
+                img_n_code = torch.sum(img_n_codes[...,:ind],-1) + torch.sum(img_n_codes[...,ind+1:],-1) # sum this two line together, then normalize
+                masks_code = [masks[...,ind_m] for ind_m in range(img_ns.size()[-1]) if ind_m != ind]
+                masks_code = torch.stack(masks_code,3)
+                img_n_code_s = normalizer(img_n_code,masks_code)
+                img_n_code_s = torch.unsqueeze(img_n_code_s,3)
                 mask = masks[...,ind:ind+1]
                 #print(f'Shape of img_n: {img_n.size()}, img_n_code_begin: {img_n_code_begin.size()}, /nimg_n_code_end: {img_n_code_end.size()}, mask: {mask.size()}, mea: {mea.size()}')
                 cat_input = torch.cat((img_n,mea,mask,img_n_code_s),dim=3)
@@ -102,7 +104,7 @@ def train():
             if (ind_batch) % 10 == 0:
                 print ("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
                        .format(epoch+1, num_epochs, ind_batch+1, total_step, loss.item()))
-        save_path = './train/epoch_normalize2/'
+        save_path = './train/epoch_normalize2_perframe/'
 
         if not os.path.exists(save_path):
             os.mkdir(save_path)

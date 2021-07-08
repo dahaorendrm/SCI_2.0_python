@@ -6,25 +6,26 @@ import scipy.io as scio
 from torch.utils.data import DataLoader
 import numpy as np
 import os
-from tuils import calculate_psnr,calculate_ssim
+from utils import calculate_psnr,calculate_ssim
 import pickle
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = CHASTINET(11,128).to(device)
 epoch_ind = 4
-model = torch.load('./train/epoch' + "/{}.pth".format(epoch_ind))
+model.load_state_dict(torch.load('./train/epoch' + "/{}.pth".format(epoch_ind)))
 
 def test(test_dataloader):
     MASK = scio.loadmat('./train/lesti_mask.mat')['mask']
-    for ind_data, (gts, inputs) in enumerate(test_dataloader):
-        with torch.no_grad():
+    with torch.no_grad():
+        for ind_data, (gts, inputs) in enumerate(test_dataloader):
             mea = inputs[...,0] # mea normalize???????????????????????????????????????????? from birnet
             img_ns = inputs[...,1:]
             masks = torch.tensor(MASK[...,:img_ns.size()[-1]]).float()
             masks = masks.repeat(img_ns.size()[0],1,1,1)
             img_n_codes = img_ns*masks
             output = []
+            imgs_n = []
             mea = torch.unsqueeze(mea,3)
             for ind in range(img_ns.size()[-1]):
                 #gt = gts[...,ind]
@@ -40,11 +41,16 @@ def test(test_dataloader):
                 cat_input = torch.from_numpy(cat_input).float()
                 #print(f'Shap of cat_input is {cat_input.size()}')
                 #cat_input = torch.movedim(cat_input,-1,1)
+                 #print(cat_input.size())
                 cat_input = cat_input.to(device)
                 output_ = model(cat_input)
                 #print(f'Shap of single output is {output_.size()}')
                 output.append(output_)
+                imgs_n.append(img_n)
             output = torch.cat(output,1)
+            output = output.cpu()
+            imgs_n = torch.cat(imgs_n,3)
+            imgs_n = imgs_n.cpu()
             #output = torch.moveaxis(output,0,-1)
             #print(f'output shape is {output.size()}')
             gts_ = []
@@ -56,13 +62,21 @@ def test(test_dataloader):
             gts = torch.stack(gts_,1)/255.
             #gts = torch.moveaxis(gts,0,-1)
             #print('gts shape is' + str(gts.size()))
-            output = output.cpu()
-            psnr = calculate_psnr(output,gts)
-            print(f'Data {ind_data} PSNR is {}.')
+            #print(f'output shape is {output.size()}')
+            #print(f'imgs_n shape is {imgs_n.size()}')
             output = output.numpy()
+            output = np.moveaxis(output,1,-1)
+            imgs_n = imgs_n.numpy()
+            gts = gts.numpy()
+            gts = np.moveaxis(gts,1,-1)
+            psnr_in  = calculate_psnr(imgs_n,gts)
+            psnr_out = calculate_psnr(output,gts)
+            print(f'Data {ind_data}, input noise images PSNR is {psnr_in}, output images PSNR is {psnr_out}.')
             if not os.path.exists('test/result'):
                 os.mkdir('test/result')
-            with open("test/result/testresult_{ind_data}.pickle","wb") as f:
+            with open(f"test/result/test_{ind_data}_input.pickle","wb") as f:
+                np.save(f, imgs_n)
+            with open(f"test/result/test_{ind_data}_result.pickle","wb") as f:
                 np.save(f, output)
 
 
