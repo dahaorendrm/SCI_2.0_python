@@ -69,15 +69,18 @@ def test(test_dataloader):
             imgs_n = imgs_n.numpy()
             gts = gts.numpy()
             gts = np.moveaxis(gts,1,-1)
-            psnr_in  = calculate_psnr(imgs_n,gts)
-            psnr_out = calculate_psnr(output,gts)
+            psnr_in  = calculate_psnr(imgs_n*255,gts*255)
+            psnr_out = calculate_psnr(output*255,gts*255)
             print(f'Data {ind_data}, input noise images PSNR is {psnr_in}, output images PSNR is {psnr_out}.')
+            print(f'This model improves PSNR by {(psnr_out-psnr_in)/psnr_in:.2%}')
             if not os.path.exists('test/result'):
                 os.mkdir('test/result')
-            with open(f"test/result/test_{ind_data}_input.pickle","wb") as f:
+            with open(f"test/result/test_{ind_data:04d}_input_psnr={psnr_in:.4f}.pickle","wb") as f:
                 np.save(f, imgs_n)
-            with open(f"test/result/test_{ind_data}_result.pickle","wb") as f:
+            with open(f"test/result/test_{ind_data:04d}_result_psnr={psnr_out:.4f}.pickle","wb") as f:
                 np.save(f, output)
+            with open(f"test/result/test_{ind_data:04d}_gt.pickle","wb") as f:
+                np.save(f, gts)
 
 
 if __name__ == '__main__':
