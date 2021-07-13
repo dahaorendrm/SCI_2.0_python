@@ -1,6 +1,6 @@
 /results
 /dataset
-/train/data
+/data/data
 */__pycache__/*
 */denoiser/__pycache__/*
 /train/temp
