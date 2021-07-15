@@ -15,17 +15,18 @@ from collections import namedtuple
 
 MODEL = 'chasti_sst'
 MASK = scio.loadmat('lesti_mask.mat')['mask']
-def compressive_model(input):
+def compressive_model(MODEL,input):
     '''
         <model> + gaptv
     '''
-    global MODEL
-    if MODEL is 'cacti':
+    #global MODEL
+    print(f'Current model is {MODEL}')
+    if MODEL == 'cacti':
         mask = scio.loadmat('cacti_mask.mat')['mask']
         input = rgb2gray(input)
         return np.mean(mask*input,2)
 
-    if MODEL is 'cassi':
+    if MODEL == 'cassi':
         mask = scio.loadmat('cassi_mask.mat')['mask']
         input = rgb2gray(input)
         assert MASK.ndim is 2
@@ -33,7 +34,7 @@ def compressive_model(input):
         temp = mask*input
         temp = utils.shifter(temp,0)
         return np.mean(temp,2)
-    if MODEL is 'lesti_4d_sst':
+    if MODEL == 'lesti_sst':
         BandsLed = scio.loadmat('BandsLed.mat')['BandsLed']
         BandsLed = BandsLed[4:-2,:]
         data = (
@@ -41,7 +42,7 @@ def compressive_model(input):
         MASK, #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
         BandsLed
         )
-        mea = measurement.Measurement(model = 'lesti_4d_sst', dim = 4, inputs=data, configs={'CUT_BAND':None})
+        mea = measurement.Measurement(model = 'lesti_sst', dim = 4, inputs=data, configs={'CUT_BAND':None})
         model = recon_model.ReModel('gap','tv_chambolle')
         model.config({'lambda': 1, 'ASSESE': 0, 'ACC': True,
                 'ITERs': 30, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
@@ -52,10 +53,12 @@ def compressive_model(input):
         orig_leds = mea.orig_leds
         mea = np.array(mea.mea)
         # print('shape of re is '+str(mea.shape))
-        return (orig_leds,mea,re)
+        result__ = (orig_leds,mea,re)
+        print(f'Return result with {len(result__)} elements!')
+        return result__
 
 
-    if MODEL is 'chasti_sst':
+    if MODEL == 'chasti_sst':
         data = (
         input,
         MASK #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
@@ -199,7 +202,7 @@ def save_test_crops(crops,crops_mea,index,fname,transform_type=''):
     for crop in crops:
         name = 'data/test/gt/' + '_'.join((fname,'%.4d'%(index),transform_type))+'.tiff'
     global MODEL
-    if MODEL == 'lesti_4d_sst'
+    if MODEL == 'lesti_4d_sst':
         for (crop_led,mea,res) in crops_mea:
             name = 'data/test/gt_led/' + '_'.join((fname,'%.4d'%(index),transform_type))+'.tiff'
             save_tiff(name,crop_led)
@@ -263,50 +266,52 @@ def entry_process(path,COMP_FRAME):
         num_crops.append(len(li_all_crops))
 
         print(f'Start multiprocessing with {len(li_all_crops)} datasets...')
-        li_all_crops_data = pool.map(compressive_model, li_all_crops) # contain (mea, gaptv_result)
+        comp_input = [(MODEL,crop) for crop in li_all_crops]
+        li_all_crops_data = pool.starmap(compressive_model, comp_input) # contain (mea, gaptv_result)
         print(f'Finished multiprocessing.{len(li_all_crops_data)} datasets are created.')
         #print(f'{}')
         save_crops(li_all_crops,li_all_crops_data,output_i,file_name)
         output_i += len_crops*4
 
 def train_data_generation():
-        # path = 'G:/My Drive/PHD_Research/data/DAVIS/JPEGImages/test/bear'
-        # entry_process(path)
-        COMP_FRAME = 9
-        path = '/work/ececis_research/X_Ma/data/DAVIS/480p/'
-        entries = os.listdir(path)
-        entries_ = [(path+entry,COMP_FRAME) for entry in entries]
-        ind_id = int(os.getenv('SLURM_ARRAY_TASK_ID'))
-        #ind_id = 0
-        print(f'We are processing dataset {entries_[ind_id][0]}')
-        tic = time.perf_counter()
-        entry_process(*entries_[ind_id])
-        #a_pool = multiprocessing.Pool(4)
-        #result = a_pool.map(entry_process, entries)
-        toc = time.perf_counter()
-        print(f"This code of {entries[ind_id]:s} run in {toc - tic:0.4f} seconds",flush=True)
+    # path = 'G:/My Drive/PHD_Research/data/DAVIS/JPEGImages/test/bear'
+    # entry_process(path)
+    COMP_FRAME = 9
+    path = '/work/ececis_research/X_Ma/data/DAVIS/480p/'
+    entries = os.listdir(path)
+    entries_ = [(path+entry,COMP_FRAME) for entry in entries]
+    ind_id = int(os.getenv('SLURM_ARRAY_TASK_ID'))
+    #ind_id = 0
+    print(f'We are processing dataset {entries_[ind_id][0]}')
+    tic = time.perf_counter()
+    entry_process(*entries_[ind_id])
+    #a_pool = multiprocessing.Pool(4)
+    #result = a_pool.map(entry_process, entries)
+    toc = time.perf_counter()
+    print(f"This code of {entries[ind_id]:s} run in {toc - tic:0.4f} seconds",flush=True)
 
 def test_data_generation():
-        global MODEL = 'chasti_sst'
-        COMP_FRAME = 9
-
-        imgs = scio.loadmat('G:/My Drive/PHD_Research/SCI_python/data/orig/3DMRGB_F86.mat')['img']
-        pic_block_down = skitrans.rescale(imgs,0.5,multichannel=True, # downscale the sub-video
-                                    anti_aliasing=True,preserve_range=True)
-        crops = []
-        for ind in range(0,27,COMP_FRAME):
-            crops.append(pic_block_down[:,:,:,ind:ind+COMP_FRAME])
-        li_all_crops_data = pool.map(compressive_model, crops) # contain (mea, gaptv_result)
-        save_test_crops(crops,li_all_crops_data,0,'F86')
-
-
-        MODEL = 'lesti_4d_sst'
-        COMP_FRAME = 16
-        imgs = scio.loadmat('G:/My Drive/PHD_Research/SCI_python/data/orig/4D_Lego.mat')['img']
-        for ind in range(0,40-COMP_FRAME+1,COMP_FRAME-4):
-            crops.append(imgs[:,:,4:-2,ind:ind+COMP_FRAME])
-        li_all_crops_data = pool.map(compressive_model, crops) # contain (mea, gaptv_result)
-        save_test_crops(crops,li_all_crops_data,0,'4D_lego')
+    global MODEL 
+    pool = multiprocessing.Pool()
+    MODEL = 'chasti_sst'
+    COMP_FRAME = 9
+    imgs = scio.loadmat('/work/ececis_research/X_Ma/SCI_python/data/orig/3DMRGB_F86.mat')['img']
+    pic_block_down = skitrans.rescale(imgs,0.5,multichannel=True, # downscale the sub-video
+                                anti_aliasing=True,preserve_range=True)
+    crops = []
+    for ind in range(0,27,COMP_FRAME):
+        crops.append(pic_block_down[:,:,:,ind:ind+COMP_FRAME])
+    comp_input = [(MODEL,crop) for crop in crops]
+    li_all_crops_data = pool.starmap(compressive_model, comp_input) # contain (mea, gaptv_result)
+    save_test_crops(crops,li_all_crops_data,0,'F86')
+    MODEL = 'lesti_sst'
+    COMP_FRAME = 16
+    imgs = scio.loadmat('/work/ececis_research/X_Ma/SCI_python/data/orig/4D_Lego.mat')['img']
+    for ind in range(0,40-COMP_FRAME+1,COMP_FRAME-4):
+        crops.append(imgs[:,:,4:-2,ind:ind+COMP_FRAME])
+    comp_input = [(MODEL,crop) for crop in crops]
+    li_all_crops_data = pool.starmap(compressive_model, comp_input) # contain (original led project, mea, gaptv_result)
+    save_test_crops(crops,li_all_crops_data,0,'4D_lego')
 
 if __name__ == '__main__':
-test_data_generation()
+    test_data_generation()
