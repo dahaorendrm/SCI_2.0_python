@@ -1,0 +1,67 @@
+2021-07-15 15:09:20,105 : INFO : func.measurement : Logger func.measurement initiated.
+2021-07-15 15:09:21,541 : INFO : func.forward_model : CHASTI super temporal model got run.
+2021-07-15 15:09:21,543 : WARNING : func.forward_model : orig max size wrong, and it is 0.9938725490196079
+2021-07-15 15:09:21,560 : INFO : func.recon_model : gap model Initialized with tv_chambolle denoiser.
+2021-07-15 15:09:21,561 : INFO : func.recon_model : Parameter lambda is set to: 1
+2021-07-15 15:09:21,561 : INFO : func.recon_model : Parameter ASSESE is set to: 0
+2021-07-15 15:09:21,561 : INFO : func.recon_model : Parameter ACC is set to: True
+2021-07-15 15:09:21,561 : INFO : func.recon_model : Parameter ITERs is set to: 30
+2021-07-15 15:09:21,561 : INFO : func.recon_model : Denoiser parameter TV_WEIGHT is set to: 0.2
+2021-07-15 15:09:21,561 : INFO : func.recon_model : Denoiser parameter TV_ITER is set to: 7
+2021-07-15 15:09:21,561 : INFO : func.recon_model : Gap model running...
+2021-07-15 15:09:21,561 : INFO : func.recon_model : No initialization.
+2021-07-15 15:09:21,574 : INFO : func.forward_model : CHASTI super temporal model got run.
+2021-07-15 15:09:21,575 : WARNING : func.forward_model : orig max size wrong, and it is 0.9894607843137255
+2021-07-15 15:09:21,591 : INFO : func.forward_model : CHASTI super temporal model got run.
+2021-07-15 15:09:21,592 : WARNING : func.forward_model : orig max size wrong, and it is 0.9661764705882353
+2021-07-15 15:09:21,594 : INFO : func.recon_model : gap model Initialized with tv_chambolle denoiser.
+2021-07-15 15:09:21,594 : INFO : func.recon_model : Parameter lambda is set to: 1
+2021-07-15 15:09:21,594 : INFO : func.recon_model : Parameter ASSESE is set to: 0
+2021-07-15 15:09:21,594 : INFO : func.recon_model : Parameter ACC is set to: True
+2021-07-15 15:09:21,594 : INFO : func.recon_model : Parameter ITERs is set to: 30
+2021-07-15 15:09:21,594 : INFO : func.recon_model : Denoiser parameter TV_WEIGHT is set to: 0.2
+2021-07-15 15:09:21,594 : INFO : func.recon_model : Denoiser parameter TV_ITER is set to: 7
+2021-07-15 15:09:21,595 : INFO : func.recon_model : Gap model running...
+2021-07-15 15:09:21,595 : INFO : func.recon_model : No initialization.
+2021-07-15 15:09:21,606 : INFO : func.recon_model : gap model Initialized with tv_chambolle denoiser.
+2021-07-15 15:09:21,606 : INFO : func.recon_model : Parameter lambda is set to: 1
+2021-07-15 15:09:21,606 : INFO : func.recon_model : Parameter ASSESE is set to: 0
+2021-07-15 15:09:21,606 : INFO : func.recon_model : Parameter ACC is set to: True
+2021-07-15 15:09:21,606 : INFO : func.recon_model : Parameter ITERs is set to: 30
+2021-07-15 15:09:21,606 : INFO : func.recon_model : Denoiser parameter TV_WEIGHT is set to: 0.2
+2021-07-15 15:09:21,606 : INFO : func.recon_model : Denoiser parameter TV_ITER is set to: 7
+2021-07-15 15:09:21,606 : INFO : func.recon_model : Gap model running...
+2021-07-15 15:09:21,606 : INFO : func.recon_model : No initialization.
+2021-07-15 15:09:32,035 : INFO : func.recon_model : Iteration   1, Sigma = 1.00.
+2021-07-15 15:09:32,130 : INFO : func.recon_model : Iteration   1, Sigma = 1.00.
+2021-07-15 15:09:32,258 : INFO : func.recon_model : Iteration   1, Sigma = 1.00.
+2021-07-15 15:09:42,537 : INFO : func.recon_model : Iteration   2, Sigma = 1.00.
+2021-07-15 15:09:42,611 : INFO : func.recon_model : Iteration   2, Sigma = 1.00.
+2021-07-15 15:09:42,830 : INFO : func.recon_model : Iteration   2, Sigma = 1.00.
+2021-07-15 15:09:52,919 : INFO : func.recon_model : Iteration   3, Sigma = 1.00.
+2021-07-15 15:09:53,011 : INFO : func.recon_model : Iteration   3, Sigma = 1.00.
+2021-07-15 15:09:53,106 : INFO : func.recon_model : Iteration   3, Sigma = 1.00.
+2021-07-15 15:10:03,114 : INFO : func.recon_model : Iteration   4, Sigma = 1.00.
+2021-07-15 15:10:03,446 : INFO : func.recon_model : Iteration   4, Sigma = 1.00.
+2021-07-15 15:10:03,461 : INFO : func.recon_model : Iteration   4, Sigma = 1.00.
+2021-07-15 15:10:13,431 : INFO : func.recon_model : Iteration   5, Sigma = 1.00.
+2021-07-15 15:10:13,933 : INFO : func.recon_model : Iteration   5, Sigma = 1.00.
+2021-07-15 15:10:14,081 : INFO : func.recon_model : Iteration   5, Sigma = 1.00.
+2021-07-15 15:10:23,925 : INFO : func.recon_model : Iteration   6, Sigma = 1.00.
+2021-07-15 15:10:24,400 : INFO : func.recon_model : Iteration   6, Sigma = 1.00.
+2021-07-15 15:10:24,663 : INFO : func.recon_model : Iteration   6, Sigma = 1.00.
+2021-07-15 15:10:34,395 : INFO : func.recon_model : Iteration   7, Sigma = 1.00.
+2021-07-15 15:10:34,860 : INFO : func.recon_model : Iteration   7, Sigma = 1.00.
+2021-07-15 15:10:35,234 : INFO : func.recon_model : Iteration   7, Sigma = 1.00.
+2021-07-15 15:10:44,863 : INFO : func.recon_model : Iteration   8, Sigma = 1.00.
+2021-07-15 15:10:45,313 : INFO : func.recon_model : Iteration   8, Sigma = 1.00.
+2021-07-15 15:10:45,835 : INFO : func.recon_model : Iteration   8, Sigma = 1.00.
+2021-07-15 15:10:55,358 : INFO : func.recon_model : Iteration   9, Sigma = 1.00.
+2021-07-15 15:10:55,795 : INFO : func.recon_model : Iteration   9, Sigma = 1.00.
+2021-07-15 15:10:56,424 : INFO : func.recon_model : Iteration   9, Sigma = 1.00.
+2021-07-15 15:11:05,871 : INFO : func.recon_model : Iteration  10, Sigma = 1.00.
+2021-07-15 15:11:06,293 : INFO : func.recon_model : Iteration  10, Sigma = 1.00.
+2021-07-15 15:11:06,987 : INFO : func.recon_model : Iteration  10, Sigma = 1.00.
+2021-07-15 15:11:16,349 : INFO : func.recon_model : Iteration  11, Sigma = 1.00.
+2021-07-15 15:11:16,759 : INFO : func.recon_model : Iteration  11, Sigma = 1.00.
+2021-07-15 15:11:17,595 : INFO : func.recon_model : Iteration  11, Sigma = 1.00.
