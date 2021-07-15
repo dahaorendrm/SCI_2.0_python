@@ -13,6 +13,7 @@ import time
 from func import utils,recon_model,result,measurement
 from collections import namedtuple
 
+MODEL='chasti_sst'
 MASK = scio.loadmat('lesti_mask.mat')['mask']
 def compressive_model(MODEL,input):
     '''
@@ -158,7 +159,7 @@ def save_crops(crops,crops_mea,index,fname,transform_type=''):
         thread.join()
     print(f'All {len(threads)} threads are released.')
 
-def save_test_crops(crops,crops_mea,index,fname,transform_type=''):
+def save_test_crops(MODEL,crops,crops_mea,index,fname,transform_type=''):
     if not os.path.exists('data'):
         try:
             os.mkdir('data')
@@ -200,8 +201,7 @@ def save_test_crops(crops,crops_mea,index,fname,transform_type=''):
     print("'"+'_'.join((fname,str(index),transform_type))+'.tiff'+"'"+' saved with '+str(len(crops))+' crops.' )
     for crop in crops:
         name = 'data/test/gt/' + '_'.join((fname,'%.4d'%(index),transform_type))+'.tiff'
-    global MODEL
-    if MODEL == 'lesti_4d_sst':
+    if MODEL == 'lesti_sst':
         for (crop_led,mea,res) in crops_mea:
             name = 'data/test/gt_led/' + '_'.join((fname,'%.4d'%(index),transform_type))+'.tiff'
             save_tiff(name,crop_led)
@@ -220,6 +220,7 @@ def save_test_crops(crops,crops_mea,index,fname,transform_type=''):
 
 
 def entry_process(path,COMP_FRAME):
+    global MODEL
     name_f = os.listdir(path)
     name_f = sorted(name_f)
     output_i = 0
@@ -238,7 +239,7 @@ def entry_process(path,COMP_FRAME):
         pic_block_down = np.reshape(pic_block,(*pic_block.shape[0:2],np.prod(pic_block.shape[2:])))
         pic_block_down = skitrans.rescale(pic_block_down,0.6,multichannel=True, # downscale the sub-video
                                     anti_aliasing=True,preserve_range=True)
-        pic_block_down = np.reshape(pic_block_down,(*pic_block_down.shape[0:2],*pic_block.shape[2:]))
+        pic_blocMODELk_down = np.reshape(pic_block_down,(*pic_block_down.shape[0:2],*pic_block.shape[2:]))
         ind_r = [0]
         ind_c = [0,127,249]
         li_crops.extend(generate_crops(pic_block_down,2,ind_r,ind_c))# generate crops based on a downscaled video
@@ -301,7 +302,7 @@ def test_data_generation():
         crops.append(pic_block_down[:,:,:,ind:ind+COMP_FRAME])
     comp_input = [(MODEL,crop) for crop in crops]
     li_all_crops_data = pool.starmap(compressive_model, comp_input) # contain (mea, gaptv_result)
-    save_test_crops(crops,li_all_crops_data,0,'F86')
+    save_test_crops(MODEL,crops,li_all_crops_data,0,'F86')
     MODEL = 'lesti_sst'
     COMP_FRAME = 16
     imgs = scio.loadmat('/work/ececis_research/X_Ma/SCI_python/data/orig/4D_Lego.mat')['img']
@@ -309,7 +310,7 @@ def test_data_generation():
         crops.append(imgs[:,:,4:-2,ind:ind+COMP_FRAME])
     comp_input = [(MODEL,crop) for crop in crops]
     li_all_crops_data = pool.starmap(compressive_model, comp_input) # contain (original led project, mea, gaptv_result)
-    save_test_crops(crops,li_all_crops_data,0,'4D_lego')
+    save_test_crops(MODEL,crops,li_all_crops_data,0,'4D_lego')
 
 if __name__ == '__main__':
     test_data_generation()
