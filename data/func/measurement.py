@@ -21,10 +21,10 @@ class Measurement:
         self.configp = {}
         self.configp["MAXV"] = 255
         self.configp["SCALE_DATA"] = 1
-        if "CASSI" in model:
+        if "CASSI" in self.modelname:
             self.configp["SHIFTD"] = 0
             self.configp["SHIFTSTEP"] = 1
-        if "LESTI" in model:
+        if "LESTI" in self.modelname:
             self.configp["SHIFTD"]=None
             self.configp["SCALE_DATA"] = .5
             self.configp["CUT_BAND"] = (4,2)

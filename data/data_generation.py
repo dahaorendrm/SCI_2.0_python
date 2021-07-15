@@ -13,7 +13,6 @@ import time
 from func import utils,recon_model,result,measurement
 from collections import namedtuple
 
-MODEL = 'chasti_sst'
 MASK = scio.loadmat('lesti_mask.mat')['mask']
 def compressive_model(MODEL,input):
     '''
@@ -291,7 +290,6 @@ def train_data_generation():
     print(f"This code of {entries[ind_id]:s} run in {toc - tic:0.4f} seconds",flush=True)
 
 def test_data_generation():
-    global MODEL 
     pool = multiprocessing.Pool()
     MODEL = 'chasti_sst'
     COMP_FRAME = 9
