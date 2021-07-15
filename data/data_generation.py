@@ -201,7 +201,7 @@ def save_test_crops(crops,crops_mea,index,fname,transform_type=''):
     for crop in crops:
         name = 'data/test/gt/' + '_'.join((fname,'%.4d'%(index),transform_type))+'.tiff'
     global MODEL
-    if MODEL == 'lesti_4d_sst':
+    if MODEL == 'lesti_sst':
         for (crop_led,mea,res) in crops_mea:
             name = 'data/test/gt_led/' + '_'.join((fname,'%.4d'%(index),transform_type))+'.tiff'
             save_tiff(name,crop_led)
