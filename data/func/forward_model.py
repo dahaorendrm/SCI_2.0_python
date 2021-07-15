@@ -151,7 +151,7 @@ def lesti_4d_sst(orig, mask, led_curve, CUT_BAND = (4,2)):
         logger.error("No enough masks!")
         raise
     if not nf%nled == 0:
-        logger.error("Frame number has to be the multiple of nled.")
+        logger.error(f"Frame number {nf} has to be the multiple of nled {nled}.")
         raise
     # Generate modulations
     mask = mask[:,:,:nf]

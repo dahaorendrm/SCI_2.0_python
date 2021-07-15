@@ -42,9 +42,9 @@ def compressive_model(MODEL,input):
         MASK, #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
         BandsLed
         )
-        mea = measurement.Measurement(model = 'lesti_sst', dim = 4, inputs=data, configs={'CUT_BAND':None})
+        mea = measurement.Measurement(model = 'lesti_sst', dim = 4, inputs=data, configs={'NUMF':input.shape[3], 'SCALE_DATA':1, 'CUT_BAND':None})
         model = recon_model.ReModel('gap','tv_chambolle')
-        model.config({'lambda': 1, 'ASSESE': 0, 'ACC': True,
+        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
                 'ITERs': 30, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
                 'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7}})
         re = result.Result(model, mea, modul = mea.modul, orig = mea.orig_leds)
@@ -65,7 +65,7 @@ def compressive_model(MODEL,input):
         )
         mea = measurement.Measurement(model = 'chasti_sst', dim = 3, inputs=data)
         model = recon_model.ReModel('gap','tv_chambolle')
-        model.config({'lambda': 1, 'ASSESE': 0, 'ACC': True,
+        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
                 'ITERs': 30, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
                 'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7}})
         re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
@@ -306,6 +306,7 @@ def test_data_generation():
     MODEL = 'lesti_sst'
     COMP_FRAME = 16
     imgs = scio.loadmat('/work/ececis_research/X_Ma/SCI_python/data/orig/4D_Lego.mat')['img']
+    print(f'shape of imgs is {imgs.shape}')
     for ind in range(0,40-COMP_FRAME+1,COMP_FRAME-4):
         crops.append(imgs[:,:,4:-2,ind:ind+COMP_FRAME])
     comp_input = [(MODEL,crop) for crop in crops]
