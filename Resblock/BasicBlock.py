@@ -59,7 +59,7 @@ class MultipleBasicBlock(nn.Module):
 
         self.block1= nn.Sequential(*[
             nn.Conv2d(input_feature, intermediate_feature,
-                      kernel_size=7, stride=1, padding=3, bias=True),
+                      kernel_size=3, stride=1, padding=3, bias=True),
             nn.LeakyReLU(inplace=True)
         ])
 
@@ -67,7 +67,10 @@ class MultipleBasicBlock(nn.Module):
         self.block2 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=2 else None
         self.block3 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=3 else None
         self.block4 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=4 else None
-        self.block5 = nn.Sequential(*[nn.Conv2d(intermediate_feature, 1 , (3, 3), 1, (1, 1))])
+        self.block5 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=5 else None
+        self.block6 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=6 else None
+        self.block7 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=7 else None
+        self.block8 = nn.Sequential(*[nn.Conv2d(intermediate_feature, 1 , (3, 3), 1, (1, 1))])
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -81,13 +84,16 @@ class MultipleBasicBlock(nn.Module):
         x = self.block1(x)
         x = self.block2(x) if self.num_block>=2 else x
         x = self.block3(x) if self.num_block>=3 else x
-        x = self.block4(x) if self.num_block== 4 else x
-        x = self.block5(x)
+        x = self.block4(x) if self.num_block>=4 else x
+        x = self.block5(x) if self.num_block>=5 else x
+        x = self.block6(x) if self.num_block>=6 else x
+        x = self.block7(x) if self.num_block>=7 else x
+        x = self.block8(x)
         return x
 
-def MultipleBasicBlock_4(input_feature,intermediate_feature = 64):
+def MultipleBasicBlock_4(input_feature,intermediate_feature = 64, num_blocks=4):
     model = MultipleBasicBlock(input_feature,
-                               BasicBlock,4 ,
+                               BasicBlock,num_blocks ,
                                intermediate_feature)
     return model
 
