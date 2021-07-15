@@ -143,6 +143,8 @@ def lesti_4d_sst(orig, mask, led_curve, CUT_BAND = (4,2)):
     nled = led_curve.shape[1]
     # Error detection
     if mask.shape[0:2] != (nr,nc):
+        print(f'Shape of mask is {mask.shape}')
+        print(f'Shape of orig is {orig.shape}')
         logger.error("Dimension mismatched!")
         raise
     if mask.shape[2] < nf:
