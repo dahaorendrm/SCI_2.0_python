@@ -1,83 +1,37 @@
-2021-07-15 16:08:59,821 : INFO : func.measurement : Logger func.measurement initiated.
-2021-07-15 16:09:01,433 : INFO : func.forward_model : CHASTI super temporal model got run.
-2021-07-15 16:09:01,434 : WARNING : func.forward_model : orig max size wrong, and it is 0.9938725490196079
-2021-07-15 16:09:01,451 : INFO : func.recon_model : gap model Initialized with tv_chambolle denoiser.
-2021-07-15 16:09:01,451 : INFO : func.recon_model : Parameter lambda is set to: 1
-2021-07-15 16:09:01,451 : INFO : func.recon_model : Parameter ASSESE is set to: 1
-2021-07-15 16:09:01,451 : INFO : func.recon_model : Parameter ACC is set to: True
-2021-07-15 16:09:01,451 : INFO : func.recon_model : Parameter ITERs is set to: 30
-2021-07-15 16:09:01,452 : INFO : func.recon_model : Denoiser parameter TV_WEIGHT is set to: 0.2
-2021-07-15 16:09:01,452 : INFO : func.recon_model : Denoiser parameter TV_ITER is set to: 7
-2021-07-15 16:09:01,452 : INFO : func.recon_model : Gap model running...
-2021-07-15 16:09:01,452 : INFO : func.recon_model : No initialization.
-2021-07-15 16:09:01,465 : INFO : func.forward_model : CHASTI super temporal model got run.
-2021-07-15 16:09:01,466 : WARNING : func.forward_model : orig max size wrong, and it is 0.9894607843137255
-2021-07-15 16:09:01,489 : INFO : func.forward_model : CHASTI super temporal model got run.
-2021-07-15 16:09:01,491 : WARNING : func.forward_model : orig max size wrong, and it is 0.9661764705882353
-2021-07-15 16:09:01,505 : INFO : func.recon_model : gap model Initialized with tv_chambolle denoiser.
-2021-07-15 16:09:01,505 : INFO : func.recon_model : Parameter lambda is set to: 1
-2021-07-15 16:09:01,506 : INFO : func.recon_model : Parameter ASSESE is set to: 1
-2021-07-15 16:09:01,506 : INFO : func.recon_model : Parameter ACC is set to: True
-2021-07-15 16:09:01,506 : INFO : func.recon_model : Parameter ITERs is set to: 30
-2021-07-15 16:09:01,506 : INFO : func.recon_model : Denoiser parameter TV_WEIGHT is set to: 0.2
-2021-07-15 16:09:01,506 : INFO : func.recon_model : Denoiser parameter TV_ITER is set to: 7
-2021-07-15 16:09:01,506 : INFO : func.recon_model : Gap model running...
-2021-07-15 16:09:01,506 : INFO : func.recon_model : No initialization.
-2021-07-15 16:09:01,510 : INFO : func.recon_model : gap model Initialized with tv_chambolle denoiser.
-2021-07-15 16:09:01,510 : INFO : func.recon_model : Parameter lambda is set to: 1
-2021-07-15 16:09:01,510 : INFO : func.recon_model : Parameter ASSESE is set to: 1
-2021-07-15 16:09:01,510 : INFO : func.recon_model : Parameter ACC is set to: True
-2021-07-15 16:09:01,510 : INFO : func.recon_model : Parameter ITERs is set to: 30
-2021-07-15 16:09:01,510 : INFO : func.recon_model : Denoiser parameter TV_WEIGHT is set to: 0.2
-2021-07-15 16:09:01,511 : INFO : func.recon_model : Denoiser parameter TV_ITER is set to: 7
-2021-07-15 16:09:01,511 : INFO : func.recon_model : Gap model running...
-2021-07-15 16:09:01,511 : INFO : func.recon_model : No initialization.
-2021-07-15 16:09:09,955 : INFO : func.recon_model : Iteration   1, Sigma = 1.00, PSNR = 5.75 dB, SSIM = -0.1684.
-2021-07-15 16:09:10,806 : INFO : func.recon_model : Iteration   1, Sigma = 1.00, PSNR = 5.10 dB, SSIM = -0.1772.
-2021-07-15 16:09:11,866 : INFO : func.recon_model : Iteration   1, Sigma = 1.00, PSNR = 3.48 dB, SSIM = -0.0372.
-2021-07-15 16:09:19,351 : INFO : func.recon_model : Iteration   2, Sigma = 1.00, PSNR = 10.14 dB, SSIM = -0.4718.
-2021-07-15 16:09:20,532 : INFO : func.recon_model : Iteration   2, Sigma = 1.00, PSNR = 10.43 dB, SSIM = -0.4141.
-2021-07-15 16:09:22,936 : INFO : func.recon_model : Iteration   2, Sigma = 1.00, PSNR = 8.63 dB, SSIM = -0.2417.
-2021-07-15 16:09:28,465 : INFO : func.recon_model : Iteration   3, Sigma = 1.00, PSNR = 16.37 dB, SSIM = 0.1223.
-2021-07-15 16:09:31,225 : INFO : func.recon_model : Iteration   3, Sigma = 1.00, PSNR = 15.86 dB, SSIM = 0.1192.
-2021-07-15 16:09:32,322 : INFO : func.recon_model : Iteration   3, Sigma = 1.00, PSNR = 13.41 dB, SSIM = 0.1126.
-2021-07-15 16:09:37,778 : INFO : func.recon_model : Iteration   4, Sigma = 1.00, PSNR = 19.86 dB, SSIM = 0.3847.
-2021-07-15 16:09:41,447 : INFO : func.recon_model : Iteration   4, Sigma = 1.00, PSNR = 15.48 dB, SSIM = 0.2196.
-2021-07-15 16:09:42,680 : INFO : func.recon_model : Iteration   4, Sigma = 1.00, PSNR = 18.56 dB, SSIM = 0.3858.
-2021-07-15 16:09:46,645 : INFO : func.recon_model : Iteration   5, Sigma = 1.00, PSNR = 19.87 dB, SSIM = 0.4617.
-2021-07-15 16:09:50,637 : INFO : func.recon_model : Iteration   5, Sigma = 1.00, PSNR = 16.00 dB, SSIM = 0.2838.
-2021-07-15 16:09:53,466 : INFO : func.recon_model : Iteration   5, Sigma = 1.00, PSNR = 18.81 dB, SSIM = 0.4489.
-2021-07-15 16:09:54,302 : INFO : func.recon_model : Iteration   6, Sigma = 1.00, PSNR = 21.17 dB, SSIM = 0.5702.
-2021-07-15 16:10:00,099 : INFO : func.recon_model : Iteration   6, Sigma = 1.00, PSNR = 17.19 dB, SSIM = 0.3637.
-2021-07-15 16:10:03,539 : INFO : func.recon_model : Iteration   7, Sigma = 1.00, PSNR = 23.44 dB, SSIM = 0.6632.
-2021-07-15 16:10:03,932 : INFO : func.recon_model : Iteration   6, Sigma = 1.00, PSNR = 20.02 dB, SSIM = 0.5383.
-2021-07-15 16:10:10,171 : INFO : func.recon_model : Iteration   7, Sigma = 1.00, PSNR = 18.84 dB, SSIM = 0.4347.
-2021-07-15 16:10:12,565 : INFO : func.recon_model : Iteration   8, Sigma = 1.00, PSNR = 25.14 dB, SSIM = 0.7171.
-2021-07-15 16:10:15,781 : INFO : func.recon_model : Iteration   7, Sigma = 1.00, PSNR = 21.90 dB, SSIM = 0.6172.
-2021-07-15 16:10:19,904 : INFO : func.recon_model : Iteration   8, Sigma = 1.00, PSNR = 20.26 dB, SSIM = 0.4863.
-2021-07-15 16:10:21,791 : INFO : func.recon_model : Iteration   9, Sigma = 1.00, PSNR = 26.03 dB, SSIM = 0.7458.
-2021-07-15 16:10:26,135 : INFO : func.recon_model : Iteration   8, Sigma = 1.00, PSNR = 23.39 dB, SSIM = 0.6659.
-2021-07-15 16:10:30,158 : INFO : func.recon_model : Iteration  10, Sigma = 1.00, PSNR = 26.77 dB, SSIM = 0.7640.
-2021-07-15 16:10:30,248 : INFO : func.recon_model : Iteration   9, Sigma = 1.00, PSNR = 21.34 dB, SSIM = 0.5220.
-2021-07-15 16:10:35,968 : INFO : func.recon_model : Iteration   9, Sigma = 1.00, PSNR = 24.35 dB, SSIM = 0.6943.
-2021-07-15 16:10:39,320 : INFO : func.recon_model : Iteration  11, Sigma = 1.00, PSNR = 27.38 dB, SSIM = 0.7766.
-2021-07-15 16:10:39,895 : INFO : func.recon_model : Iteration  10, Sigma = 1.00, PSNR = 22.24 dB, SSIM = 0.5450.
-2021-07-15 16:10:46,498 : INFO : func.recon_model : Iteration  10, Sigma = 1.00, PSNR = 25.14 dB, SSIM = 0.7123.
-2021-07-15 16:10:48,058 : INFO : func.recon_model : Iteration  12, Sigma = 1.00, PSNR = 27.71 dB, SSIM = 0.7852.
-2021-07-15 16:10:49,225 : INFO : func.recon_model : Iteration  11, Sigma = 1.00, PSNR = 22.91 dB, SSIM = 0.5616.
-2021-07-15 16:10:57,171 : INFO : func.recon_model : Iteration  13, Sigma = 1.00, PSNR = 27.84 dB, SSIM = 0.7906.
-2021-07-15 16:10:57,732 : INFO : func.recon_model : Iteration  11, Sigma = 1.00, PSNR = 25.74 dB, SSIM = 0.7249.
-2021-07-15 16:10:58,505 : INFO : func.recon_model : Iteration  12, Sigma = 1.00, PSNR = 23.30 dB, SSIM = 0.5743.
-2021-07-15 16:11:06,610 : INFO : func.recon_model : Iteration  14, Sigma = 1.00, PSNR = 27.91 dB, SSIM = 0.7937.
-2021-07-15 16:11:08,168 : INFO : func.recon_model : Iteration  13, Sigma = 1.00, PSNR = 23.49 dB, SSIM = 0.5829.
-2021-07-15 16:11:08,321 : INFO : func.recon_model : Iteration  12, Sigma = 1.00, PSNR = 26.08 dB, SSIM = 0.7330.
-2021-07-15 16:11:13,648 : INFO : func.recon_model : Iteration  15, Sigma = 1.00, PSNR = 27.96 dB, SSIM = 0.7957.
-2021-07-15 16:11:17,885 : INFO : func.recon_model : Iteration  14, Sigma = 1.00, PSNR = 23.56 dB, SSIM = 0.5879.
-2021-07-15 16:11:19,672 : INFO : func.recon_model : Iteration  13, Sigma = 1.00, PSNR = 26.23 dB, SSIM = 0.7380.
-2021-07-15 16:11:22,919 : INFO : func.recon_model : Iteration  16, Sigma = 1.00, PSNR = 28.03 dB, SSIM = 0.7979.
-2021-07-15 16:11:27,626 : INFO : func.recon_model : Iteration  15, Sigma = 1.00, PSNR = 23.61 dB, SSIM = 0.5912.
-2021-07-15 16:11:30,261 : INFO : func.recon_model : Iteration  14, Sigma = 1.00, PSNR = 26.29 dB, SSIM = 0.7406.
-2021-07-15 16:11:31,886 : INFO : func.recon_model : Iteration  17, Sigma = 1.00, PSNR = 28.13 dB, SSIM = 0.8010.
-2021-07-15 16:11:37,136 : INFO : func.recon_model : Iteration  16, Sigma = 1.00, PSNR = 23.67 dB, SSIM = 0.5947.
-2021-07-15 16:11:40,757 : INFO : func.recon_model : Iteration  15, Sigma = 1.00, PSNR = 26.34 dB, SSIM = 0.7424.
-2021-07-15 16:11:41,153 : INFO : func.recon_model : Iteration  18, Sigma = 1.00, PSNR = 28.25 dB, SSIM = 0.8049.
+2021-07-16 10:45:20,930 : INFO : func.measurement : Logger func.measurement initiated.
+2021-07-16 10:45:24,067 : INFO : func.forward_model : LESTI_4D super spectral-temporal model got run.
+2021-07-16 10:45:24,067 : ERROR : func.forward_model : Frame number 9 has to be the multiple of nled 8.
+2021-07-16 10:45:24,096 : INFO : func.forward_model : LESTI_4D super spectral-temporal model got run.
+2021-07-16 10:45:24,096 : ERROR : func.forward_model : Frame number 9 has to be the multiple of nled 8.
+2021-07-16 10:45:24,118 : INFO : func.forward_model : LESTI_4D super spectral-temporal model got run.
+2021-07-16 10:45:24,118 : ERROR : func.forward_model : Frame number 9 has to be the multiple of nled 8.
+2021-07-16 10:45:25,502 : INFO : func.forward_model : LESTI_4D super spectral-temporal model got run.
+2021-07-16 10:45:26,712 : INFO : func.recon_model : gap model Initialized with tv_chambolle denoiser.
+2021-07-16 10:45:26,712 : INFO : func.recon_model : Parameter lambda is set to: 1
+2021-07-16 10:45:26,713 : INFO : func.recon_model : Parameter ASSESE is set to: 1
+2021-07-16 10:45:26,713 : INFO : func.recon_model : Parameter ACC is set to: True
+2021-07-16 10:45:26,713 : INFO : func.recon_model : Parameter ITERs is set to: 30
+2021-07-16 10:45:26,713 : INFO : func.recon_model : Denoiser parameter TV_WEIGHT is set to: 0.2
+2021-07-16 10:45:26,713 : INFO : func.recon_model : Denoiser parameter TV_ITER is set to: 7
+2021-07-16 10:45:26,713 : INFO : func.recon_model : Gap model running...
+2021-07-16 10:45:26,713 : INFO : func.recon_model : No initialization.
+2021-07-16 10:45:26,722 : INFO : func.forward_model : LESTI_4D super spectral-temporal model got run.
+2021-07-16 10:45:27,929 : INFO : func.forward_model : LESTI_4D super spectral-temporal model got run.
+2021-07-16 10:45:27,976 : INFO : func.recon_model : gap model Initialized with tv_chambolle denoiser.
+2021-07-16 10:45:27,976 : INFO : func.recon_model : Parameter lambda is set to: 1
+2021-07-16 10:45:27,976 : INFO : func.recon_model : Parameter ASSESE is set to: 1
+2021-07-16 10:45:27,976 : INFO : func.recon_model : Parameter ACC is set to: True
+2021-07-16 10:45:27,976 : INFO : func.recon_model : Parameter ITERs is set to: 30
+2021-07-16 10:45:27,976 : INFO : func.recon_model : Denoiser parameter TV_WEIGHT is set to: 0.2
+2021-07-16 10:45:27,976 : INFO : func.recon_model : Denoiser parameter TV_ITER is set to: 7
+2021-07-16 10:45:27,977 : INFO : func.recon_model : Gap model running...
+2021-07-16 10:45:27,977 : INFO : func.recon_model : No initialization.
+2021-07-16 10:45:29,939 : INFO : func.recon_model : gap model Initialized with tv_chambolle denoiser.
+2021-07-16 10:45:29,940 : INFO : func.recon_model : Parameter lambda is set to: 1
+2021-07-16 10:45:29,940 : INFO : func.recon_model : Parameter ASSESE is set to: 1
+2021-07-16 10:45:29,940 : INFO : func.recon_model : Parameter ACC is set to: True
+2021-07-16 10:45:29,940 : INFO : func.recon_model : Parameter ITERs is set to: 30
+2021-07-16 10:45:29,940 : INFO : func.recon_model : Denoiser parameter TV_WEIGHT is set to: 0.2
+2021-07-16 10:45:29,940 : INFO : func.recon_model : Denoiser parameter TV_ITER is set to: 7
+2021-07-16 10:45:29,940 : INFO : func.recon_model : Gap model running...
+2021-07-16 10:45:29,940 : INFO : func.recon_model : No initialization.

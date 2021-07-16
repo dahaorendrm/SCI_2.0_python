@@ -9,8 +9,8 @@
 # SBATCH --mem-per-cpu=10G
 
 #SBATCH --job-name=chasti_test
-# SBATCH --partition=standard
-#SBATCH --partition=devel
+#SBATCH --partition=standard
+# SBATCH --partition=devel
 # SBATCH --partition=_workgroup_
 # SBATCH --gres=gpu
 

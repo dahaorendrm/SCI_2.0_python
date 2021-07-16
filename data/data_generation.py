@@ -42,6 +42,7 @@ def compressive_model(MODEL,input):
         MASK, #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
         BandsLed
         )
+        #print(f'test:shape of input is {input.shape}')
         mea = measurement.Measurement(model = 'lesti_sst', dim = 4, inputs=data, configs={'NUMF':input.shape[3], 'SCALE_DATA':1, 'CUT_BAND':None})
         model = recon_model.ReModel('gap','tv_chambolle')
         model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
@@ -301,13 +302,15 @@ def test_data_generation():
     for ind in range(0,27,COMP_FRAME):
         crops.append(pic_block_down[:,:,:,ind:ind+COMP_FRAME])
     comp_input = [(MODEL,crop) for crop in crops]
-    li_all_crops_data = pool.starmap(compressive_model, comp_input) # contain (mea, gaptv_result)
-    save_test_crops(MODEL,crops,li_all_crops_data,0,'F86')
+    #li_all_crops_data = pool.starmap(compressive_model, comp_input) # contain (mea, gaptv_result)
+    #save_test_crops(MODEL,crops,li_all_crops_data,0,'F86')
     MODEL = 'lesti_sst'
     COMP_FRAME = 16
     imgs = scio.loadmat('/work/ececis_research/X_Ma/SCI_python/data/orig/4D_Lego.mat')['img']
-    print(f'shape of imgs is {imgs.shape}')
+    #print(f'shape of imgs is {imgs.shape}')
+    crops = []
     for ind in range(0,40-COMP_FRAME+1,COMP_FRAME-4):
+        #print(f'Test: index of the data range is {ind} to {ind+COMP_FRAME}')
         crops.append(imgs[:,:,4:-2,ind:ind+COMP_FRAME])
     comp_input = [(MODEL,crop) for crop in crops]
     li_all_crops_data = pool.starmap(compressive_model, comp_input) # contain (original led project, mea, gaptv_result)
