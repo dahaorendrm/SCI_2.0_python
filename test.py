@@ -18,7 +18,13 @@ model.load_state_dict(torch.load('./train/epoch' + "/{}.pth".format(epoch_ind)))
 def test(test_dataloader):
     MASK = scio.loadmat('./train/lesti_mask.mat')['mask']
     with torch.no_grad():
-        for ind_data, (gts, inputs) in enumerate(test_dataloader):
+        for ind_data, data in enumerate(test_dataloader):
+            if len(data) >= 3:
+                (_,inputs,gts) = data # for lesti model; use led projection as gts
+                CHAN = 8
+            else:
+                (gts,inputs) = data
+                CHAN = 3
             mea = inputs[...,0] # mea normalize???????????????????????????????????????????? from birnet
             img_ns = inputs[...,1:]
             masks = torch.tensor(MASK[...,:img_ns.size()[-1]]).float()
@@ -58,7 +64,7 @@ def test(test_dataloader):
             for ind in range(gts.size()[-1]):
                 temp = gts[...,ind_c,ind]
                 gts_.append(temp)
-                ind_c = ind_c+1 if ind_c<2 else 0
+                ind_c = ind_c+1 if ind_c<CHAN-1 else 0
             gts = torch.stack(gts_,1)/255.
             #gts = torch.moveaxis(gts,0,-1)
             #print('gts shape is' + str(gts.size()))
@@ -75,16 +81,24 @@ def test(test_dataloader):
             print(f'This model improves PSNR by {(psnr_out-psnr_in)/psnr_in:.2%}')
             if not os.path.exists('test/result'):
                 os.mkdir('test/result')
-            with open(f"test/result/test_{ind_data:04d}_input_psnr={psnr_in:.4f}.pickle","wb") as f:
+            with open(f"test/result/test_{ind_data:04d}_input_psnr={psnr_in:.4f}.npy","wb") as f:
                 np.save(f, imgs_n)
-            with open(f"test/result/test_{ind_data:04d}_result_psnr={psnr_out:.4f}.pickle","wb") as f:
+            with open(f"test/result/test_{ind_data:04d}_result_psnr={psnr_out:.4f}.npy","wb") as f:
                 np.save(f, output)
-            with open(f"test/result/test_{ind_data:04d}_gt.pickle","wb") as f:
+            with open(f"test/result/test_{ind_data:04d}_gt.npy","wb") as f:
                 np.save(f, gts)
 
-
-if __name__ == '__main__':
-    test_path = 'test/data'
+def validation_func():
+    test_path = 'data/data/validation'
     dataset = Imgdataset(test_path)
     test_dataloader = DataLoader(dataset)
     test(test_dataloader)
+
+def test_func():
+    test_path = 'data/data/test'
+    dataset = Imgdataset(test_path)
+    test_dataloader = DataLoader(dataset)
+    test(test_dataloader)
+
+if __name__ == '__main__':
+    test_func()
