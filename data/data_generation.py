@@ -17,7 +17,7 @@ MODEL='chasti_sst'
 MASK = scio.loadmat('lesti_mask.mat')['mask']
 def compressive_model(MODEL,input):
     '''
-        <model> + gaptv
+        <aodel> + gaptv
     '''
     #global MODEL
     print(f'Current model is {MODEL}')
@@ -48,7 +48,15 @@ def compressive_model(MODEL,input):
         model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
                 'ITERs': 30, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
                 'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7}})
-        re = result.Result(model, mea, modul = mea.modul, orig = mea.orig_leds)
+        orig = np.empty_like(mea.mask)
+        index = 0
+        for i in range(mea.orig_leds.shape[3]):
+            orig[:,:,i] = mea.orig_leds[:,:,index,i]
+            if index<7: # hard coding. 8 is the number of LEDs
+                index += 1
+            else:
+                index = 0
+        re = result.Result(model, mea, modul = mea.mask, orig = orig)
         re = np.array(re)
         re[re<0] = 0
         orig_leds = mea.orig_leds
@@ -200,8 +208,9 @@ def save_test_crops(MODEL,crops,crops_mea,index,fname,transform_type=''):
     # tiff
     save_tiff = lambda name,crop: tifffile.imwrite(name,crop)
     print("'"+'_'.join((fname,str(index),transform_type))+'.tiff'+"'"+' saved with '+str(len(crops))+' crops.' )
-    for crop in crops:
-        name = 'data/test/gt/' + '_'.join((fname,'%.4d'%(index),transform_type))+'.tiff'
+    for ind,crop in enumerate(crops):
+        name = 'data/test/gt/' + '_'.join((fname,'%.4d'%(index+ind),transform_type))+'.tiff'
+        save_tiff(name,crop)
     if MODEL == 'lesti_sst':
         for (crop_led,mea,res) in crops_mea:
             name = 'data/test/gt_led/' + '_'.join((fname,'%.4d'%(index),transform_type))+'.tiff'
@@ -302,8 +311,8 @@ def test_data_generation():
     for ind in range(0,27,COMP_FRAME):
         crops.append(pic_block_down[:,:,:,ind:ind+COMP_FRAME])
     comp_input = [(MODEL,crop) for crop in crops]
-    #li_all_crops_data = pool.starmap(compressive_model, comp_input) # contain (mea, gaptv_result)
-    #save_test_crops(MODEL,crops,li_all_crops_data,0,'F86')
+    li_all_crops_data = pool.starmap(compressive_model, comp_input) # contain (mea, gaptv_result)
+    save_test_crops(MODEL,crops,li_all_crops_data,0,'F86')
     MODEL = 'lesti_sst'
     COMP_FRAME = 16
     imgs = scio.loadmat('/work/ececis_research/X_Ma/SCI_python/data/orig/4D_Lego.mat')['img']

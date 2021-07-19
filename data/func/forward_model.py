@@ -140,6 +140,7 @@ def lesti_4d_sst(orig, mask, led_curve, CUT_BAND = (4,2)):
         led_curve = led_curve[CUT_BAND[0]:-CUT_BAND[1],:]
     # Retrive the necessary dimension
     (nr,nc,nl,nf) = orig.shape
+    mask = mask[:,:,:nf].astype('float32')
     nled = led_curve.shape[1]
     # Error detection
     if mask.shape[0:2] != (nr,nc):

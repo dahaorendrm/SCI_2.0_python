@@ -142,6 +142,7 @@ def gap_model(yy, phi, denoiser, Afunc, Atfunc,
         # shift
         # [1.3] Evaluation
         if ASSESE and orig is not None and np.mod(it,ASSESE) == 0:
+            #print(f'shape of vv is {vv.shape}, shape of orig is {orig.shape}')
             temp_psnr =utils.calculate_psnr(vv*255,orig*255)
             temp_ssim =utils.calculate_ssim(vv*255,orig*255)
             psnr_record.append(temp_psnr)
