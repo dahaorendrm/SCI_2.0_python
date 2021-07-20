@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 import os
 num_epochs = 100
-batch_size = 4
+batch_size = 6
 learning_rate = 0.0005
 
 
@@ -86,8 +86,6 @@ def train(data_loader):
                 cat_input = cat_input.to(device)
                 output = model(cat_input)
 
-
-
                 loss = criterion(output, gts[:,ind,...]) # probably loss per frame/ add all frames loss together
                 # Backward and optimize
                 optimizer.zero_grad()
@@ -95,17 +93,17 @@ def train(data_loader):
                 optimizer.step()
 
 
-            if (ind_batch) % 10 == 0:
+            if (ind_batch) % 4 == 0:
                 print ("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
                        .format(epoch+1, num_epochs, ind_batch+1, total_step, loss.item()))
-        save_path = './train/epoch_normalize2_perframe/'
+        save_path = './train/epoch_more_depth/'
 
         if not os.path.exists(save_path):
             os.mkdir(save_path)
         torch.save(model.state_dict(), save_path + str(epoch) +".pth")
 
         # Decay learning rate
-        if (epoch+1) % 20 == 0:
+        if (epoch+1) % 10 == 0:
             curr_lr /= 3
             update_lr(optimizer, curr_lr)
 
