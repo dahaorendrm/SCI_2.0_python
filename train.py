@@ -107,7 +107,7 @@ def train(data_loader):
 
 
 if __name__ == '__main__':
-    path = './train/data'
+    path = './data/data/train'
     dataset = Imgdataset(path)
     train_dataloader = DataLoader(dataset, num_workers=2, batch_size=batch_size, shuffle=True)
     train(train_dataloader)
