@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 import os
 num_epochs = 100
-batch_size = 4
+batch_size = 6 
 learning_rate = 0.0005
 
 
@@ -41,7 +41,7 @@ def update_lr(optimizer, lr):
 
 # Train the model
 def train(data_loader):
-    MASK = scio.loadmat('./train/lesti_mask.mat')['mask']
+    MASK = scio.loadmat('./data/lesti_mask.mat')['mask']
     total_step = len(data_loader)
     curr_lr = learning_rate
     for epoch in range(num_epochs):
@@ -95,14 +95,14 @@ def train(data_loader):
             if (ind_batch) % 10 == 0:
                 print ("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
                        .format(epoch+1, num_epochs, ind_batch+1, total_step, loss.item()))
-        save_path = './train/epoch/'
+        save_path = './train/epoch_master/'
 
         if not os.path.exists(save_path):
             os.mkdir(save_path)
         torch.save(model.state_dict(), save_path + str(epoch) +".pth")
         # Decay learning rate
-        if (epoch+1) % 20 == 0:
-            curr_lr /= 3
+        if (epoch+1) % 3 == 0:
+            curr_lr /= 2
             update_lr(optimizer, curr_lr)
 
 
