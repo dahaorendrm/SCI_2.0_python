@@ -45,12 +45,12 @@ def normalizer(imgs,masks):
     imgs = imgs/mask_s
     return imgs
 # Train the model
-def train():
+def train(data_loader):
     MASK = scio.loadmat('./train/lesti_mask.mat')['mask']
-    total_step = len(train_dataloader)
+    total_step = len(data_loader)
     curr_lr = learning_rate
     for epoch in range(num_epochs):
-        for ind_batch, (gts, inputs) in enumerate(train_dataloader): # batch,weight,height,channel
+        for ind_batch, (gts, inputs) in enumerate(data_loader): # batch,weight,height,channel
             mea = inputs[...,0]
             img_ns = inputs[...,1:]
             masks = torch.tensor(MASK[...,:img_ns.size()[-1]]).float()
@@ -133,4 +133,7 @@ def test():
     # Save the model checkpoint
     torch.save(model.state_dict(), 'resnet.ckpt')
 if __name__ == '__main__':
-    train()
+    path = './data/data/train'
+    dataset = Imgdataset(path)
+    train_dataloader = DataLoader(dataset, num_workers=2, batch_size=batch_size, shuffle=True)
+    train(train_dataloader)
