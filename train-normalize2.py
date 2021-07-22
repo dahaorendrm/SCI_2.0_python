@@ -7,12 +7,12 @@ from torch.utils.data import DataLoader
 import numpy as np
 import os
 num_epochs = 100
-batch_size = 4
+batch_size = 6 
 learning_rate = 0.0005
 
-path = './train/data'
-dataset = Imgdataset(path)
-train_dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
+#path = './train/data'
+#dataset = Imgdataset(path)
+#train_dataloader = DataLoader(dataset, batch_size=batch_size, shuffle=True)
 #test_dataloader = DataLoader(test_data, batch_size=4, shuffle=True)
 
 # data transfer?
