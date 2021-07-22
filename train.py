@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 import os
 num_epochs = 100
-batch_size = 6
+batch_size = 10
 learning_rate = 0.0005
 
 
@@ -39,20 +39,23 @@ def update_lr(optimizer, lr):
 
 def normalizer(imgs,masks):
     mask_s = torch.sum(masks,3)
+    #mask_s = masksi
+    #print(f'normalizer mask_s size is {mask_s.size()}; size of imgs is {imgs.size()}')
     mask_s[mask_s==0] = 1
     imgs = imgs/mask_s
     return imgs
 # Train the model
 def train(data_loader):
-    MASK = scio.loadmat('./train/lesti_mask.mat')['mask']
+    MASK = scio.loadmat('./data/lesti_mask.mat')['mask']
     total_step = len(data_loader)
     curr_lr = learning_rate
     for epoch in range(num_epochs):
-        for ind_batch, (gts, inputs) in enumerate(data_loader): # batch,weight,height,channel
+        for ind_batch, (gts, inputs) in enumerate(data_loader): # batch,width,height,channel
             mea = inputs[...,0]
             img_ns = inputs[...,1:]
             masks = torch.tensor(MASK[...,:img_ns.size()[-1]]).float()
             masks = masks.repeat(img_ns.size()[0],1,1,1)
+            #print(f'test:{masks.size()}')
             img_n_codes = img_ns*masks # may be not with mask?????????????????????????????????????????????
             output = []
             mea = normalizer(mea,masks)
@@ -67,12 +70,14 @@ def train(data_loader):
             gts = torch.stack(gts_,1)/255.
             gts = gts.to(device)
 
-            for ind in range(img_ns.size()[-1]):
+            for ind in range(img_ns.size()[-1]): # iterative over channel 
                 #gt = gts[...,ind]
                 img_n = img_ns[...,ind:ind+1]
-                img_n_code = torch.sum(img_n_codes[...,:ind],-1, keepdim=True) + torch.sum(img_n_codes[...,ind+1:],-1, keepdim=True) # sum this two line together, then normalize
-                mask_code = torch.sum(mask[...,:ind],-1, keepdim=True) + torch.sum(mask[...,ind+1:],-1, keepdim=True)
+                img_n_code = torch.sum(img_n_codes[...,:ind],-1) + torch.sum(img_n_codes[...,ind+1:],-1) # sum this two line together, then normalize
+                mask_code = torch.sum(masks[...,:ind],-1, keepdim=True) + torch.sum(masks[...,ind+1:],-1, keepdim=True)
+                #print(f'size of img_n_code is {img_n_code.size()}; size of mask_code is {mask_code.size()}')
                 img_n_code_s = normalizer(img_n_code,mask_code)
+                img_n_code_s = torch.unsqueeze(img_n_code_s,-1)
                 mask = masks[...,ind:ind+1]
                 #print(f'Shape of img_n: {img_n.size()}, img_n_code_begin: {img_n_code_begin.size()}, /nimg_n_code_end: {img_n_code_end.size()}, mask: {mask.size()}, mea: {mea.size()}')
                 cat_input = torch.cat((img_n,mea,mask,img_n_code_s),dim=3)
