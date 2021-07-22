@@ -50,7 +50,6 @@ def train(data_loader):
     for epoch in range(num_epochs):
         for ind_batch, (gts, inputs) in enumerate(data_loader): # batch,weight,height,channel
             mea = inputs[...,0]
-
             img_ns = inputs[...,1:]
             masks = torch.tensor(MASK[...,:img_ns.size()[-1]]).float()
             masks = masks.repeat(img_ns.size()[0],1,1,1)
@@ -84,15 +83,14 @@ def train(data_loader):
                 #print(f'Shap of cat_input is {cat_input.size()}')
                 #cat_input = torch.movedim(cat_input,-1,1)
                 cat_input = cat_input.to(device)
-                output = model(cat_input)
-
-                loss = criterion(output, gts[:,ind,...]) # probably loss per frame/ add all frames loss together
-                # Backward and optimize
-                optimizer.zero_grad()
-                loss.backward()
-                optimizer.step()
-
-
+                output_ = model(cat_input)
+                output.append(output_)
+            # Backward and optimize
+            output = torch.cat(output,1)
+            loss = criterion(output, gts) # probably loss per frame/ add all frames loss together
+            optimizer.zero_grad()
+            loss.backward()
+            optimizer.step()
             if (ind_batch) % 4 == 0:
                 print ("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
                        .format(epoch+1, num_epochs, ind_batch+1, total_step, loss.item()))
@@ -103,8 +101,8 @@ def train(data_loader):
         torch.save(model.state_dict(), save_path + str(epoch) +".pth")
 
         # Decay learning rate
-        if (epoch+1) % 10 == 0:
-            curr_lr /= 3
+        if (epoch+1) % 3 == 0:
+            curr_lr /= 2
             update_lr(optimizer, curr_lr)
 
 
