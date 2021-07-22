@@ -27,7 +27,7 @@ learning_rate = 0.0005
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f'Device: {device}')
-model = CHASTINET(4,128,6).to(device)
+model = CHASTINET(4,128,4).to(device)
 print(model)
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
