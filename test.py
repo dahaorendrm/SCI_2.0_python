@@ -11,9 +11,17 @@ import pickle
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = CHASTINET(11,128).to(device)
-epoch_ind = 4
-model.load_state_dict(torch.load('./train/epoch' + "/{}.pth".format(epoch_ind)))
+model = CHASTINET(4,128,5).to(device)
+epoch_ind = 3
+model.load_state_dict(torch.load('./train/epoch_more_depth_wf' + "/{}.pth".format(epoch_ind)))
+
+def normalizer(imgs,masks):
+    mask_s = torch.sum(masks,3)
+    #mask_s = masksi
+    #print(f'normalizer mask_s size is {mask_s.size()}; size of imgs is {imgs.size()}')
+    mask_s[mask_s==0] = 1
+    imgs = imgs/mask_s
+    return imgs
 
 def test(test_dataloader):
     MASK = scio.loadmat('./train/lesti_mask.mat')['mask']
@@ -36,18 +44,20 @@ def test(test_dataloader):
             for ind in range(img_ns.size()[-1]):
                 #gt = gts[...,ind]
                 img_n = img_ns[...,ind:ind+1]
-                img_n_code_begin = img_n_codes[...,:ind]
-                img_n_code_end = img_n_codes[...,ind+1:]
+                img_n_code = torch.sum(img_n_codes[...,:ind],-1) + torch.sum(img_n_codes[...,ind+1:],-1) # sum this two line together, then normalize
+                mask_code = torch.sum(masks[...,:ind],-1, keepdim=True) + torch.sum(masks[...,ind+1:],-1, keepdim=True)
+                #print(f'size of img_n_code is {img_n_code.size()}; size of mask_code is {mask_code.size()}')
+                img_n_code_s = normalizer(img_n_code,mask_code)
+                img_n_code_s = torch.unsqueeze(img_n_code_s,-1)
                 mask = masks[...,ind:ind+1]
                 #print(f'Shape of img_n: {img_n.size()}, img_n_code_begin: {img_n_code_begin.size()}, /nimg_n_code_end: {img_n_code_end.size()}, mask: {mask.size()}, mea: {mea.size()}')
-                cat_input = torch.cat((img_n,mea,mask,img_n_code_begin,img_n_code_end),dim=3)
+                cat_input = torch.cat((img_n,mea,mask,img_n_code_s),dim=3)
                 # Forward pass
                 cat_input = np.array(cat_input)
                 cat_input = np.moveaxis(cat_input,-1,1)
                 cat_input = torch.from_numpy(cat_input).float()
                 #print(f'Shap of cat_input is {cat_input.size()}')
                 #cat_input = torch.movedim(cat_input,-1,1)
-                 #print(cat_input.size())
                 cat_input = cat_input.to(device)
                 output_ = model(cat_input)
                 #print(f'Shap of single output is {output_.size()}')
