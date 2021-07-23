@@ -71,7 +71,13 @@ class MultipleBasicBlock(nn.Module):
         self.block6 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=6 else None
         self.block7 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=7 else None
         self.block8 = nn.Sequential(*[nn.Conv2d(intermediate_feature, 1 , (3, 3), 1, (1, 1))])
-        self.BN     = nn.BatchNorm2d(intermediate_feature)
+        self.BN2     = nn.BatchNorm2d(intermediate_feature)
+        self.BN3     = nn.BatchNorm2d(intermediate_feature)
+        self.BN4     = nn.BatchNorm2d(intermediate_feature)
+        self.BN5     = nn.BatchNorm2d(intermediate_feature)
+        self.BN6     = nn.BatchNorm2d(intermediate_feature)
+        #self.BN7     = nn.BatchNorm2d(intermediate_feature)
+
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
                 n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
@@ -83,15 +89,15 @@ class MultipleBasicBlock(nn.Module):
     def forward(self, x):
         x = self.block1(x)
         x = self.block2(x) if self.num_block>=2 else x
-        x = self.BN(x)     if self.num_block>2  else x
+        x = self.BN2(x)     if self.num_block>2  else x
         x = self.block3(x) if self.num_block>=3 else x
-        x = self.BN(x)     if self.num_block>3  else x
+        x = self.BN3(x)     if self.num_block>3  else x
         x = self.block4(x) if self.num_block>=4 else x
-        x = self.BN(x)     if self.num_block>4  else x
+        x = self.BN4(x)     if self.num_block>4  else x
         x = self.block5(x) if self.num_block>=5 else x
-        x = self.BN(x)     if self.num_block>5  else x
+        x = self.BN5(x)     if self.num_block>5  else x
         x = self.block6(x) if self.num_block>=6 else x
-        x = self.BN(x)     if self.num_block>6  else x
+        x = self.BN6(x)     if self.num_block>6  else x
         x = self.block7(x) if self.num_block>=7 else x
         x = self.block8(x)
         return x
