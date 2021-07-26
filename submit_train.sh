@@ -8,12 +8,12 @@
 #SBATCH --mem=40G
 # SBATCH --mem-per-cpu=10G
 
-#SBATCH --job-name=chasti_train_inputlayer7_BN_wholeframes
+#SBATCH --job-name=chasti_train_6layers_7*7firstL
 #SBATCH --partition=standard
 # SBATCH --partition=_workgroup_
 #SBATCH --gres=gpu
 
-#SBATCH --time=2-10:00:00
+#SBATCH --time=5-10:00:00
 # SBATCH --output=ArraySCI%A-%a.out
 #SBATCH --mail-user='xmdrm@udel.edu'
 #SBATCH --mail-type=END,FAIL,TIME_LIMIT_90

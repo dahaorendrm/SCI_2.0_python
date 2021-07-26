@@ -6,7 +6,7 @@ import scipy.io as scio
 from torch.utils.data import DataLoader
 import numpy as np
 import os
-num_epochs = 100
+num_epochs = 10
 batch_size = 4 
 learning_rate = 0.0005
 
@@ -27,7 +27,7 @@ learning_rate = 0.0005
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f'Device: {device}')
-model = CHASTINET(4,128,5).to(device)
+model = CHASTINET(4,128,4).to(device)
 print(model)
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
@@ -99,7 +99,7 @@ def train(data_loader):
             if (ind_batch) % 4 == 0:
                 print ("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
                        .format(epoch+1, num_epochs, ind_batch+1, total_step, loss.item()))
-        save_path = './train/epoch_more_depth_wf/'
+        save_path = './train/epoch_more_depth_wf_6layers/'
 
         if not os.path.exists(save_path):
             os.mkdir(save_path)
