@@ -13,10 +13,10 @@ import pickle
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = CHASTINET(11,128).to(device)
 epoch_ind = 4
-model.load_state_dict(torch.load('./train/epoch' + "/{}.pth".format(epoch_ind)))
+model.load_state_dict(torch.load('./train/epoch_master' + "/{}.pth".format(epoch_ind)))
 
 def test(test_dataloader):
-    MASK = scio.loadmat('./train/lesti_mask.mat')['mask']
+    MASK = scio.loadmat('./data/lesti_mask.mat')['mask']
     with torch.no_grad():
         for ind_data, data in enumerate(test_dataloader):
             if len(data) >= 3:
@@ -25,6 +25,7 @@ def test(test_dataloader):
             else:
                 (gts,inputs) = data
                 CHAN = 3
+            print(f'DATA has {CHAN} channels, gts shape is {gts.size()}, inputs shape is {inputs.size()}')
             mea = inputs[...,0] # mea normalize???????????????????????????????????????????? from birnet
             img_ns = inputs[...,1:]
             masks = torch.tensor(MASK[...,:img_ns.size()[-1]]).float()
@@ -45,6 +46,7 @@ def test(test_dataloader):
                 cat_input = np.array(cat_input)
                 cat_input = np.moveaxis(cat_input,-1,1)
                 cat_input = torch.from_numpy(cat_input).float()
+                print(f'test:cat_input size is {cat_input.size()}')
                 #print(f'Shap of cat_input is {cat_input.size()}')
                 #cat_input = torch.movedim(cat_input,-1,1)
                  #print(cat_input.size())
