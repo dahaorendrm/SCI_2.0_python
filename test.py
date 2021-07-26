@@ -24,7 +24,7 @@ def normalizer(imgs,masks):
     return imgs
 
 def test(test_dataloader):
-    MASK = scio.loadmat('./train/lesti_mask.mat')['mask']
+    MASK = scio.loadmat('./data/lesti_mask.mat')['mask']
     with torch.no_grad():
         for ind_data, data in enumerate(test_dataloader):
             if len(data) >= 3:
@@ -33,6 +33,8 @@ def test(test_dataloader):
             else:
                 (gts,inputs) = data
                 CHAN = 3
+            print(f'Data has {CHAN} channels.')
+            #print(f'test: shape of gts is {gts.size()}')
             mea = inputs[...,0] # mea normalize???????????????????????????????????????????? from birnet
             img_ns = inputs[...,1:]
             masks = torch.tensor(MASK[...,:img_ns.size()[-1]]).float()
@@ -89,6 +91,8 @@ def test(test_dataloader):
             psnr_out = calculate_psnr(output*255,gts*255)
             print(f'Data {ind_data}, input noise images PSNR is {psnr_in}, output images PSNR is {psnr_out}.')
             print(f'This model improves PSNR by {(psnr_out-psnr_in)/psnr_in:.2%}')
+            if not os.path.exists('test'):
+                os.mkdir('test')
             if not os.path.exists('test/result'):
                 os.mkdir('test/result')
             with open(f"test/result/test_{ind_data:04d}_input_psnr={psnr_in:.4f}.npy","wb") as f:
@@ -111,4 +115,4 @@ def test_func():
     test(test_dataloader)
 
 if __name__ == '__main__':
-    test_func()
+    validation_func()
