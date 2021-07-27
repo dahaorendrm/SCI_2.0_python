@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 import os
 num_epochs = 100
-batch_size = 4
+batch_size = 4 
 learning_rate = 0.0005
 
 
@@ -27,7 +27,7 @@ learning_rate = 0.0005
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f'Device: {device}')
-model = CHASTINET(1,128,7).to(device)
+model = CHASTINET(1,128,5).to(device)
 print(model)
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
@@ -73,7 +73,7 @@ def train(data_loader):
 
             for ind in range(img_ns.size()[-1]): # iterative over channel
                 #gt = gts[...,ind]
-                img_n = img_ns[...,ind:ind+1]:
+                img_n = img_ns[...,ind:ind+1]
                 img_n_code = torch.sum(img_n_codes[...,:ind],-1) + torch.sum(img_n_codes[...,ind+1:],-1) # sum this two line together, then normalize
                 mask_code = torch.sum(masks[...,:ind],-1, keepdim=True) + torch.sum(masks[...,ind+1:],-1, keepdim=True)
                 #print(f'size of img_n_code is {img_n_code.size()}; size of mask_code is {mask_code.size()}')
@@ -83,8 +83,8 @@ def train(data_loader):
                 #print(f'Shape of img_n: {img_n.size()}, img_n_code_begin: {img_n_code_begin.size()}, /nimg_n_code_end: {img_n_code_end.size()}, mask: {mask.size()}, mea: {mea.size()}')
                 cat_input = img_n
                 # Forward pass
-                #cat_input = np.array(cat_input)
-                #cat_input = np.moveaxis(cat_input,-1,1)
+                cat_input = np.array(cat_input)
+                cat_input = np.moveaxis(cat_input,-1,1)
                 cat_input = torch.from_numpy(cat_input).float()
                 #print(f'Shap of cat_input is {cat_input.size()}')
                 #cat_input = torch.movedim(cat_input,-1,1)

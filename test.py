@@ -11,9 +11,9 @@ import pickle
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = CHASTINET(4,128,5).to(device)
-epoch_ind = 5
-model.load_state_dict(torch.load('./train/epoch_more_depth' + "/{}.pth".format(epoch_ind)))
+model = CHASTINET(4,128,4).to(device)
+epoch_ind = 2
+model.load_state_dict(torch.load('./train/epoch_more_depth_wf_6layers' + "/{}.pth".format(epoch_ind)))
 
 def normalizer(imgs,masks):
     mask_s = torch.sum(masks,3)
