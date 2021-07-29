@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 import os
 num_epochs = 10
-batch_size = 4 
+batch_size = 8 
 learning_rate = 0.0005
 
 
