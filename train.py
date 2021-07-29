@@ -99,7 +99,7 @@ def train(data_loader):
             if (ind_batch) % 4 == 0:
                 print ("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
                        .format(epoch+1, num_epochs, ind_batch+1, total_step, loss.item()))
-        save_path = './train/epoch_tradition/w_4inputlayers/'
+        save_path = './train/epoch_tradition_4l_NBN/'
 
         if not os.path.exists(save_path):
             os.mkdir(save_path)
