@@ -29,3 +29,10 @@ display_highdimdatacube(outputimgs)
 
 gtimgs = np.squeeze(gtimgs)
 display_highdimdatacube(gtimgs)
+
+
+print(f'Shape of data is inputimgs : {inputimgs.shape}, outputimgs : {outputimgs.shape}, gtimgs : {gtimgs.shape}')
+print(f'Max value is inputimgs : {numpy.amax(inputimgs)},  outputimgs : {numpy.amax(outputimgs)},  gtimgs : {numpy.amax(gtimgs)}')
+psnr_in = calculate_psnr(gtimgs,inputimgs)
+psnr_out = calculate_psnr(gtimgs,outputimgs)
+print(f'Input noise images PSNR is {psnr_in}, output images PSNR is {psnr_out}.')
