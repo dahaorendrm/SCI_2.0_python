@@ -4,7 +4,7 @@ import os
 
 path = 'test/result'
 data_list = os.listdir(path)
-name = '0004'
+name = '0000'
 for data in data_list:
     if name in data and 'input' in data:
         with open(path + '/' + data, 'rb') as f:
@@ -22,12 +22,15 @@ for data in data_list:
 from utils import *
 
 inputimgs = np.squeeze(inputimgs)
+inputimgs = inputimgs * 255
 display_highdimdatacube(inputimgs)
 
 outputimgs = np.squeeze(outputimgs)
+outputimgs = outputimgs * 255
 display_highdimdatacube(outputimgs)
 
 gtimgs = np.squeeze(gtimgs)
+gtimgs = gtimgs * 255
 display_highdimdatacube(gtimgs)
 
 
