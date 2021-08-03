@@ -54,6 +54,6 @@ class CHASTINET(torch.nn.Module):
         #print(f'Print from CHASTINET input shape : {input.size()}')
         temp = self.ResNet(input)
         #print(f'Print from CHASTINET temp shape : {temp.size()}')
-        cur_output_rectified = temp + input[:,0:1,...]
+        cur_output_rectified = temp# + input[:,0:1,...]
         #print(f'Print from CHASTINET output shape : {cur_output_rectified.size()}')
         return cur_output_rectified

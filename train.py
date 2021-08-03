@@ -6,11 +6,7 @@ import scipy.io as scio
 from torch.utils.data import DataLoader
 import numpy as np
 import os
-<<<<<<< HEAD
-num_epochs = 100
-=======
 num_epochs = 10
->>>>>>> more_depth
 batch_size = 6 
 learning_rate = 0.0005
 
@@ -103,11 +99,7 @@ def train(data_loader):
             if (ind_batch) % 4 == 0:
                 print ("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
                        .format(epoch+1, num_epochs, ind_batch+1, total_step, loss.item()))
-<<<<<<< HEAD
-        save_path = './train/epoch_master/'
-=======
         save_path = './train/epoch_tradition_4l_NBN_f7/'
->>>>>>> more_depth
 
         if not os.path.exists(save_path):
             os.mkdir(save_path)
