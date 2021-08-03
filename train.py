@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 import os
 num_epochs = 10
-batch_size = 8 
+batch_size = 6 
 learning_rate = 0.0005
 
 
@@ -99,7 +99,7 @@ def train(data_loader):
             if (ind_batch) % 4 == 0:
                 print ("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
                        .format(epoch+1, num_epochs, ind_batch+1, total_step, loss.item()))
-        save_path = './train/epoch_tradition_4l_NBN/'
+        save_path = './train/epoch_tradition_4l_NBN_f7/'
 
         if not os.path.exists(save_path):
             os.mkdir(save_path)

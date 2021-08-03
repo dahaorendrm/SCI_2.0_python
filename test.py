@@ -12,8 +12,8 @@ import pickle
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = CHASTINET(4,128,4).to(device)
-epoch_ind = 0
-model.load_state_dict(torch.load('./train/epoch_tradition_4l_NBN' + "/{}.pth".format(epoch_ind)))
+epoch_ind = 5 
+model.load_state_dict(torch.load('./train/epoch_tradition_4l_NBN_f7' + "/{}.pth".format(epoch_ind)))
 
 def normalizer(imgs,masks):
     mask_s = torch.sum(masks,3)
@@ -23,7 +23,7 @@ def normalizer(imgs,masks):
     imgs = imgs/mask_s
     return imgs
 
-def test(test_dataloader):
+def test(test_dataloader,GTMAXV=1):
     MASK = scio.loadmat('./data/lesti_mask.mat')['mask']
     with torch.no_grad():
         for ind_data, data in enumerate(test_dataloader):
@@ -40,6 +40,15 @@ def test(test_dataloader):
             masks = torch.tensor(MASK[...,:img_ns.size()[-1]]).float()
             masks = masks.repeat(img_ns.size()[0],1,1,1)
             img_n_codes = img_ns*masks
+            gts_ = []
+            ind_c = 0
+            for ind in range(gts.size()[-1]):
+                temp = gts[...,ind_c,ind]/255.
+                gts_.append(temp)
+                ind_c = ind_c+1 if ind_c<CHAN-1 else 0
+            gts = torch.stack(gts_,1)
+            gts = gts.numpy()
+            gts = np.moveaxis(gts,1,-1)
             output = []
             imgs_n = []
             mea = torch.unsqueeze(mea,3)
@@ -65,19 +74,22 @@ def test(test_dataloader):
                 #print(f'Shap of single output is {output_.size()}')
                 output.append(output_)
                 imgs_n.append(img_n)
+                gt = gts[...,ind]
+                output_ = output_.cpu().numpy()
+                img_n   = img_n.cpu().numpy()
+                gt = np.squeeze(gt)
+                output_ = np.squeeze(output_)
+                img_n = np.squeeze(img_n)
+                psnr_in  = calculate_psnr(img_n*255,gt*255)
+                psnr_out = calculate_psnr(output_*255,gt*255)
+                print(f'Data {ind_data} at frame {ind}, input noise images PSNR is {psnr_in}, output images PSNR is {psnr_out}.')
+                print(f'PSNR has been improved {(psnr_out-psnr_in)/psnr_in:.2%}')
             output = torch.cat(output,1)
             output = output.cpu()
             imgs_n = torch.cat(imgs_n,3)
             imgs_n = imgs_n.cpu()
             #output = torch.moveaxis(output,0,-1)
             #print(f'output shape is {output.size()}')
-            gts_ = []
-            ind_c = 0
-            for ind in range(gts.size()[-1]):
-                temp = gts[...,ind_c,ind]
-                gts_.append(temp)
-                ind_c = ind_c+1 if ind_c<CHAN-1 else 0
-            gts = torch.stack(gts_,1)/255.
             #gts = torch.moveaxis(gts,0,-1)
             #print('gts shape is' + str(gts.size()))
             #print(f'output shape is {output.size()}')
@@ -85,8 +97,6 @@ def test(test_dataloader):
             output = output.numpy()
             output = np.moveaxis(output,1,-1)
             imgs_n = imgs_n.numpy()
-            gts = gts.numpy()
-            gts = np.moveaxis(gts,1,-1)
             psnr_in  = calculate_psnr(imgs_n*255,gts*255)
             psnr_out = calculate_psnr(output*255,gts*255)
             print(f'Data {ind_data}, input noise images PSNR is {psnr_in}, output images PSNR is {psnr_out}.')
@@ -106,7 +116,7 @@ def validation_func():
     test_path = 'data/data/validation'
     dataset = Imgdataset(test_path)
     test_dataloader = DataLoader(dataset)
-    test(test_dataloader)
+    test(test_dataloader,255)
 
 def test_func():
     test_path = 'data/data/test'
@@ -115,4 +125,4 @@ def test_func():
     test(test_dataloader)
 
 if __name__ == '__main__':
-    test_func()
+    validation_func()

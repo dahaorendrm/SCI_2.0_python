@@ -11,7 +11,7 @@ import pickle
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-model = CHASTINET(4,128,5).to(device)
+model = CHASTINET(1,128,5).to(device)
 epoch_ind = 5
 model.load_state_dict(torch.load('./train/epoch_more_depth_denoiser' + "/{}.pth".format(epoch_ind)))
 
@@ -34,6 +34,15 @@ def test(test_dataloader):
                 (gts,inputs) = data
                 CHAN = 3
             print(f'Data has {CHAN} channels.')
+            gts_ = []
+            ind_c = 0
+            for ind in range(gts.size()[-1]):
+                temp = gts[...,ind_c,ind]
+                gts_.append(temp)
+                ind_c = ind_c+1 if ind_c<CHAN-1 else 0
+            gts = torch.stack(gts_,1)/255.
+            gts = gts.numpy()
+            gts = np.moveaxis(gts,1,-1)
             #print(f'test: shape of gts is {gts.size()}')
             mea = inputs[...,0] # mea normalize???????????????????????????????????????????? from birnet
             img_ns = inputs[...,1:]
@@ -66,19 +75,20 @@ def test(test_dataloader):
                 #print(f'Shap of single output is {output_.size()}')
                 output.append(output_)
                 imgs_n.append(img_n)
+                gt = gts[...,ind]
+                output_ = output_.numpy()
+                img_n   = img_n.numpy()
+                psnr_in  = calculate_psnr(img_n*255,gt*255)
+                psnr_out = calculate_psnr(output_*255,gt*255)
+                print(f'Data {ind_data}, input noise images PSNR is {psnr_in}, output images PSNR is {psnr_out}.')
+
+                print(f'Each frame: ')
             output = torch.cat(output,1)
             output = output.cpu()
             imgs_n = torch.cat(imgs_n,3)
             imgs_n = imgs_n.cpu()
             #output = torch.moveaxis(output,0,-1)
             #print(f'output shape is {output.size()}')
-            gts_ = []
-            ind_c = 0
-            for ind in range(gts.size()[-1]):
-                temp = gts[...,ind_c,ind]
-                gts_.append(temp)
-                ind_c = ind_c+1 if ind_c<CHAN-1 else 0
-            gts = torch.stack(gts_,1)/255.
             #gts = torch.moveaxis(gts,0,-1)
             #print('gts shape is' + str(gts.size()))
             #print(f'output shape is {output.size()}')
@@ -86,8 +96,6 @@ def test(test_dataloader):
             output = output.numpy()
             output = np.moveaxis(output,1,-1)
             imgs_n = imgs_n.numpy()
-            gts = gts.numpy()
-            gts = np.moveaxis(gts,1,-1)
             psnr_in  = calculate_psnr(imgs_n*255,gts*255)
             psnr_out = calculate_psnr(output*255,gts*255)
             print(f'Data {ind_data}, input noise images PSNR is {psnr_in}, output images PSNR is {psnr_out}.')
