@@ -8,7 +8,7 @@
 #SBATCH --mem=40G
 # SBATCH --mem-per-cpu=10G
 
-#SBATCH --job-name=chasti_train_4layer_no_BN_7f
+#SBATCH --job-name=chasti_train_denoiser
 #SBATCH --partition=standard
 # SBATCH --partition=_workgroup_
 #SBATCH --gres=gpu
@@ -21,4 +21,4 @@
 
 # export OMP_NUM_THREADS=4
 vpkg_require xm_pytorch
-python3 -u train.py
+python3 -u train_denoiser.py

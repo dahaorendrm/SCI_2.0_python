@@ -210,6 +210,7 @@ def save_test_crops(MODEL,crops,crops_mea,index,fname,transform_type=''):
     print("'"+'_'.join((fname,str(index),transform_type))+'.tiff'+"'"+' saved with '+str(len(crops))+' crops.' )
     for ind,crop in enumerate(crops):
         name = 'data/test/gt/' + '_'.join((fname,'%.4d'%(index+ind),transform_type))+'.tiff'
+        crop = crop/255.
         save_tiff(name,crop)
     if MODEL == 'lesti_sst':
         for (crop_led,mea,res) in crops_mea:
@@ -220,6 +221,7 @@ def save_test_crops(MODEL,crops,crops_mea,index,fname,transform_type=''):
             name = 'data/test/feature/' + '_'.join((fname,'%.4d'%(index),transform_type))+'.tiff'
             save_tiff(name,temp)
             index+=1
+        print(f'Max value of gt is {np.amax(crop)}, gt_led is {np.amax(crop_led)}, feature is {np.amax(temp)}')
     else:
         for (mea,res) in crops_mea:
             mea = mea[...,np.newaxis]
@@ -227,6 +229,7 @@ def save_test_crops(MODEL,crops,crops_mea,index,fname,transform_type=''):
             name = 'data/test/feature/' + '_'.join((fname,'%.4d'%(index),transform_type))+'.tiff'
             save_tiff(name,temp)
             index+=1
+        print(f'Max value of gt is {np.amax(crop)}, feature is {np.amax(temp)}')
 
 
 def entry_process(path,COMP_FRAME):
@@ -305,17 +308,24 @@ def test_data_generation():
     MODEL = 'chasti_sst'
     COMP_FRAME = 9
     imgs = scio.loadmat('/work/ececis_research/X_Ma/SCI_python/data/orig/3DMRGB_F86.mat')['img']
-    pic_block_down = skitrans.rescale(imgs,0.5,multichannel=True, # downscale the sub-video
+    print(f'Input F86 data max is {np.amax(imgs)}.')
+    imgs_down = np.reshape(imgs,(*imgs.shape[0:2],np.prod(imgs.shape[2:])))
+    imgs_down = skitrans.rescale(imgs_down,0.5,multichannel=True, # downscale the sub-video
                                 anti_aliasing=True,preserve_range=True)
+    imgs_down = np.reshape(imgs_down,(*imgs_down.shape[0:2],*imgs.shape[2:]))
+    #imgs = imgs_down
     crops = []
     for ind in range(0,27,COMP_FRAME):
-        crops.append(pic_block_down[:,:,:,ind:ind+COMP_FRAME])
+        crops.append(imgs_down[:,:,:,ind:ind+COMP_FRAME])
     comp_input = [(MODEL,crop) for crop in crops]
     li_all_crops_data = pool.starmap(compressive_model, comp_input) # contain (mea, gaptv_result)
     save_test_crops(MODEL,crops,li_all_crops_data,0,'F86')
+
+
     MODEL = 'lesti_sst'
     COMP_FRAME = 16
     imgs = scio.loadmat('/work/ececis_research/X_Ma/SCI_python/data/orig/4D_Lego.mat')['img']
+    print(f'Input LEGO data max is {np.amax(imgs)}.')
     #print(f'shape of imgs is {imgs.shape}')
     crops = []
     for ind in range(0,40-COMP_FRAME+1,COMP_FRAME-4):
