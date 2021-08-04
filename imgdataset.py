@@ -42,22 +42,20 @@ class Imgdataset(Dataset):
         ground_truth = self.data[index]['ground_truth']
         measurement = self.data[index]['measurement']
         gt = tifffile.imread(ground_truth)
+        #print(f'imgdataset:{ground_truth} gt shape is {gt.shape}')
         meas = tifffile.imread(measurement)
         gt = torch.from_numpy(gt).float()
         meas = torch.from_numpy(meas).float()
-
         if 'gt_led' in self.data[index]:
             gt_led = self.data[index]['gt_led']
             gt_led = tifffile.imread(gt_led)
+            print(f'imgdataset:gt_led shape is {gt_led.shape}')
             gt_led = torch.from_numpy(gt_led).float()
             return gt, meas, gt_led
         #print(f'Path of gt is {ground_truth}')
-
         #gt = torch.from_numpy(gt / 255)
         #meas = torch.from_numpy(meas / 255)
-
         #gt = gt.permute(2, 0, 1)
-
         return gt, meas
 
     def __len__(self):
