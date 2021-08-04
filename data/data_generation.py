@@ -152,6 +152,7 @@ def save_crops(crops,crops_mea,index,fname,transform_type=''):
     threads = []
     for ind,crop in enumerate(crops):
         name = 'data/gt/' + '_'.join((fname,'%.4d'%(index),transform_type))+'.tiff'
+        crop = crop/255.
         t1 = threading.Thread(target=save_tiff,args=[name,crop])
         t1.start()
         threads.append(t1)
@@ -163,6 +164,7 @@ def save_crops(crops,crops_mea,index,fname,transform_type=''):
         t2.start()
         threads.append(t2)
         index+=1
+    print(f'Max value of gt is {np.amax(crop)}, feature is {np.amax(temp)}')
 
     for thread in threads:
         thread.join()
