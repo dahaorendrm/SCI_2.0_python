@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 import os
 num_epochs = 10
-batch_size = 6 
+batch_size = 6
 learning_rate = 0.0005
 
 
@@ -54,11 +54,11 @@ def train(data_loader):
             mea = inputs[...,0]
             img_ns = inputs[...,1:]
             masks = torch.tensor(MASK[...,:img_ns.size()[-1]]).float()
-            masks = masks.repeat(img_ns.size()[0],1,1,1)
+            masks = masks.repeat(img_ns.size()[0],1,1,1) # repeat over batches
             #print(f'test:{masks.size()}')
-            img_n_codes = img_ns*masks # may be not with mask?????????????????????????????????????????????
+            img_n_codes = img_ns*masks # may be not with mask
             output = []
-            mea = normalizer(mea,masks)
+            mea = normalizer(mea,masks) #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
             mea = torch.unsqueeze(mea,3)
 
             gts_ = []
@@ -70,7 +70,7 @@ def train(data_loader):
             gts = torch.stack(gts_,1)/255.
             gts = gts.to(device)
 
-            for ind in range(img_ns.size()[-1]): # iterative over channel 
+            for ind in range(img_ns.size()[-1]): # iterative over channel
                 #gt = gts[...,ind]
                 img_n = img_ns[...,ind:ind+1]
                 img_n_code = torch.sum(img_n_codes[...,:ind],-1) + torch.sum(img_n_codes[...,ind+1:],-1) # sum this two line together, then normalize

@@ -50,6 +50,7 @@ def test(test_dataloader,GTMAXV=1):
             gts = np.moveaxis(gts,1,-1)
             output = []
             imgs_n = []
+            mea = normalizer(mea,masks)
             mea = torch.unsqueeze(mea,3)
             for ind in range(img_ns.size()[-1]):
                 #gt = gts[...,ind]
