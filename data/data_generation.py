@@ -292,7 +292,7 @@ def train_data_generation():
     # path = 'G:/My Drive/PHD_Research/data/DAVIS/JPEGImages/test/bear'
     # entry_process(path)
     COMP_FRAME = 9
-    path = '/work/ececis_research/X_Ma/data/DAVIS/480p/'
+    path = '${WORKDIR}/X_MA/data/DAVIS/480p/'
     entries = os.listdir(path)
     entries_ = [(path+entry,COMP_FRAME) for entry in entries]
     ind_id = int(os.getenv('SLURM_ARRAY_TASK_ID'))
@@ -309,7 +309,7 @@ def test_data_generation():
     pool = multiprocessing.Pool()
     MODEL = 'chasti_sst'
     COMP_FRAME = 9
-    imgs = scio.loadmat('/work/ececis_research/X_Ma/SCI_python/data/orig/3DMRGB_F86.mat')['img']
+    imgs = scio.loadmat('3DMRGB_F86.mat')['img']
     print(f'Input F86 data max is {np.amax(imgs)}.')
     imgs_down = np.reshape(imgs,(*imgs.shape[0:2],np.prod(imgs.shape[2:])))
     imgs_down = skitrans.rescale(imgs_down,0.5,multichannel=True, # downscale the sub-video
@@ -326,7 +326,7 @@ def test_data_generation():
 
     MODEL = 'lesti_sst'
     COMP_FRAME = 16
-    imgs = scio.loadmat('/work/ececis_research/X_Ma/SCI_python/data/orig/4D_Lego.mat')['img']
+    imgs = scio.loadmat('4D_Lego.mat')['img']
     print(f'Input LEGO data max is {np.amax(imgs)}.')
     #print(f'shape of imgs is {imgs.shape}')
     crops = []
