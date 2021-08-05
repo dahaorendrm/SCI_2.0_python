@@ -12,7 +12,7 @@ import pickle
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = CHASTINET(4,128,4).to(device)
-epoch_ind = 5
+epoch_ind = 1
 model.load_state_dict(torch.load('./train/epoch_tradition_4l_NBN_f7' + "/{}.pth".format(epoch_ind)))
 
 def normalizer(imgs,masks):
@@ -23,7 +23,7 @@ def normalizer(imgs,masks):
     imgs = imgs/mask_s
     return imgs
 
-def test(test_dataloader,GTMAXV=1):
+def test(test_dataloader):
     MASK = scio.loadmat('./data/lesti_mask.mat')['mask']
     with torch.no_grad():
         for ind_data, data in enumerate(test_dataloader):
@@ -42,7 +42,7 @@ def test(test_dataloader,GTMAXV=1):
             gts_ = []
             ind_c = 0
             for ind in range(gts.size()[-1]):
-                temp = gts[...,ind_c,ind]/255.
+                temp = gts[...,ind_c,ind]
                 gts_.append(temp)
                 ind_c = ind_c+1 if ind_c<CHAN-1 else 0
             gts = torch.stack(gts_,1)
@@ -117,7 +117,7 @@ def validation_func():
     test_path = 'data/data/validation'
     dataset = Imgdataset(test_path)
     test_dataloader = DataLoader(dataset)
-    test(test_dataloader,255)
+    test(test_dataloader)
 
 def test_func():
     test_path = 'data/data/test'
