@@ -58,16 +58,17 @@ def train(data_loader):
             #print(f'test:{masks.size()}')
             img_n_codes = img_ns*masks # may be not with mask
             output = []
-            mea = normalizer(mea,masks) #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+            #mea = normalizer(mea,masks) #@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
             mea = torch.unsqueeze(mea,3)
 
             gts_ = []
             ind_c = 0
+            #print(f'max value of gts is {torch.max(gts)}')
             for ind in range(gts.size()[-1]):
                 temp = gts[...,ind_c,ind]
                 gts_.append(temp)
                 ind_c = ind_c+1 if ind_c<2 else 0
-            gts = torch.stack(gts_,1)/255.
+            gts = torch.stack(gts_,1)
             gts = gts.to(device)
 
             for ind in range(img_ns.size()[-1]): # iterative over channel

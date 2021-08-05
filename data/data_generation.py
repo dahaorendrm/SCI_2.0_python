@@ -254,7 +254,7 @@ def entry_process(path,COMP_FRAME):
         pic_block_down = np.reshape(pic_block,(*pic_block.shape[0:2],np.prod(pic_block.shape[2:])))
         pic_block_down = skitrans.rescale(pic_block_down,0.6,multichannel=True, # downscale the sub-video
                                     anti_aliasing=True,preserve_range=True)
-        pic_blocMODELk_down = np.reshape(pic_block_down,(*pic_block_down.shape[0:2],*pic_block.shape[2:]))
+        pic_block_down = np.reshape(pic_block_down,(*pic_block_down.shape[0:2],*pic_block.shape[2:]))
         ind_r = [0]
         ind_c = [0,127,249]
         li_crops.extend(generate_crops(pic_block_down,2,ind_r,ind_c))# generate crops based on a downscaled video
@@ -292,7 +292,7 @@ def train_data_generation():
     # path = 'G:/My Drive/PHD_Research/data/DAVIS/JPEGImages/test/bear'
     # entry_process(path)
     COMP_FRAME = 9
-    path = '${WORKDIR}/X_MA/data/DAVIS/480p/'
+    path = '../../data/DAVIS/480p/'
     entries = os.listdir(path)
     entries_ = [(path+entry,COMP_FRAME) for entry in entries]
     ind_id = int(os.getenv('SLURM_ARRAY_TASK_ID'))
@@ -338,4 +338,4 @@ def test_data_generation():
     save_test_crops(MODEL,crops,li_all_crops_data,0,'4D_lego')
 
 if __name__ == '__main__':
-    test_data_generation()
+    train_data_generation()
