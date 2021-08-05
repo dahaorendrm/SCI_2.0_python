@@ -9,9 +9,9 @@
 # SBATCH --mem-per-cpu=10G
 
 #SBATCH --job-name=chasti_train_4layer_no_BN_7f
-#SBATCH --partition=standard
+#SBATCH --partition=gpu-v100
 # SBATCH --partition=_workgroup_
-#SBATCH --gres=gpu
+#SBATCH --gpus=1
 
 #SBATCH --time=5-10:00:00
 # SBATCH --output=ArraySCI%A-%a.out
