@@ -4,7 +4,7 @@ import os
 
 path = 'test/result'
 data_list = os.listdir(path)
-name = '0000'
+name = '0005'
 for data in data_list:
     if name in data and 'input' in data:
         with open(path + '/' + data, 'rb') as f:
