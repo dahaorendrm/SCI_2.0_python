@@ -337,5 +337,18 @@ def test_data_generation():
     li_all_crops_data = pool.starmap(compressive_model, comp_input) # contain (original led project, mea, gaptv_result)
     save_test_crops(MODEL,crops,li_all_crops_data,0,'4D_lego')
 
+
+    MODEL = 'lesti_sst'
+    COMP_FRAME = 24
+    imgs = scio.loadmat('blocks.mat')['img']
+    print(f'Input wood blocks data max is {np.amax(imgs)}.')
+    #print(f'shape of imgs is {imgs.shape}')
+    crops = []
+    for ind in range(0,40-COMP_FRAME+1,COMP_FRAME-4):
+        #print(f'Test: index of the data range is {ind} to {ind+COMP_FRAME}')
+        crops.append(imgs[:,:,4:-2,ind:ind+COMP_FRAME])
+    comp_input = [(MODEL,crop) for crop in crops]
+    li_all_crops_data = pool.starmap(compressive_model, comp_input) # contain (original led project, mea, gaptv_result)
+    save_test_crops(MODEL,crops,li_all_crops_data,0,'4D_blocks')
 if __name__ == '__main__':
     train_data_generation()
