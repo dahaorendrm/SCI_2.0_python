@@ -21,4 +21,4 @@
 
 # export OMP_NUM_THREADS=4
 vpkg_require xm_pytorch
-python3 -u train.py
+python3 -u train_meaN.py

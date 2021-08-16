@@ -12,8 +12,8 @@ import pickle
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = CHASTINET(4,128,4).to(device)
-epoch_ind = 6
-model.load_state_dict(torch.load('./train/epoch_tradition_4l_NBN_f7' + "/{}.pth".format(epoch_ind)))
+epoch_ind = 9
+model.load_state_dict(torch.load('./train/epoch_meaN' + "/{}.pth".format(epoch_ind)))
 
 def normalizer(imgs,masks):
     mask_s = torch.sum(masks,3)
@@ -50,7 +50,7 @@ def test(test_dataloader):
             gts = np.moveaxis(gts,1,-1)
             output = []
             imgs_n = []
-            #mea = normalizer(mea,masks)
+            mea = normalizer(mea,masks)
             mea = torch.unsqueeze(mea,3)
             for ind in range(img_ns.size()[-1]):
                 #gt = gts[...,ind]
