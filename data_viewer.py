@@ -6,30 +6,38 @@ path = 'test/result'
 data_list = os.listdir(path)
 name = '0005'
 for data in data_list:
-    if name in data and 'input' in data:
+    if name in data:
         with open(path + '/' + data, 'rb') as f:
-            inputimgs = numpy.load(f)
-
-    if name in data and 'result' in data:
-        with open(path + '/' + data, 'rb') as f:
-            outputimgs = numpy.load(f)
-
-    if name in data and 'gt' in data:
-        with open(path + '/' + data, 'rb') as f:
-            gtimgs = numpy.load(f)
-
+            data = numpy.load(f)
+    # if name in data and 'input' in data:
+    #     with open(path + '/' + data, 'rb') as f:
+    #         inputimgs = numpy.load(f)
+    #
+    # if name in data and 'result' in data:
+    #     with open(path + '/' + data, 'rb') as f:
+    #         outputimgs = numpy.load(f)
+    #
+    # if name in data and 'gt' in data:
+    #     with open(path + '/' + data, 'rb') as f:
+    #         gtimgs = numpy.load(f)
+gt_outp = data['gt_outp']
+input = data['input']
+output = data['output']
+gt_orig = data['gt_orig']
+if 'gt_leds' in data.keys():
+    gt_leds = data['gt_leds']
 
 from utils import *
 
-inputimgs = np.squeeze(inputimgs)
+inputimgs = np.squeeze(input)
 inputimgs = inputimgs * 255
 display_highdimdatacube(inputimgs)
 
-outputimgs = np.squeeze(outputimgs)
+outputimgs = np.squeeze(output)
 outputimgs = outputimgs * 255
 display_highdimdatacube(outputimgs)
 
-gtimgs = np.squeeze(gtimgs)
+gtimgs = np.squeeze(gt_outp)
 gtimgs = gtimgs * 255
 display_highdimdatacube(gtimgs)
 
