@@ -340,7 +340,7 @@ def test_data_generation():
 
     MODEL = 'lesti_sst'
     COMP_FRAME = 24
-    imgs = scio.loadmat('blocks.mat')['img']
+    imgs = scio.loadmat('blocks.mat')['img']*255
     print(f'Input wood blocks data max is {np.amax(imgs)}.')
     #print(f'shape of imgs is {imgs.shape}')
     crops = []
@@ -351,4 +351,4 @@ def test_data_generation():
     li_all_crops_data = pool.starmap(compressive_model, comp_input) # contain (original led project, mea, gaptv_result)
     save_test_crops(MODEL,crops,li_all_crops_data,0,'4D_blocks')
 if __name__ == '__main__':
-    train_data_generation()
+    test_data_generation()
