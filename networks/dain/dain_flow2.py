@@ -7,9 +7,9 @@ from .my_package.DepthFlowProjection import DepthFlowProjectionModule
 
 from .Stack import Stack
 
-import ..PWCNet
+from .. import PWCNet
 from . import S2D_models
-from . import Resblock
+from .. import Resblock
 from . import MegaDepth
 import time
 import utils

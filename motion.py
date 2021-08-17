@@ -22,7 +22,7 @@ class Motion:
         elif method is 'dain_flow':
             self.model = dain_net.__dict__['DAIN_flow'](
                                                timestep=timestep,training=False)
-            SAVED_MODEL = './model_weights/best.pth'
+            SAVED_MODEL = './networks/dain/model_weights/best.pth'
             pretrained_dict = torch.load(SAVED_MODEL)
             model_dict = self.model.state_dict()
             # 1. filter out unnecessary keys
@@ -37,7 +37,7 @@ class Motion:
         elif method is 'dain_flow2':
             self.model = dain_net.__dict__['DAIN_flow2'](
                                                training=False)
-            SAVED_MODEL = './model_weights/best.pth'
+            SAVED_MODEL = './networks/dain/model_weights/best.pth'
             pretrained_dict = torch.load(SAVED_MODEL)
             model_dict = self.model.state_dict()
             # 1. filter out unnecessary keys

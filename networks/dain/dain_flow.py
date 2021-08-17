@@ -7,12 +7,12 @@ from .my_package.DepthFlowProjection import DepthFlowProjectionModule
 
 from .Stack import Stack
 
-import ..PWCNet
+from .. import PWCNet
 from . import S2D_models
-from . import Resblock
+from .. import Resblock
 from . import MegaDepth
 import time
-from func import utils
+import utils
 logger = utils.init_logger(__name__)
 
 class DAIN_flow(torch.nn.Module):
