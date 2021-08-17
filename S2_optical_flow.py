@@ -6,22 +6,19 @@ import os
 
 path = 'test/result'
 data_list = os.listdir(path)
-name = '0005'
-for data in data_list:
-    if name in data and 'input' in data:
-        with open(path + '/' + data, 'rb') as f:
-            inputimgs = numpy.load(f)
+name = '0003'
+for data_name in data_list:
+    if name in data_name:
+        with numpy.load(path + '/' + data_name) as data:
+            gt_outp = data['gt_outp']
+            input = data['input']
+            output = data['output']
+            gt_orig = data['gt_orig']
+            if 'gt_leds' in data.keys():
+                gt_leds = data['gt_leds']
 
-    if name in data and 'result' in data:
-        with open(path + '/' + data, 'rb') as f:
-            outputimgs = numpy.load(f)
-
-    if name in data and 'gt' in data:
-        with open(path + '/' + data, 'rb') as f:
-            gtimgs = numpy.load(f)
-
-re = outputimgs
-orig_leds = gtimgs
+re = np.squeeze(output)
+orig_leds = gt_leds
 #flow = Motion(method='dain_flow',timestep=0.125)
 #_ = flow.get_motions(orig_new[:,:,:8],orig_new[:,:,8:16], orig_ref)
 #logger.debug('Shape of dainflow2 input '+str(orig_new.shape))
