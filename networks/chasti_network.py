@@ -2,7 +2,7 @@
 import torch
 import torch.nn as nn
 import time
-import Resblock
+import networks.Resblock
 
 
 

@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 import torch
 import torch.nn as nn
-from dain.my_package.FilterInterpolation import  FilterInterpolationModule
-from dain.my_package.FlowProjection import  FlowProjectionModule #,FlowFillholeModule
-from dain.my_package.DepthFlowProjection import DepthFlowProjectionModule
+from .my_package.FilterInterpolation import  FilterInterpolationModule
+from .my_package.FlowProjection import  FlowProjectionModule #,FlowFillholeModule
+from .my_package.DepthFlowProjection import DepthFlowProjectionModule
 
-from dain.Stack import Stack
+from .Stack import Stack
 
-import PWCNet
-from dain import S2D_models
-from dain import Resblock
-from dain import MegaDepth
+import ..PWCNet
+from . import S2D_models
+from . import Resblock
+from . import MegaDepth
 import time
 
 class DAIN(torch.nn.Module):
@@ -22,7 +22,7 @@ class DAIN(torch.nn.Module):
 
         # base class initialization
         super(DAIN, self).__init__()
-        
+
         self.filter_size = filter_size
         self.training = training
         self.timestep = timestep
@@ -39,7 +39,7 @@ class DAIN(torch.nn.Module):
         self.rectifyNet = Resblock.__dict__['MultipleBasicBlock_4'](3 + 3 + 3 +2*1+ 2*2 +16*2+ 2 * self.ctx_ch,128)
 
         self._initialize_weights()
-        
+
         if self.training:
             self.flownets = PWCNet.__dict__['pwc_dc_net']("PWCNet/pwc_net.pth.tar")
         else:
@@ -98,7 +98,7 @@ class DAIN(torch.nn.Module):
         s2 = torch.cuda.current_stream()
 
         '''
-            STEP 1: sequeeze the input 
+            STEP 1: sequeeze the input
         '''
         if self.training == True:
             assert input.size(0) == 3
@@ -121,7 +121,7 @@ class DAIN(torch.nn.Module):
         cur_filter_input = cur_offset_input # torch.cat((cur_input_0, cur_input_2), dim=1)
 
         '''
-            STEP 3.3: perform the estimation by the Three subpath Network 
+            STEP 3.3: perform the estimation by the Three subpath Network
         '''
         time_offsets = [ kk * self.timestep for kk in range(1, 1+self.numFrames,1)]
 
@@ -160,7 +160,7 @@ class DAIN(torch.nn.Module):
                 ]
 
         '''
-            STEP 3.4: perform the frame interpolation process 
+            STEP 3.4: perform the frame interpolation process
         '''
         cur_offset_output = [cur_offset_outputs[0][0], cur_offset_outputs[1][0]]
         ctx0,ctx2 = self.FilterInterpolate_ctx(cur_ctx_output[0],cur_ctx_output[1],
@@ -180,7 +180,7 @@ class DAIN(torch.nn.Module):
         '''
         if self.training == True:
                 losses +=[cur_output - cur_input_1]
-                losses += [cur_output_rectified - cur_input_1]                
+                losses += [cur_output_rectified - cur_input_1]
                 offsets +=[cur_offset_output]
                 filters += [cur_filter_output]
         '''

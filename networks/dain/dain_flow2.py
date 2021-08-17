@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 import torch
 import torch.nn as nn
-from networks.dain.my_package.FilterInterpolation import  FilterInterpolationModule
-from networks.dain.my_package.FlowProjection import  FlowProjectionModule #,FlowFillholeModule
-from networks.dain.my_package.DepthFlowProjection import DepthFlowProjectionModule
+from .my_package.FilterInterpolation import  FilterInterpolationModule
+from .my_package.FlowProjection import  FlowProjectionModule #,FlowFillholeModule
+from .my_package.DepthFlowProjection import DepthFlowProjectionModule
 
-from networks.dain.Stack import Stack
+from .Stack import Stack
 
-import networks.PWCNet
-from networks.dain import S2D_models
-from networks.dain import Resblock
-from networks.dain import MegaDepth
+import ..PWCNet
+from . import S2D_models
+from . import Resblock
+from . import MegaDepth
 import time
 import utils
 logger = utils.init_logger(__name__)

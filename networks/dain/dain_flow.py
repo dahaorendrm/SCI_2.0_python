@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 import torch
 import torch.nn as nn
-from dain.my_package.FilterInterpolation import  FilterInterpolationModule
-from dain.my_package.FlowProjection import  FlowProjectionModule #,FlowFillholeModule
-from dain.my_package.DepthFlowProjection import DepthFlowProjectionModule
+from .my_package.FilterInterpolation import  FilterInterpolationModule
+from .my_package.FlowProjection import  FlowProjectionModule #,FlowFillholeModule
+from .my_package.DepthFlowProjection import DepthFlowProjectionModule
 
-from dain.Stack import Stack
+from .Stack import Stack
 
-import PWCNet
-from dain import S2D_models
-from dain import Resblock
-from dain import MegaDepth
+import ..PWCNet
+from . import S2D_models
+from . import Resblock
+from . import MegaDepth
 import time
 from func import utils
 logger = utils.init_logger(__name__)
@@ -110,7 +110,7 @@ class DAIN_flow(torch.nn.Module):
             assert input.size(0) ==2
             input_0,input_2 = torch.squeeze(input,dim=0)
 
-        
+
         #prepare the input data of current scale
         cur_input_0 = input_0
         if self.training == True:
