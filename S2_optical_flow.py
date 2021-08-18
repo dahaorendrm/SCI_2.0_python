@@ -4,7 +4,7 @@ import numpy as np
 import os
 
 
-path = 'test/result'
+path = 'S1_result'
 data_list = os.listdir(path)
 name = '0000'
 for data_name in data_list:

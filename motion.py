@@ -88,9 +88,9 @@ class Motion:
             input = torch.from_numpy(input).to(self.device)
             output = self.model(input)
         output = output.cpu().numpy()
-        with open("temp/dainflow2_results.pickle",'wb') as f:
+        with open("S2_result/dainflow2_results.pickle",'wb') as f:
             pickle.dump(output,f)
-        with open("temp/dainflow2_results_ref.pickle",'wb') as f:
+        with open("S2_result/dainflow2_results_ref.pickle",'wb') as f:
             pickle.dump(origs,f)
         if origs is not None:
             self.psnr = []
