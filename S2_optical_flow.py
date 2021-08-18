@@ -18,12 +18,12 @@ for data_name in data_list:
                 gt_leds = data['gt_leds']
 
 re = np.squeeze(output)
-re = np.reshape(re,(256,256,3,int(re.shape[-1]/3)))
-#re = np.reshape(re,(256,256,8,int(re.shape[-1]/8)))
+#re = np.reshape(re,(256,256,3,int(re.shape[-1]/3)))
+re = np.reshape(re,(256,256,8,int(re.shape[-1]/8)))
 re = np.moveaxis(re,(0,1,2,3),(-2,-1,-3,-4))
-#orig_leds = np.squeeze(gt_leds)
-#orig_leds = orig_leds[...,:24]
-orig_leds = np.squeeze(gt_orig)
+orig_leds = np.squeeze(gt_leds)
+orig_leds = orig_leds[...,:24]
+#orig_leds = np.squeeze(gt_orig)
 print(f'Shape check: re has shape of {re.shape}, orig_leds has shape of {orig_leds.shape}')
 #flow = Motion(method='dain_flow',timestep=0.125)
 #_ = flow.get_motions(orig_new[:,:,:8],orig_new[:,:,8:16], orig_ref)
@@ -42,6 +42,5 @@ for ind_r in range(re_ledimg_4d.shape[3]):
 print('Max and min value of the result is ')
 print(v_max)
 print(v_min)
-print(f'The psnr of result is {np.mean(array(v_psnr)):wq
-}')
+print(f'The psnr of result is {np.mean(array(v_psnr))}')
 #np.save('temp/dain_result.npy',re_ledimg_4d)
