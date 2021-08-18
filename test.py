@@ -12,7 +12,7 @@ import pickle
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = CHASTINET(4,128,4).to(device)
-epoch_ind = 6
+epoch_ind = 7
 model.load_state_dict(torch.load('./train/epoch_tradition_4l_NBN_f7' + "/{}.pth".format(epoch_ind)))
 
 def normalizer(imgs,masks):
