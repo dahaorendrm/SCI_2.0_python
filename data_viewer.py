@@ -5,9 +5,9 @@ import matplotlib
 matplotlib.use('qt5agg')
 
 # chasti result viewer
-path = 'test/result'
+path = 'S1_result'
 data_list = os.listdir(path)
-name = '0003'
+name = '0001'
 for data_name in data_list:
     if name in data_name:
         with numpy.load(path + '/' + data_name) as data:
@@ -53,14 +53,14 @@ print(f'Input noise images PSNR is {psnr_in}, output images PSNR is {psnr_out}.'
 # <codecell> DAIN result viewer
 import pickle
 from utils import *
-with open(r'S2_result/dainflow2_results.pickle','rb') as f:
+with open(r'S2_result/0001gt_dainflow2_results.pickle','rb') as f:
     re_ledimg_4d = pickle.load(f)
-with open(r'S2_result/0000_dainflow2_results_ref.pickle','rb') as f:
-    ref = pickle.load(f)
 re_ledimg_4d[re_ledimg_4d<0] = 0
-re_ledimg_4d[re_ledimg_4d>5] = 5
+re_ledimg_4d[re_ledimg_4d>1] = 1
 fig = display_highdimdatacube(re_ledimg_4d[:,:,:,:8],transpose=True)
 fig.show()
+# with open(r'S2_result/0000_dainflow2_results_ref.pickle','rb') as f:
+# ref = pickle.load(f)
 # fig_ref = display_highdimdatacube(ref,transpose=True)
 # fig_ref.show()
 

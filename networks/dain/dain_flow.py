@@ -14,7 +14,6 @@ from . import MegaDepth
 import time
 import utils
 logger = utils.init_logger(__name__)
-
 class DAIN_flow(torch.nn.Module):
     def __init__(self,
                  channel = 3,

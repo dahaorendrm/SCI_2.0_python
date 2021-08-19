@@ -23,11 +23,11 @@ class CorrelationFunction(Function):
             rbot2 = input2.new()
             output = input1.new()
 
-            correlation_cuda.forward(input1, input2, rbot1, rbot2, output, 
+            correlation_cuda.forward(input1, input2, rbot1, rbot2, output,
                 pad_size, kernel_size, max_displacement,stride1, stride2, corr_multiply)
 
         return output
-    #@staticmethod
+    @staticmethod
     def backward(ctx, grad_output):
         input1, input2,pad_size,kernel_size,max_displacement,stride1,stride2,corr_multiply = ctx.saved_tensors
 
@@ -59,4 +59,3 @@ class Correlation(Module):
         result = CorrelationFunction.apply(input1, input2,self.pad_size, self.kernel_size, self.max_displacement,self.stride1, self.stride2, self.corr_multiply)
 
         return result
-
