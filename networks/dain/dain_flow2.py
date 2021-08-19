@@ -108,7 +108,7 @@ class DAIN_flow2(torch.nn.Module):
                 if indg == ngroup-2:
                     result[:,:,indf, nf*(indg+1)+indf] = torch.mean(input1,0)
                 ### Step 1.2: Fill the 7 intermediate frames and put them in results
-                li_7 = self.forward_7frames(input0,input1)
+                li_7 = self.forward_7frames(input0,input1,nf)
                 print('Length of li_7 is '+str(len(li_7))+' with shape '+str(li_7[0].size()))
                 for ind,item in enumerate(li_7):
                     item = torch.squeeze(item)
@@ -143,7 +143,7 @@ class DAIN_flow2(torch.nn.Module):
         #result.cpu()
         return result
 
-    def forward_7frames(self,input0,input1):
+    def forward_7frames(self,input0,input1,nf):
         s1 = torch.cuda.current_stream()
         s2 = torch.cuda.current_stream()
 
@@ -154,8 +154,10 @@ class DAIN_flow2(torch.nn.Module):
         '''
         cur_offset_input = torch.cat((cur_input_0, cur_input_1), dim=1)
         cur_filter_input = cur_offset_input
-        numFrames =int(1.0/0.125) - 1
-        time_offsets = [ kk * 0.125 for kk in range(1, 1+numFrames,1)]
+        #numFrames =int(1.0/0.125) - 1
+        numFrames = nf-1
+        unit_time = 1.0/nf
+        time_offsets = [ kk * unit_time for kk in range(1, 1+numFrames,1)]
         '''
             STEP 2: First layer estimations
         '''
