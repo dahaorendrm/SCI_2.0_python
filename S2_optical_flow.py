@@ -31,16 +31,18 @@ print(f'Shape check: re has shape of {re.shape}, orig_leds has shape of {orig_le
 #logger.debug('Shape of dainflow2 output '+str(mea.orig_leds.shape))
 flow = Motion(method='dain_flow2')
 re_ledimg_4d,v_psnr,_ = flow.get_motions(re, orig_leds)
-v_max, v_min = []
+v_max = []
+v_min = []
 for ind_r in range(re_ledimg_4d.shape[3]):
-    t_max, t_min = []
+    t_max = []
+    t_min = []
     for ind_c in range(re_ledimg_4d.shape[2]):
         t_max.append(np.amax(re_ledimg_4d[...,ind_c,ind_r]))
         t_min.append(np.amin(re_ledimg_4d[...,ind_c,ind_r]))
     v_max.append(t_max)
     v_min.append(t_min)
 print('Max and min value of the result is ')
-print(v_max)
-print(v_min)
-print(f'The psnr of result is {np.mean(array(v_psnr))}')
+print(np.array(v_max))
+print(np.array(v_min))
+print(f'The psnr of result is {np.mean(np.array(v_psnr))}')
 #np.save('temp/dain_result.npy',re_ledimg_4d)
