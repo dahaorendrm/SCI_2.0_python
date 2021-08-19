@@ -28,14 +28,17 @@ for data_name in data_list:
             gt_orig = data['gt_orig']
             if 'gt_leds' in data.keys():
                 gt_leds = data['gt_leds']
-
+        break
 re = np.squeeze(output)
-#re = np.reshape(re,(256,256,3,int(re.shape[-1]/3)))
-re = np.reshape(re,(256,256,8,int(re.shape[-1]/8)))
-re = np.moveaxis(re,(0,1,2,3),(-2,-1,-3,-4))
-orig_leds = np.squeeze(gt_leds)
-orig_leds = orig_leds[...,:24]
-#orig_leds = np.squeeze(gt_orig)
+if 'rgb' in data_name:
+    re = np.reshape(re,(256,256,3,int(re.shape[-1]/3)),order='F')
+    orig_leds = np.squeeze(gt_orig)
+    re = np.moveaxis(re,(0,1,2,3),(-2,-1,-3,-4))
+if 'spectra' in data_name:
+    re = np.reshape(re,(256,256,8,int(re.shape[-1]/8)),order='F')
+    orig_leds = np.squeeze(gt_leds)
+    orig_leds = orig_leds[...,:24]
+    re = np.moveaxis(re,(0,1,2,3),(-2,-1,-3,-4))
 print(f'Shape check: re has shape of {re.shape}, orig_leds has shape of {orig_leds.shape}')
 #flow = Motion(method='dain_flow',timestep=0.125)
 #_ = flow.get_motions(orig_new[:,:,:8],orig_new[:,:,8:16], orig_ref)
