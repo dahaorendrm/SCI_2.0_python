@@ -37,7 +37,6 @@ name = '0000'
 for data_name in data_list:
     if name in data_name:
         with np.load(path + '/' + data_name) as data:
-            re_gt=re_gt,re_in=re_in, re_out=re_out, orig_leds=orig_leds
             re_gt = data['re_gt']
             re_in = data['re_in']
             re_out = data['re_out']
@@ -49,46 +48,46 @@ for data_name in data_list:
     # print('Max and min value of the result is ')
     # print(v_max)
     # print(v_min)
-    MAX_V = 3
-    MIN_V = 0
-    re_gt[re_gt<MIN_V] = MIN_V
-    re_gt[re_gt>MAX_V] = MAX_V
-    re_gt = re_gt/np.amax(re_gt)
-    re_in[re_in<MIN_V] = MIN_V
-    re_in[re_in>MAX_V] = MAX_V
-    re_in = re_in/np.amax(re_in)
-    re_out[re_out<MIN_V] = MIN_V
-    re_out[re_out>MAX_V] = MAX_V
-    re_out = re_out/np.amax(re_out)
+MAX_V = 3
+MIN_V = 0
+re_gt[re_gt<MIN_V] = MIN_V
+re_gt[re_gt>MAX_V] = MAX_V
+re_gt = re_gt/np.amax(re_gt)
+re_in[re_in<MIN_V] = MIN_V
+re_in[re_in>MAX_V] = MAX_V
+re_in = re_in/np.amax(re_in)
+re_out[re_out<MIN_V] = MIN_V
+re_out[re_out>MAX_V] = MAX_V
+re_out = re_out/np.amax(re_out)
 
-    ## spectra conversion
-    # led_curve = scio.loadmat('BandsLed.mat')['BandsLed']
-    # # load led curve
-    # led_curve = signal.resample(led_curve,8,axis=0)
-    # orig = signal.resample(mea.orig,8,axis=2)
-    # temp = np.moveaxis(re_ledimg_4d,-1,-2)
-    # shape_ = temp.shape
-    # temp = np.reshape(temp,(np.cumprod(shape_[:3])[2],shape_[3]))
-    # temp = np.linalg.solve(led_curve.transpose(), temp.transpose())
-    # temp = np.reshape(temp.transpose(),shape_)
-    # temp = np.moveaxis(temp,-1,-2)
-    # fig = utils.display_highdimdatacube(temp[:,:,:,:8],transpose=True)
-    # fig.show()
-    # fig_ref = utils.display_highdimdatacube(orig[:,:,:,:8],transpose=True)
-    # fig_ref.show()
+## spectra conversion
+# led_curve = scio.loadmat('BandsLed.mat')['BandsLed']
+# # load led curve
+# led_curve = signal.resample(led_curve,8,axis=0)
+# orig = signal.resample(mea.orig,8,axis=2)
+# temp = np.moveaxis(re_ledimg_4d,-1,-2)
+# shape_ = temp.shape
+# temp = np.reshape(temp,(np.cumprod(shape_[:3])[2],shape_[3]))
+# temp = np.linalg.solve(led_curve.transpose(), temp.transpose())
+# temp = np.reshape(temp.transpose(),shape_)
+# temp = np.moveaxis(temp,-1,-2)
+# fig = utils.display_highdimdatacube(temp[:,:,:,:8],transpose=True)
+# fig.show()
+# fig_ref = utils.display_highdimdatacube(orig[:,:,:,:8],transpose=True)
+# fig_ref.show()
 
-    ## Evaluation
-    psnr_gt,ssim_gt = outputevalarray(re_gt,ref)
-    print(f'The avg psnr of gt is {np.mean(psnr_gt)}')
-    print(f'The avg ssim of gt is {np.mean(ssim_gt)}')
-    psnr_in,ssim_in = outputevalarray(re_in,ref)
-    print(f'The avg psnr of gaptv+DAIN is {np.mean(psnr_in)}')
-    print(f'The avg ssim of gaptv+DAIN is {np.mean(ssim_in)}')
-    psnr_out,ssim_out = outputevalarray(re_out,ref)
-    print(f'The avg psnr of gaptv+ResNet+DAIN is {np.mean(psnr_out)}')
-    print(f'The avg ssim of gaptv+ResNet+DAIN is {np.mean(ssim_out)}')
+## Evaluation
+psnr_gt,ssim_gt = outputevalarray(re_gt,ref)
+print(f'The avg psnr of gt is {np.mean(psnr_gt)}')
+print(f'The avg ssim of gt is {np.mean(ssim_gt)}')
+psnr_in,ssim_in = outputevalarray(re_in,ref)
+print(f'The avg psnr of gaptv+DAIN is {np.mean(psnr_in)}')
+print(f'The avg ssim of gaptv+DAIN is {np.mean(ssim_in)}')
+psnr_out,ssim_out = outputevalarray(re_out,ref)
+print(f'The avg psnr of gaptv+ResNet+DAIN is {np.mean(psnr_out)}')
+print(f'The avg ssim of gaptv+ResNet+DAIN is {np.mean(ssim_out)}')
 
-    ## Save
+## Save
 
-    with open('S3_result/'+data_name[:-4]+f'_gtpsnr={psnr_gt}_inputpsnr={psnr_in}_outputpsnr={psnr_out}',"wb") as f:
-        np.savez(f, re_gt=re_gt,re_in=re_in, re_out=re_out, ref=orig_leds)
+with open('S3_result/'+data_name[:-4]+f'_gtpsnr={np.mean(psnr_gt)}_inputpsnr={np.mean(psnr_in)}_outputpsnr={np.mean(psnr_out)}.npz',"wb") as f:
+    np.savez(f, re_gt=re_gt,re_in=re_in, re_out=re_out, ref=ref)

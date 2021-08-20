@@ -2,12 +2,14 @@ import pickle
 import numpy
 import os
 import matplotlib
+matplotlib.use('webagg')
 matplotlib.use('qt5agg')
+from utils import *
 
-# chasti result viewer
+# <codecell> S1 results viewer
 path = 'S1_result'
 data_list = os.listdir(path)
-name = '0001'
+name = '0000'
 for data_name in data_list:
     if name in data_name:
         with numpy.load(path + '/' + data_name) as data:
@@ -17,20 +19,10 @@ for data_name in data_list:
             gt_orig = data['gt_orig']
             if 'gt_leds' in data.keys():
                 gt_leds = data['gt_leds']
-    # if name in data and 'input' in data:
-    #     with open(path + '/' + data, 'rb') as f:
-    #         inputimgs = numpy.load(f)
-    #
-    # if name in data and 'result' in data:
-    #     with open(path + '/' + data, 'rb') as f:
-    #         outputimgs = numpy.load(f)
-    #
-    # if name in data and 'gt' in data:
-    #     with open(path + '/' + data, 'rb') as f:
-    #         gtimgs = numpy.load(f)
-from utils import *
-
+        break
+input
 inputimgs = np.squeeze(input)
+inputimgs
 inputimgs = inputimgs * 255
 display_highdimdatacube(inputimgs)
 
@@ -48,6 +40,22 @@ print(f'Max value is inputimgs : {numpy.amax(inputimgs)},  outputimgs : {numpy.a
 psnr_in = calculate_psnr(gtimgs,inputimgs)
 psnr_out = calculate_psnr(gtimgs,outputimgs)
 print(f'Input noise images PSNR is {psnr_in}, output images PSNR is {psnr_out}.')
+
+
+
+
+
+# <codecell> S2 results viewer
+path = 'S2_result'
+data_list = os.listdir(path)
+name = '0000'
+for data_name in data_list:
+    if name in data_name:
+        with numpy.load(path + '/' + data_name) as data:
+            re_gt = data['re_gt']
+            re_in = data['re_in']
+            re_out = data['re_out']
+            ref = data['ref']
 
 
 # <codecell> DAIN result viewer
