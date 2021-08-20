@@ -5,9 +5,9 @@ import os
 
 
 
-def reshape_data(data):
+def reshape_data(data,step):
     data = np.squeeze(data)
-    data = np.reshape(data,(256,256,8,int(data.shape[-1]/8)),order='F')
+    data = np.reshape(data,(256,256,step,int(data.shape[-1]/step)),order='F')
     data = np.moveaxis(data,(0,1,2,3),(-2,-1,-3,-4))
     return data
 
@@ -38,15 +38,15 @@ for data_name in data_list:
     # process data
     if 'rgb' in data_name:
         save_name = save_name + 'rgb_'
-        gt_outp = reshape_data(gt_outp)
-        input = reshape_data(input)
-        output = reshape_data(output)
+        gt_outp = reshape_data(gt_outp,3)
+        input = reshape_data(input,3)
+        output = reshape_data(output,3)
         orig_leds = np.squeeze(gt_orig)
     if 'spectra' in data_name:
         save_name = save_name + 'spectra_'
-        gt_outp = reshape_data(gt_outp)
-        input = reshape_data(input)
-        output = reshape_data(output)
+        gt_outp = reshape_data(gt_outp,8)
+        input = reshape_data(input,8)
+        output = reshape_data(output,8)
         orig_leds = np.squeeze(gt_leds)
         orig_leds = orig_leds[...,:24]
     #print(f'Shape check: data has shape of {data.shape}, orig_leds has shape of {orig_leds.shape}')
