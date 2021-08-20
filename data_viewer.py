@@ -53,11 +53,11 @@ print(f'Input noise images PSNR is {psnr_in}, output images PSNR is {psnr_out}.'
 # <codecell> DAIN result viewer
 import pickle
 from utils import *
-with open(r'S2_result/0001gt_dainflow2_results.pickle','rb') as f:
+with open(r'S2_result/dainflow2_results.pickle','rb') as f:
     re_ledimg_4d = pickle.load(f)
 re_ledimg_4d[re_ledimg_4d<0] = 0
-re_ledimg_4d[re_ledimg_4d>1] = 1
-fig = display_highdimdatacube(re_ledimg_4d[:,:,:,:8],transpose=True)
+re_ledimg_4d[re_ledimg_4d>3] = 3
+fig = display_highdimdatacube(re_ledimg_4d[:,:,:,8:],transpose=True)
 fig.show()
 # with open(r'S2_result/0000_dainflow2_results_ref.pickle','rb') as f:
 # ref = pickle.load(f)
