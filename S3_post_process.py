@@ -89,5 +89,5 @@ print(f'The avg ssim of gaptv+ResNet+DAIN is {np.mean(ssim_out)}')
 
 ## Save
 
-with open('S3_result/'+data_name[:-4]+f'_gtpsnr={np.mean(psnr_gt)}_inputpsnr={np.mean(psnr_in)}_outputpsnr={np.mean(psnr_out)}.npz',"wb") as f:
+with open('S3_result/'+data_name[:-4]+f'_gtpsnr={np.mean(psnr_gt):.4f}_inputpsnr={np.mean(psnr_in):.4f}_outputpsnr={np.mean(psnr_out):.4f}.npz',"wb") as f:
     np.savez(f, re_gt=re_gt,re_in=re_in, re_out=re_out, ref=ref)

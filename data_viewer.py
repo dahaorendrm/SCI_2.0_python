@@ -65,7 +65,7 @@ with open(r'S2_result/dainflow2_results.pickle','rb') as f:
     re_ledimg_4d = pickle.load(f)
 re_ledimg_4d[re_ledimg_4d<0] = 0
 re_ledimg_4d[re_ledimg_4d>3] = 3
-fig = display_highdimdatacube(re_ledimg_4d[:,:,:,8:],transpose=True)
+fig = display_highdimdatacube(re_in[:,:,:,8:],transpose=True)
 fig.show()
 # with open(r'S2_result/0000_dainflow2_results_ref.pickle','rb') as f:
 # ref = pickle.load(f)
@@ -87,3 +87,45 @@ fig = display_highdimdatacube(temp[:,:,:,:8],transpose=True)
 fig.show()
 fig_ref = display_highdimdatacube(orig[:,:,:,:8],transpose=True)
 fig_ref.show()
+
+
+
+# <codecell> S3 results viewer
+import pickle
+from utils import *
+import numpy as np
+path = 'S3_result'
+data_list = os.listdir(path)
+name = '0000_spectra__gtpsnr=11.4092'
+display = 're_gt' #re_gt, re_in, re_out
+
+for data_name in data_list:
+    if name in data_name:
+        with np.load(path + '/' + data_name) as data:
+            re_display = data[display]
+            ref = data['ref']
+
+print(f'The shape of {display} is {re_display.shape}')
+fig = display_highdimdatacube(re_display[:,:,:,0:],transpose=True)
+fig.show()
+
+
+
+# <codecell> S4 results viewer
+import pickle
+from utils import *
+import numpy as np
+path = 'S3_result'
+data_list = os.listdir(path)
+name = '0000_spectra__gtpsnr=11.4092'
+display = 're_gt' #re_gt, re_in, re_out
+
+for data_name in data_list:
+    if name in data_name:
+        with np.load(path + '/' + data_name) as data:
+            re_display = data[display]
+            ref = data['ref']
+
+print(f'The shape of {display} is {re_display.shape}')
+fig = display_highdimdatacube(re_display[:,:,:,0:],transpose=True)
+fig.show()

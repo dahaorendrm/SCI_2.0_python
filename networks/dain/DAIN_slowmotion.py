@@ -9,7 +9,7 @@ from .Stack import Stack
 
 from .. import PWCNet
 from . import S2D_models
-from .. import Resblock
+from . import Resblock
 from . import MegaDepth
 import time
 
