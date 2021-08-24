@@ -115,17 +115,19 @@ fig.show()
 import pickle
 from utils import *
 import numpy as np
-path = 'S3_result'
+path = 'S4_result'
 data_list = os.listdir(path)
-name = '0000_spectra__gtpsnr=11.4092'
-display = 're_gt' #re_gt, re_in, re_out
+name = '0000_result'
 
 for data_name in data_list:
     if name in data_name:
         with np.load(path + '/' + data_name) as data:
-            re_display = data[display]
+            result = data['result']
             ref = data['ref']
+            input = data['input']
 
-print(f'The shape of {display} is {re_display.shape}')
-fig = display_highdimdatacube(re_display[:,:,:,0:],transpose=True)
+
+fig = display_highdimdatacube(result[:,:,:,0:8],transpose=True)
+fig.show()
+fig = display_highdimdatacube(ref[:,:,:,0:8],transpose=True)
 fig.show()

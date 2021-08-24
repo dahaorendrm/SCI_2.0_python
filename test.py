@@ -107,10 +107,10 @@ def test(test_dataloader):
             if not os.path.exists('test/result'):
                 os.mkdir('test/result')
             if len(data) >= 3:
-                with open(f"test/result/test_{ind_data:04d}_spectra_input_psnr={psnr_in:.4f}_result_psnr={psnr_out:.4f}.npy","wb") as f:
+                with open(f"test/result/test_{ind_data:04d}_spectra_input_psnr={psnr_in:.4f}_result_psnr={psnr_out:.4f}.npz","wb") as f:
                     np.savez(f, gt_outp=gts,input=imgs_n,output=output,gt_orig=data[0],gt_leds=data[2])
             else:
-                with open(f"test/result/test_{ind_data:04d}_rgb_input_psnr={psnr_in:.4f}_result_psnr={psnr_out:.4f}.npy","wb") as f:
+                with open(f"test/result/test_{ind_data:04d}_rgb_input_psnr={psnr_in:.4f}_result_psnr={psnr_out:.4f}.npz","wb") as f:
                     np.savez(f, gt_outp=gts,input=imgs_n,output=output,gt_orig=data[0])
             # with open(f"test/result/test_{ind_data:04d}_input_psnr={psnr_in:.4f}.npy","wb") as f:
             #     np.save(f, imgs_n)

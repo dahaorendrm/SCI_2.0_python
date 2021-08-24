@@ -33,7 +33,7 @@ def outputevalarray(data,ref):
 
 path = 'S2_result'
 data_list = os.listdir(path)
-name = '0000'
+name = '0006'
 for data_name in data_list:
     if name in data_name:
         with np.load(path + '/' + data_name) as data:
