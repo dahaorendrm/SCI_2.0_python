@@ -96,8 +96,8 @@ from utils import *
 import numpy as np
 path = 'S3_result'
 data_list = os.listdir(path)
-name = '0000_spectra__gtpsnr=11.4092'
-display = 're_gt' #re_gt, re_in, re_out
+name = '0004'
+display = 're_out' #re_gt, re_in, re_out
 
 for data_name in data_list:
     if name in data_name:
@@ -106,7 +106,7 @@ for data_name in data_list:
             ref = data['ref']
 
 print(f'The shape of {display} is {re_display.shape}')
-fig = display_highdimdatacube(re_display[:,:,:,0:],transpose=True)
+fig = display_highdimdatacube(re_display[:,:,:,0:8],transpose=True)
 fig.show()
 
 
