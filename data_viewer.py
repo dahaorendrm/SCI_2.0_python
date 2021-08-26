@@ -1,12 +1,14 @@
+
+import matplotlib
+matplotlib.use('webagg')
+matplotlib.use('Qt5Agg')
+%matplotlib qt
+%matplotlib inline
+# <codecell> S1 results viewer
 import pickle
 import numpy
 import os
-import matplotlib
-matplotlib.use('webagg')
-matplotlib.use('qt5agg')
 from utils import *
-
-# <codecell> S1 results viewer
 path = 'S1_result'
 data_list = os.listdir(path)
 name = '0000'
@@ -96,17 +98,17 @@ from utils import *
 import numpy as np
 path = 'S3_result'
 data_list = os.listdir(path)
-name = '0004'
+name = '0000_spectra__MAX=2'
 display = 're_out' #re_gt, re_in, re_out
 
 for data_name in data_list:
-    if name in data_name:
+    if name in data_name and '.npz' in data_name:
         with np.load(path + '/' + data_name) as data:
             re_display = data[display]
             ref = data['ref']
 
 print(f'The shape of {display} is {re_display.shape}')
-fig = display_highdimdatacube(re_display[:,:,:,0:8],transpose=True)
+fig = display_highdimdatacube(re_display[:,:,:,:8],transpose=True)
 fig.show()
 
 

@@ -33,7 +33,7 @@ def outputevalarray(data,ref):
 
 path = 'S2_result'
 data_list = os.listdir(path)
-name = '0006'
+name = '0000'
 for data_name in data_list:
     if name in data_name:
         with np.load(path + '/' + data_name) as data:
@@ -48,7 +48,7 @@ for data_name in data_list:
     # print('Max and min value of the result is ')
     # print(v_max)
     # print(v_min)
-MAX_V = 1
+MAX_V = 2
 MIN_V = 0
 re_gt[re_gt<MIN_V] = MIN_V
 re_gt[re_gt>MAX_V] = MAX_V
