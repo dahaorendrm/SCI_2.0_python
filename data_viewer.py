@@ -119,7 +119,7 @@ from utils import *
 import numpy as np
 path = 'S4_result'
 data_list = os.listdir(path)
-name = '0000_result'
+name = '0000_resultpsnr=16.0138'
 
 for data_name in data_list:
     if name in data_name:
@@ -129,7 +129,7 @@ for data_name in data_list:
             input = data['input']
 
 
-fig = display_highdimdatacube(result[:,:,:,0:8],transpose=True)
+fig = display_highdimdatacube(result[:,:,:,8:],transpose=True)
 fig.show()
-fig = display_highdimdatacube(ref[:,:,:,0:8],transpose=True)
+fig = display_highdimdatacube(ref[:,:,:,8:],transpose=True)
 fig.show()
