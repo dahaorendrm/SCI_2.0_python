@@ -41,7 +41,7 @@ test_path = 'data/data/test/gt/4D_lego_0001_.tiff'
 gts = tifffile.imread(test_path)
 
 name = '0000_spectra__MAX=2'
-path = 'S3_result'
+path = 'S2_result'
 data_list = os.listdir(path)
 display = 're_out' #re_gt, re_in, re_out
 for data_name in data_list:
