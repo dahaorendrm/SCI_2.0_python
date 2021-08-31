@@ -125,7 +125,7 @@ class DAIN_flow2(torch.nn.Module):
                     for indf2 in range(indf+1,nf):
                         input0 = self.onech2threech(result[:,:,indf,indf2-1])
                         input2 = self.onech2threech(result[:,:,indf2,indf2])
-                        input0 = self.forward_simplewrap(input0,input1,input2)
+                        input0 = self.forward_simplewrap(input0,input1,input2,rectify=False)
                         input0 = torch.squeeze(input0)
                         result[:,:,indf2,indf] = torch.mean(input0,0)
                         print('pre output index col='+str(indf2)+' ,row='+str(indf))
@@ -136,7 +136,7 @@ class DAIN_flow2(torch.nn.Module):
                     for indf2 in range(indf):
                         input0 = self.onech2threech(result[:,:,indf,nf*(indg+1)+indf2])
                         input2 = self.onech2threech(result[:,:,indf2,nf*(indg+1)+indf2])
-                        input0 = self.forward_simplewrap(input0,input1,input2)
+                        input0 = self.forward_simplewrap(input0,input1,input2,rectify=False)
                         input0 = torch.squeeze(input0)
                         result[:,:,indf2,nf*(indg+1)+indf] = torch.mean(input0,0)
                         print('post output index col='+str(indf2)+' ,row='+str(nf*(indg+1)+indf))
@@ -241,10 +241,11 @@ class DAIN_flow2(torch.nn.Module):
             '''
             #print('Shape of 7 rectify input'+str(rectify_input.size()))
             rectified_temp = self.rectifyNet(rectify_input) + weighted_sum
+            rectified_temp = nn.sigmoid()(rectified_temp)
             cur_output_rectified.append(rectified_temp)
         return cur_output_rectified
 
-    def forward_simplewrap(self,input0,input1,input2):
+    def forward_simplewrap(self,input0,input1,input2,rectify=True):
         '''
         Generate flow from input0 to input1, then apply the flow to input2
         '''
@@ -307,17 +308,21 @@ class DAIN_flow2(torch.nn.Module):
             STEP 3.3: Concatenation
             Interpolated frames; interpolated flow; kernel filters; context
         '''
-        #print('Shape of input:(1)ref0'+str(ref0_offset.size())+'(2)cur_offset_outputs'+str(cur_offset_output.size())+'(3)cur_filter_output'+str(cur_filter_output[0].size())+'(4)context'+str(ctx0_offset.size()))
-        rectify_input = torch.cat((ref0_offset,ref0_offset,ref0_offset,
-                                cur_offset_output,cur_offset_output,
-                                cur_filter_output[0],cur_filter_output[1], # cur_filter_output[0] again?
-                                ctx0_offset,ctx0_offset),dim = 1)
-        '''
-            STEP 4.3: Rectification with resnet
-        '''
-        #print('Shape of simple rectify input'+str(rectify_input.size()))
-        cur_output_rectified = self.rectifyNet(rectify_input) + ref0_offset
-        return cur_output_rectified
+        if rectify:
+            #print('Shape of input:(1)ref0'+str(ref0_offset.size())+'(2)cur_offset_outputs'+str(cur_offset_output.size())+'(3)cur_filter_output'+str(cur_filter_output[0].size())+'(4)context'+str(ctx0_offset.size()))
+            rectify_input = torch.cat((ref0_offset,ref0_offset,ref0_offset,
+                                    cur_offset_output,cur_offset_output,
+                                    cur_filter_output[0],cur_filter_output[1], # cur_filter_output[0] again?
+                                    ctx0_offset,ctx0_offset),dim = 1)
+            '''
+                STEP 4.3: Rectification with resnet
+            '''
+            #print('Shape of simple rectify input'+str(rectify_input.size()))
+            cur_output_rectified = self.rectifyNet(rectify_input) + ref0_offset
+            cur_output_rectified = nn.sigmoid()(cur_output_rectified)
+            return cur_output_rectified
+        else:
+            return cur_offset_output
 
     def forward_flownets(self, model, input, time_offsets = None):
         temp = model(input)  # this is a single direction motion results, but not a bidirectional one
