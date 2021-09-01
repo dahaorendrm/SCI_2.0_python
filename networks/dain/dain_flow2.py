@@ -283,7 +283,7 @@ class DAIN_flow2(torch.nn.Module):
                 STEP 2.3: Kernel estimation
                 ######### maybe should from input2?
             '''
-            temp = self.forward_singlePath(self.initScaleNets_filter, cur_offset_input, 'filter')
+            temp = self.forward_singlePath(self.initScaleNets_filter, torch.cat((cur_input_2,cur_input_2), dim=1), 'filter')
             cur_filter_output = [self.forward_singlePath(self.initScaleNets_filter1, temp, name=None),
                              self.forward_singlePath(self.initScaleNets_filter2, temp, name=None)]
             '''
