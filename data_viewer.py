@@ -92,13 +92,13 @@ fig_ref.show()
 
 
 
-# <codecell> S3 results viewer
+# <codecell> S2.5 results viewer
 import pickle
 from utils import *
 import numpy as np
-path = 'S3_result'
+path = 'S2_result'
 data_list = os.listdir(path)
-name = '0000_spectra__MAX=2'
+name = 'normed0000_spectra'
 display = 're_out' #re_gt, re_in, re_out
 
 for data_name in data_list:

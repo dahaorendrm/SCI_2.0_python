@@ -322,7 +322,7 @@ class DAIN_flow2(torch.nn.Module):
             cur_output_rectified = nn.sigmoid()(cur_output_rectified)
             return cur_output_rectified
         else:
-            return cur_offset_output
+            return ref0_offset
 
     def forward_flownets(self, model, input, time_offsets = None):
         temp = model(input)  # this is a single direction motion results, but not a bidirectional one
