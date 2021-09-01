@@ -16,3 +16,4 @@
 data/blocks.mat
 *.npz
 *.npy
+*_result/*.txt

@@ -128,6 +128,7 @@ class DAIN_flow2(torch.nn.Module):
                         input0 = self.forward_simplewrap(input0,input1,input2,rectify=False)
                         input0 = torch.squeeze(input0)
                         result[:,:,indf2,indf] = torch.mean(input0,0)
+                        print(f'Generate flow from img({indf},{indf2-1]}) to img({indf},{indf}), apply on img({indf2},{indf2})')
                         print('pre output index col='+str(indf2)+' ,row='+str(indf))
 
             if indg == ngroup-2:
@@ -258,7 +259,7 @@ class DAIN_flow2(torch.nn.Module):
         '''
             STEP 1: concatenating the inputs.
         '''
-        cur_offset_input = torch.cat((cur_input_0, cur_input_1), dim=1) # shape:1,6,256,256
+        cur_offset_input = torch.cat((cur_input_1,cur_input_0), dim=1) # shape:1,6,256,256
         cur_filter_input = cur_input_2 # shape:1,3,256,256
         '''
             STEP 2: First layer estimations
