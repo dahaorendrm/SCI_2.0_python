@@ -123,12 +123,12 @@ class DAIN_flow2(torch.nn.Module):
                 for indf in range(nf-1):
                     input1 = self.onech2threech(result[:,:,indf,indf])
                     for indf2 in range(indf+1,nf):
-                        input0 = self.onech2threech(result[:,:,indf,indf2-1])
+                        input0 = self.onech2threech(result[:,:,indf,indf2])
                         input2 = self.onech2threech(result[:,:,indf2,indf2])
                         input0 = self.forward_simplewrap(input0,input1,input2,rectify=False)
                         input0 = torch.squeeze(input0)
                         result[:,:,indf2,indf] = torch.mean(input0,0)
-                        print(f'Generate flow from img({indf},{indf2-1]}) to img({indf},{indf}), apply on img({indf2},{indf2})')
+                        print(f'Generate flow from img({indf},{indf2}) to img({indf},{indf}), apply on img({indf2},{indf2})')
                         print('pre output index col='+str(indf2)+' ,row='+str(indf))
 
             if indg == ngroup-2:
@@ -140,6 +140,7 @@ class DAIN_flow2(torch.nn.Module):
                         input0 = self.forward_simplewrap(input0,input1,input2,rectify=False)
                         input0 = torch.squeeze(input0)
                         result[:,:,indf2,nf*(indg+1)+indf] = torch.mean(input0,0)
+                        print(f'Generate flow from img({indf},{nf*(indg+1)+indf2}) to img({indf},{nf*(indg+1)+indf}), apply on img({indf2},{indf2,nf*(indg+1)+indf2})')
                         print('post output index col='+str(indf2)+' ,row='+str(nf*(indg+1)+indf))
         #result.cpu()
         return result
@@ -324,6 +325,7 @@ class DAIN_flow2(torch.nn.Module):
             return cur_output_rectified
         else:
             return ref0_offset
+            #return cur_offset_output
 
     def forward_flownets(self, model, input, time_offsets = None):
         temp = model(input)  # this is a single direction motion results, but not a bidirectional one
