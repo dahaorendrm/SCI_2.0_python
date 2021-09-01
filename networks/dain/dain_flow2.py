@@ -241,7 +241,7 @@ class DAIN_flow2(torch.nn.Module):
             '''
             #print('Shape of 7 rectify input'+str(rectify_input.size()))
             rectified_temp = self.rectifyNet(rectify_input) + weighted_sum
-            rectified_temp = nn.sigmoid()(rectified_temp)
+            #rectified_temp = nn.Sigmoid()(rectified_temp)
             cur_output_rectified.append(rectified_temp)
         return cur_output_rectified
 
