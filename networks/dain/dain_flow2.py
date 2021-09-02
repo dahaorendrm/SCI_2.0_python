@@ -125,7 +125,7 @@ class DAIN_flow2(torch.nn.Module):
                     for indf2 in range(indf+1,nf):
                         input0 = self.onech2threech(result[:,:,indf,indf2])
                         input2 = self.onech2threech(result[:,:,indf2,indf2])
-                        input0 = self.forward_simplewrap(input0,input1,input2,rectify=False)
+                        input0 = self.forward_simplewrap(input0,input1,input2,rectify=True)
                         input0 = torch.squeeze(input0)
                         result[:,:,indf2,indf] = torch.mean(input0,0)
                         print(f'Generate flow from img({indf},{indf2}) to img({indf},{indf}), apply on img({indf2},{indf2})')
@@ -137,7 +137,7 @@ class DAIN_flow2(torch.nn.Module):
                     for indf2 in range(indf):
                         input0 = self.onech2threech(result[:,:,indf,nf*(indg+1)+indf2])
                         input2 = self.onech2threech(result[:,:,indf2,nf*(indg+1)+indf2])
-                        input0 = self.forward_simplewrap(input0,input1,input2,rectify=False)
+                        input0 = self.forward_simplewrap(input0,input1,input2,rectify=True)
                         input0 = torch.squeeze(input0)
                         result[:,:,indf2,nf*(indg+1)+indf] = torch.mean(input0,0)
                         print(f'Generate flow from img({indf},{nf*(indg+1)+indf2}) to img({indf},{nf*(indg+1)+indf}), apply on img({indf2},{indf2,nf*(indg+1)+indf2})')
@@ -243,7 +243,7 @@ class DAIN_flow2(torch.nn.Module):
             '''
             #print('Shape of 7 rectify input'+str(rectify_input.size()))
             rectified_temp = self.rectifyNet(rectify_input) + weighted_sum
-            #rectified_temp = nn.Sigmoid()(rectified_temp)
+            rectified_temp = nn.Sigmoid()(rectified_temp)
             cur_output_rectified.append(rectified_temp)
         return cur_output_rectified
 
@@ -322,7 +322,7 @@ class DAIN_flow2(torch.nn.Module):
             '''
             #print('Shape of simple rectify input'+str(rectify_input.size()))
             cur_output_rectified = self.rectifyNet(rectify_input) + ref0_offset
-            cur_output_rectified = nn.sigmoid()(cur_output_rectified)
+            cur_output_rectified = nn.Sigmoid()(cur_output_rectified)
             return cur_output_rectified
         else:
             return ref0_offset
