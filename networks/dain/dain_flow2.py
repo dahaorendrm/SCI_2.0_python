@@ -298,8 +298,8 @@ class DAIN_flow2(torch.nn.Module):
             ####### Use input2 kernel filter?
         '''
         #ref0_offset = FilterInterpolationModule()(
-        #                        cur_input_2, cur_offset_output,cur_filter_output[1].detach())
-        ref0_offset = self.forward_flownets.wrap(cur_input_2,cur_offset_output)
+        #                        cur_input_2, cur_offset_output,cur_filter_output[0].detach())
+        ref0_offset = self.flownets.warp(cur_input_2,cur_offset_output*20)
         #ref0_offset = torch.unsqueeze(ref0_offset,0)
         #return ref0_offset
         '''

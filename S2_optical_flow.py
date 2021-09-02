@@ -26,6 +26,8 @@ name = '0000'
 
 for data_name in data_list:
     # load data
+    #if name not in data_name:
+    #    continue
     save_name = data_name[5:10]
     with np.load(path + '/' + data_name) as data:
         gt_outp = data['gt_outp']
