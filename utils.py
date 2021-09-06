@@ -130,12 +130,14 @@ def init_logger(NAME):
 # --------------------------------------------
 # PSNR
 # --------------------------------------------
-def calculate_psnr(img1, img2, border=0):
-    # img1 and img2 have range [0, 255]
+def calculate_psnr(img1, img2, maxv=1, border=0):
+    # img1 and img2 have range [0, 1]
     #img1 = img1.squeeze()
     #img2 = img2.squeeze()
     if not img1.shape == img2.shape:
         raise ValueError('Input images must have the same dimensions.')
+    img1 = img1/np.amax(img1)
+    img1 = img1/np.amax(img1)
     h, w = img1.shape[:2]
     img1 = img1[border:h-border, border:w-border]
     img2 = img2[border:h-border, border:w-border]
@@ -145,13 +147,13 @@ def calculate_psnr(img1, img2, border=0):
     mse = np.mean((img1 - img2)**2)
     if mse == 0:
         return float('inf')
-    return 20 * math.log10(255.0 / math.sqrt(mse))
+    return 20 * math.log10(maxv / math.sqrt(mse))
 
 
 # --------------------------------------------
 # SSIM
 # --------------------------------------------
-def calculate_ssim(img1, img2, border=0):
+def calculate_ssim(img1, img2, max_v=1, border=0):
     '''calculate SSIM
     the same outputs as MATLAB's
     img1, img2: [0, 255]
@@ -160,6 +162,8 @@ def calculate_ssim(img1, img2, border=0):
     #img2 = img2.squeeze()
     if not img1.shape == img2.shape:
         raise ValueError('Input images must have the same dimensions.')
+    img1 = img1/max_v*255
+    img2 = img2/max_v*255
     h, w = img1.shape[:2]
     img1 = img1[border:h-border, border:w-border]
     img2 = img2[border:h-border, border:w-border]

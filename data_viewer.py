@@ -4,6 +4,47 @@ matplotlib.use('webagg')
 matplotlib.use('Qt5Agg')
 %matplotlib qt
 %matplotlib inline
+
+# <codecell> S0 gaptv result viewer
+import tifffile
+import matplotlib
+import numpy as np
+from utils import *
+name = '4D_lego_0000_.tiff'
+path = './data/data/test/feature/' + name
+re_gaptv = tifffile.imread(path)
+re_gaptv = re_gaptv[...,1:]
+path = './data/data/test/gt/' + name
+gt = tifffile.imread(path)
+gt = gt[...,1:]
+path = './data/data/test/gt_led/' + name
+orig = tifffile.imread(path)
+ind_c = 0
+orig_ = []
+CHAN = 8
+for ind in range(orig.shape[-1]):
+    temp = orig[...,ind_c,ind]
+    orig_.append(temp)
+    ind_c = ind_c+1 if ind_c<CHAN-1 else 0
+orig = np.stack(orig_,1)
+orig = np.moveaxis(orig,1,-1)
+
+MAX_v = np.amax(orig)
+print(f'Maxv of gt is {np.amax(gt)}, of orig is {MAX_v}, of recon is {np.amax(re_gaptv)}')
+psnr_v = calculate_psnr(orig,re_gaptv)
+print(f'psnr before: {psnr_v}')
+re_gaptv_max = re_gaptv/np.amax(orig)
+orig_max = orig/np.amax(orig)
+psnr_v = calculate_psnr(orig_max,re_gaptv_max)
+print(f'psnr after divid max: {psnr_v}')
+re_gaptv1 = re_gaptv
+re_gaptv1[re_gaptv1>MAX_v] = MAX_v
+psnr_v = calculate_psnr(orig,re_gaptv1,MAX_v)
+print(f'psnr after take off max: {psnr_v}')
+
+display_highdimdatacube(re_gaptv)
+
+
 # <codecell> S1 results viewer
 import pickle
 import numpy

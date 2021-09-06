@@ -160,7 +160,7 @@ def lesti_4d_sst(orig, mask, led_curve, CUT_BAND = (4,2)):
     # Step 1: Produce LED projected images
     orig_leds = np.expand_dims(orig,axis=3)            # shape:nr, nc, nl,    1, nf
     led_curve = np.expand_dims(led_curve,axis=2)       # shape:        nl, nled, 1
-    orig_leds = np.sum(orig_leds * led_curve, axis=2)  # shape:nr, nc,     nled, nf
+    orig_leds = np.mean(orig_leds * led_curve, axis=2)  # shape:nr, nc,     nled, nf
     # Step 2: Impose coding and summation
     mea = np.zeros((nr,nc))
     iled = 0
