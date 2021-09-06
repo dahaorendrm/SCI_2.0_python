@@ -41,6 +41,10 @@ re_gaptv1 = re_gaptv
 re_gaptv1[re_gaptv1>MAX_v] = MAX_v
 psnr_v = calculate_psnr(orig,re_gaptv1,MAX_v)
 print(f'psnr after take off max: {psnr_v}')
+re_gaptv_max = re_gaptv/np.amax(re_gaptv)
+orig_max = orig/np.amax(orig)
+psnr_v = calculate_psnr(orig_max,re_gaptv_max,1)
+print(f'psnr after divid own max: {psnr_v}')
 
 display_highdimdatacube(re_gaptv)
 

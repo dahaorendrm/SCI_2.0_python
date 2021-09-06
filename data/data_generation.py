@@ -59,7 +59,10 @@ def compressive_model(MODEL,input):
         re = result.Result(model, mea, modul = mea.mask, orig = orig)
         re = np.array(re)
         re[re<0] = 0
+        re = re/np.amax(re)
         orig_leds = mea.orig_leds
+        orig_leds[orig_leds<0] = 0
+        orig_leds = orig_leds/np.amax(orig_leds)
         mea = np.array(mea.mea)
         # print('shape of re is '+str(mea.shape))
         result__ = (orig_leds,mea,re)
