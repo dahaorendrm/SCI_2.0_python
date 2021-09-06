@@ -22,7 +22,7 @@
 
 # export OMP_NUM_THREADS=4
 
-vpkg_require xm_pytorch
+vpkg_require xm_pytorch/20210806-LESTI_2.0_DAIN
 
 
 start=$(date "+%s")
