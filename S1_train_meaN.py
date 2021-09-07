@@ -1,4 +1,4 @@
-from imgdataset import Imgdataset
+from S1_imgdataset import Imgdataset
 import torch
 import torch.nn as nn
 from networks.chasti_network import CHASTINET
