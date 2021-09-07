@@ -11,7 +11,9 @@ class Imgdataset(Dataset):
         super(Imgdataset, self).__init__()
         #self.data = []
         if os.path.exists(path):
-            self.data = os.listdir(path)
+            self.data = []
+            for pa in os.listdir(path):
+                self.data.append(path+pa)
         else:
             raise FileNotFoundError('path doesnt exist!')
 
