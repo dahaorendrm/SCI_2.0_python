@@ -294,13 +294,13 @@ def entry_process(path,COMP_FRAME):
 def train_data_generation():
     # path = 'G:/My Drive/PHD_Research/data/DAVIS/JPEGImages/test/bear'
     # entry_process(path)
-    COMP_FRAME = 9
+    COMP_FRAME = 15
     path = '../../data/DAVIS/480p/'
     entries = os.listdir(path)
     entries_ = [(path+entry,COMP_FRAME) for entry in entries]
     ind_id = int(os.getenv('SLURM_ARRAY_TASK_ID'))
     #ind_id = 0
-    print(f'We are processing dataset {entries_[ind_id][0]}, with shape of {entries_[0].shape}')
+    #print(f'We are processing dataset {entries_[ind_id][0]}, with shape of {entries_[ind_id][0].shape}')
     tic = time.perf_counter()
     entry_process(*entries_[ind_id])
     #a_pool = multiprocessing.Pool(4)
@@ -354,4 +354,4 @@ def test_data_generation():
     li_all_crops_data = pool.starmap(compressive_model, comp_input) # contain (original led project, mea, gaptv_result)
     save_test_crops(MODEL,crops,li_all_crops_data,0,'4D_blocks')
 if __name__ == '__main__':
-    test_data_generation()
+    train_data_generation()

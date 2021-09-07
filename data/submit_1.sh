@@ -17,11 +17,11 @@
 # SBATCH --output=ArraySCI%A-%a.out
 #SBATCH --mail-user='xmdrm@udel.edu'
 #SBATCH --mail-type=END,FAIL,TIME_LIMIT_90
-#SBATCH --array=71-90
+#SBATCH --array=60-90
 
 # export OMP_NUM_THREADS=4
 
-vpkg_require xm_pytorch
+vpkg_require xm_pytorch/20210806-LESTI_2.0_DAIN
 
 
 start=$(date "+%s")
