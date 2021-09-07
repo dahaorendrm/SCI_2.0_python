@@ -70,7 +70,7 @@ class MultipleBasicBlock(nn.Module):
         self.block5 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=5 else None
         #self.block6 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=6 else None
         #self.block7 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=7 else None
-        self.block8 = nn.Sequential(*[nn.Conv2d(intermediate_feature, 1 , (3, 3), 1, (1, 1))])
+        self.block8 = nn.Sequential(*[nn.Conv2d(intermediate_feature, 1 , (3, 3), 1, (1, 1)),nn.Sigmoid()])
         #self.BN2     = nn.BatchNorm2d(intermediate_feature)
         #self.BN3     = nn.BatchNorm2d(intermediate_feature)
         #self.BN4     = nn.BatchNorm2d(intermediate_feature)
