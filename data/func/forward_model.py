@@ -207,15 +207,23 @@ def lesti(orig, mask, led_curve, SHIFTD=None, CUT_BAND = (4,2), RESAMPLE = False
     mask = np.expand_dims(mask[:,:,:nled],axis=2) # Shape:nr,nc,1,nled
     modul = mask * led_curve  # Shape:nr,nc,nl,nled
     modul = np.sum(modul,axis=3) # Shape:nr,nc,nl
-    # Shift the modulations
-    if type(SHIFTD) == int:
-        shift_orig = utils.shifter(orig, SHIFTD)
-        modul = utils.shifter(modul, SHIFTD)
-        logger.info('Mask shift at dimension {}.'.format(SHIFTD))
-    else:
-        shift_orig = orig
+    # Step 1: Produce LED projected images
+    orig_leds = np.expand_dims(orig,axis=3)            # shape:nr, nc, nl,    1
+    led_curve = led_curve                              # shape:        nl, nled
+    orig_leds = np.sum(orig_leds * led_curve, axis=2)  # shape:nr, nc,     nled
+    # # Shift the modulations
+    # if type(SHIFTD) == int:
+    #     shift_orig = utils.shifter(orig, SHIFTD)
+    #     modul = utils.shifter(modul, SHIFTD)
+    #     logger.info('Mask shift at dimension {}.'.format(SHIFTD))
+    # else:
+    #     shift_orig = orig
     # Generate the measurement
-    mea = np.sum(shift_orig * modul, axis=2)
+    # mea = np.sum(shift_orig * modul, axis=2)
+    mea = np.zeros((nr,nc))
+    for indl in range(nl):
+        mea += orig_leds[:,:,indl] * mask[:,:,indl]
+
     # Resample
     if RESAMPLE:
         logger.info('Resample all the data to {} bands'.format(RESAMPLE))
@@ -226,7 +234,7 @@ def lesti(orig, mask, led_curve, SHIFTD=None, CUT_BAND = (4,2), RESAMPLE = False
         modul = np.reshape(modul,(nr*nc,nl))
         modul = signal.resample(modul,RESAMPLE,axis=1)
         modul = np.reshape(modul,(nr,nc,RESAMPLE))
-    return orig, modul, mea
+    return orig, orig_leds, modul, mask, mea, led_curve
 
 def afunc(orig, modul, SHIFTD=None, SHIFTSTEP=1):
     if type(SHIFTD) == int:

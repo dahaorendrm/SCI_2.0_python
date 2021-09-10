@@ -84,7 +84,8 @@ class Measurement:
             #logger.debug('Output the shape of orig, modul, mea: ' + repr(self.orig.shape) + repr(self.modul.shape) + repr(self.mea.shape))
         elif self.modelname == "LESTI" and self.modeldim==3:
             self.led_curve = led_curve
-            self.orig, self.modul, self.mea = lesti(self.orig, self.mask, self.led_curve,
+            self.orig, self.orig_leds, self.modul, self.mask, self.mea, \
+                       self.led_curve = lesti(self.orig, self.mask, self.led_curve,
                                             self.configp["SHIFTD"],
                                             self.configp["CUT_BAND"],
                                             self.configp["RESAMPLE"])
