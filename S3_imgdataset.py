@@ -36,7 +36,7 @@ class Imgdataset(Dataset):
         ground_truth = self.data[index]
         gt = scio.loadmat(ground_truth)['cube']
         #gt = gt.permute(2, 0, 1)
-        gts = training_transformations(gt)
+        gts = training_transformations(image=gt)
 
         return gts
 
