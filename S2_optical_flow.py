@@ -3,7 +3,22 @@ import pickle
 import numpy as np
 import os
 
-
+def outputevalarray(data,ref):
+    v_psnr = []
+    v_ssim = []
+    for indr in range(data.shape[3]):
+        temp_psnr = []
+        temp_ssim = []
+        for indc in range(data.shape[2]):
+            psnr_ = utils.calculate_psnr(
+                       ref[:,:,indc,indr],data[:,:,indc,indr])
+            ssim_ = utils.calculate_ssim(
+                       ref[:,:,indc,indr],data[:,:,indc,indr])
+            temp_ssim.append(ssim_)
+            temp_psnr.append(psnr_)
+        v_psnr.append(temp_psnr)
+        v_ssim.append(temp_ssim)
+    return np.array(v_psnr),np.array(v_ssim)
 
 def reshape_data(data,step):
     data = np.squeeze(data)
@@ -55,9 +70,28 @@ for data_name in data_list:
     re_gt  = process(gt_outp,orig_leds)
     re_in  = process(input,orig_leds)
     re_out = process(output,orig_leds)
-    with open('S2_result/'+save_name+'.npz',"wb") as f:
-        np.savez(f, re_gt=re_gt,re_in=re_in, re_out=re_out, ref=orig_leds)
+    ref = orig_leds
     # np.save('S2_result/'+save_name+'gt.npy',    re_gt)
     # np.save('S2_result/'+save_name+'input.npy', re_in)
     # np.save('S2_result/'+save_name+'output.npy', re_out)
     # np.save('S2_result/'+save_name+'ref.npy', orig_leds)
+    psnr_gt,ssim_gt = outputevalarray(re_gt,ref)
+    print(f'The avg psnr of gt is {np.mean(psnr_gt)}')
+    print(f'The avg ssim of gt is {np.mean(ssim_gt)}')
+    psnr_in,ssim_in = outputevalarray(re_in,ref)
+    print(f'The avg psnr of gaptv+DAIN is {np.mean(psnr_in)}')
+    print(f'The avg ssim of gaptv+DAIN is {np.mean(ssim_in)}')
+    psnr_out,ssim_out = outputevalarray(re_out,ref)
+    print(f'The avg psnr of gaptv+ResNet+DAIN is {np.mean(psnr_out)}')
+    print(f'The avg ssim of gaptv+ResNet+DAIN is {np.mean(ssim_out)}')
+    MAX_V = 1
+    ## Save
+    np.savetxt('S2_result/normed'+data_name[:4]+f'_MAX={MAX_V}_array_psnr_gt_{np.mean(psnr_gt):.4f}.txt', psnr_gt, fmt='%.4f')
+    np.savetxt('S2_result/normed'+data_name[:4]+f'_MAX={MAX_V}_array_ssim_gt_{np.mean(ssim_gt):.4f}.txt', ssim_gt, fmt='%.4f')
+    np.savetxt('S2_result/normed'+data_name[:4]+f'_MAX={MAX_V}_array_psnr_in_{np.mean(psnr_in):.4f}.txt', psnr_in, fmt='%.4f')
+    np.savetxt('S2_result/normed'+data_name[:4]+f'_MAX={MAX_V}_array_ssim_in_{np.mean(ssim_in):.4f}.txt', ssim_in, fmt='%.4f')
+    np.savetxt('S2_result/normed'+data_name[:4]+f'_MAX={MAX_V}_array_psnr_out_{np.mean(psnr_out):.4f}.txt', psnr_out, fmt='%.4f')
+    np.savetxt('S2_result/normed'+data_name[:4]+f'_MAX={MAX_V}_array_ssim_out_{np.mean(ssim_out):.4f}.txt', ssim_out, fmt='%.4f')
+
+    with open('S2_result/'+save_name+f'_MAX={MAX_V}_gtpsnr={np.mean(psnr_gt):.4f}_inputpsnr={np.mean(psnr_in):.4f}_outputpsnr={np.mean(psnr_out):.4f}.npz',"wb") as f:
+        np.savez(f, re_gt=re_gt,re_in=re_in, re_out=re_out, ref=ref)

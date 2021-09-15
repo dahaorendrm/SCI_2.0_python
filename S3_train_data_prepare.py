@@ -48,7 +48,7 @@ def normalizer(imgs,masks):
     imgs = imgs/mask_s
     return imgs
 
-def chasti(gts,img_ns,mea,masks):
+def chasti(gts,img_ns,mea,masks): # need to be updated ########################
     gts = torch.tensor(gts).float()
     img_ns = torch.tensor(img_ns).float()
     mea = torch.tensor(mea).float()
@@ -135,7 +135,9 @@ def main():
     gts = []
     for pa in os.listdir(path):
         gts.append(scio.loadmat(path+pa)['cube'])
-    # compressive model parallel ; ref s1 data generation
+    li_all_crops_data = pool.starmap(compressive_model, gts) # contain (mea, gaptv_result)
+    print(f'Finished multiprocessing.{len(gts)} datasets are created.')
+
     # chasti gpu model for loop ; ref s2 optial flow
 
     # save the data

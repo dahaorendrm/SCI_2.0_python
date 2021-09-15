@@ -22,9 +22,9 @@ def outputevalarray(data,ref):
         temp_ssim = []
         for indc in range(data.shape[2]):
             psnr_ = utils.calculate_psnr(
-                       ref[:,:,indc,indr]*255,data[:,:,indc,indr]*255)
+                       ref[:,:,indc,indr],data[:,:,indc,indr])
             ssim_ = utils.calculate_ssim(
-                       ref[:,:,indc,indr]*255,data[:,:,indc,indr]*255)
+                       ref[:,:,indc,indr],data[:,:,indc,indr])
             temp_ssim.append(ssim_)
             temp_psnr.append(psnr_)
         v_psnr.append(temp_psnr)
