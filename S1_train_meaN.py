@@ -6,8 +6,8 @@ import scipy.io as scio
 from torch.utils.data import DataLoader
 import numpy as np
 import os
-num_epochs = 10
-batch_size = 14
+num_epochs = 40
+batch_size = 8 
 learning_rate = 0.0006
 INIT = True
 
@@ -29,8 +29,8 @@ device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f'Device: {device}')
 model = CHASTINET(4,128,4).to(device)
 if INIT:
-    epoch_ind = 7
-    model.load_state_dict(torch.load('./train/epoch_tradition_4l_NBN_f7' + "/{}.pth".format(epoch_ind)))
+    epoch_ind = 9
+    model.load_state_dict(torch.load('./train/epoch_meaN' + "/{}.pth".format(epoch_ind)))
 print(model)
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
@@ -103,7 +103,7 @@ def train(data_loader):
             if (ind_batch) % 4 == 0:
                 print ("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
                        .format(epoch+1, num_epochs, ind_batch+1, total_step, loss.item()))
-        save_path = './train/epoch_meaN/'
+        save_path = './train/epoch_meaN_2/'
 
         if not os.path.exists(save_path):
             os.mkdir(save_path)

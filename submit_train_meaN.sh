@@ -11,7 +11,7 @@
 #SBATCH --job-name=chasti_train_4layer_no_BN_7f
 #SBATCH --partition=gpu-v100
 # SBATCH --partition=_workgroup_
-#SBATCH --gpus=2
+#SBATCH --gpus=1
 
 #SBATCH --time=5-10:00:00
 # SBATCH --output=ArraySCI%A-%a.out
@@ -20,5 +20,5 @@
 # SBATCH --array=4-10
 
 # export OMP_NUM_THREADS=4
-vpkg_require xm_pytorch
-python3 -u train_meaN.py
+vpkg_require xm_pytorch/20210806-LESTI_2.0_DAIN
+python3 -u S1_train_meaN.py
