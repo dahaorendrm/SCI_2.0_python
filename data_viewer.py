@@ -56,7 +56,7 @@ import os
 from utils import *
 path = 'S1_result'
 data_list = os.listdir(path)
-name = '0000'
+name = 'test_0002_spectra_input_psnr=31.2101'
 for data_name in data_list:
     if name in data_name:
         with numpy.load(path + '/' + data_name) as data:
@@ -70,15 +70,15 @@ for data_name in data_list:
 input
 inputimgs = np.squeeze(input)
 inputimgs
-inputimgs = inputimgs * 255
+inputimgs = inputimgs
 display_highdimdatacube(inputimgs)
 
 outputimgs = np.squeeze(output)
-outputimgs = outputimgs * 255
+outputimgs = outputimgs *1.2
 display_highdimdatacube(outputimgs)
 
 gtimgs = np.squeeze(gt_outp)
-gtimgs = gtimgs * 255
+gtimgs = gtimgs
 display_highdimdatacube(gtimgs)
 
 
@@ -86,7 +86,9 @@ print(f'Shape of data is inputimgs : {inputimgs.shape}, outputimgs : {outputimgs
 print(f'Max value is inputimgs : {numpy.amax(inputimgs)},  outputimgs : {numpy.amax(outputimgs)},  gtimgs : {numpy.amax(gtimgs)}')
 psnr_in = calculate_psnr(gtimgs,inputimgs)
 psnr_out = calculate_psnr(gtimgs,outputimgs)
-print(f'Input noise images PSNR is {psnr_in}, output images PSNR is {psnr_out}.')
+ssim_in = calculate_ssim(gtimgs,inputimgs)
+ssim_out = calculate_ssim(gtimgs,outputimgs)
+print(f'Input noise images PSNR is {psnr_in}/{ssim_in}, output images PSNR is {psnr_out}/{ssim_out}.')
 
 
 

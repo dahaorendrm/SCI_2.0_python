@@ -7,7 +7,7 @@ import torch.nn as nn
 #  More details.
 # ----------------------------------------------------------------------------------------------------------------------
 class GenUNetNoPooling(torch.nn.Module):
-    def __init__(self, cnt_downs = 10):
+    def __init__(self, cnt_downs = 10,input_chan = 3):
         super(GenUNetNoPooling, self).__init__()
         self._name = 'GenUNetNoPooling'
 
@@ -18,7 +18,7 @@ class GenUNetNoPooling(torch.nn.Module):
         self._cntFirstFilter = 32
         self._cnt_downs = cnt_downs
         self._cnt_output_chan = 31
-        self._cnt_input_chan = 3
+        self._cnt_input_chan = input_chan
         self._max_filter_mul = 4
 
         self._cntFilterPP = 0   # amount of post processing
