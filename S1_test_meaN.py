@@ -1,4 +1,4 @@
-from imgdataset import Imgdataset
+from S1_imgdataset import Imgdataset
 import torch
 import torch.nn as nn
 from networks.chasti_network import CHASTINET
@@ -12,7 +12,7 @@ import pickle
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = CHASTINET(4,128,4).to(device)
-epoch_ind = 0
+epoch_ind = 10 
 model.load_state_dict(torch.load('./train/epoch_meaN' + "/{}.pth".format(epoch_ind)))
 
 def normalizer(imgs,masks):
@@ -81,8 +81,8 @@ def test(test_dataloader):
                 gt = np.squeeze(gt)
                 output_ = np.squeeze(output_)
                 img_n = np.squeeze(img_n)
-                psnr_in  = calculate_psnr(img_n*255,gt*255)
-                psnr_out = calculate_psnr(output_*255,gt*255)
+                psnr_in  = calculate_psnr(img_n,gt)
+                psnr_out = calculate_psnr(output_,gt)
                 print(f'Data {ind_data} at frame {ind}, input noise images PSNR is {psnr_in}, output images PSNR is {psnr_out}.')
                 print(f'PSNR has been improved {(psnr_out-psnr_in)/psnr_in:.2%}')
             output = torch.cat(output,1)
@@ -98,8 +98,8 @@ def test(test_dataloader):
             output = output.numpy()
             output = np.moveaxis(output,1,-1)
             imgs_n = imgs_n.numpy()
-            psnr_in  = calculate_psnr(imgs_n*255,gts*255)
-            psnr_out = calculate_psnr(output*255,gts*255)
+            psnr_in  = calculate_psnr(imgs_n,gts)
+            psnr_out = calculate_psnr(output,gts)
             print(f'Data {ind_data}, input noise images PSNR is {psnr_in}, output images PSNR is {psnr_out}.')
             print(f'This model improves PSNR by {(psnr_out-psnr_in)/psnr_in:.2%}')
             if not os.path.exists('S1_result'):
