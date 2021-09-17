@@ -100,9 +100,9 @@ class Motion:
             for indr in range(output.shape[3]):
                 for indc in range(output.shape[2]):
                     psnr_ = utils.calculate_psnr(
-                               origs[:,:,indc,indr]*255,output[:,:,indc,indr]*255)
+                               origs[:,:,indc,indr],output[:,:,indc,indr])
                     ssim_ = utils.calculate_ssim(
-                               origs[:,:,indc,indr]*255,output[:,:,indc,indr]*255)
+                               origs[:,:,indc,indr],output[:,:,indc,indr])
                     self.ssim.append(ssim_)
                     self.psnr.append(psnr_)
                     logger.debug(
@@ -132,9 +132,9 @@ class Motion:
             for indr in range(output_images.shape[2]):
                 for indc in range(output_images.shape[3]):
                     psnr_ = utils.calculate_psnr(
-                               origs[:,:,indr,indc]*255,output_images[:,:,indr,indc]*255)
+                               origs[:,:,indr,indc],output_images[:,:,indr,indc])
                     ssim_ = utils.calculate_ssim(
-                               origs[:,:,indr,indc]*255,output_images[:,:,indr,indc]*255)
+                               origs[:,:,indr,indc],output_images[:,:,indr,indc])
                     self.ssim.append(ssim_)
                     self.psnr.append(psnr_)
                     logger.debug(
