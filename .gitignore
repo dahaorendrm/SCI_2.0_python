@@ -1,8 +1,7 @@
 /results
 /dataset
 /data/data
-*/__pycache__/*
-*/denoiser/__pycache__/*
+**/__pycache__
 /data/temp
 /temp
 *.out
@@ -13,8 +12,10 @@
 *.npy
 *.pickle
 *.tiff
-data/blocks.mat
+**/3DMRGB_F86.mat
+**/blocks.mat
+**/4D_Lego.mat
 *.npz
 *.npy
-*_result/*.txt
 *.mod
+*.svg

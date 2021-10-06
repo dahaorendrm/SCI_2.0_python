@@ -1,0 +1,36 @@
+{
+
+    "MODEL": "CASSI",
+    "DIM": 3,
+
+    "P_FORWARD": {
+        "QUANTIZATION": false,
+        "MAXV": 255,
+        "ORIG_DATA": "3D_Doll_center",
+        "SCALE_DATA": 1,
+        "MASK": "white_1",
+        "SHIFTD": 0,
+        "SAVE_PICKLE": true
+    },
+    "P_RECONs": [
+        {"lambda": 1,
+        "ASSESE": 3,
+        "ACC": true,
+        "ITERs": 100,
+        "RECON_MODEL": "GAP",
+        "RECON_DENOISER": "tv_chambolle",
+        "P_DENOISE": {
+            "TV_WEIGHT": 0.6,
+            "TV_ITER": 7}},
+
+        {"lambda": 1,
+        "ASSESE": 3,
+        "ACC": true,
+        "ITERs": 20,
+        "RECON_MODEL": "GAP",
+        "RECON_DENOISER": "tv_chambolle",
+        "P_DENOISE": {
+            "TV_WEIGHT": 0.2,
+            "TV_ITER": 5}}
+          ]
+}
