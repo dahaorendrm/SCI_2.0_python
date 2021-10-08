@@ -7,7 +7,7 @@ import pickle
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
-from networks import dain as dain_net
+import networks as dain_net
 import utils
 #from torchsummary import summary
 
@@ -22,7 +22,7 @@ class Motion:
         elif method is 'dain_flow':
             self.model = dain_net.__dict__['DAIN_flow'](
                                                timestep=timestep,training=False)
-            SAVED_MODEL = './networks/dain/model_weights/best.pth'
+            SAVED_MODEL = './model_weights/best.pth'
             pretrained_dict = torch.load(SAVED_MODEL)
             model_dict = self.model.state_dict()
             # 1. filter out unnecessary keys
