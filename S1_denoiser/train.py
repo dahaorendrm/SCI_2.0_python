@@ -30,7 +30,7 @@ print(f'Device: {device}')
 model = CHASTINET(4,128,4).to(device)
 if INIT:
     epoch_ind = 9
-    model.load_state_dict(torch.load('./model_weight/epoch_meaN' + "/{}.pth".format(epoch_ind)))
+    model.load_state_dict(torch.load('./model_weights/epoch_meaN' + "/{}.pth".format(epoch_ind)))
 print(model)
 criterion = nn.MSELoss()
 optimizer = torch.optim.Adam(model.parameters(), lr=learning_rate)
@@ -103,7 +103,7 @@ def train(data_loader):
             if (ind_batch) % 4 == 0:
                 print ("Epoch [{}/{}], Step [{}/{}] Loss: {:.4f}"
                        .format(epoch+1, num_epochs, ind_batch+1, total_step, loss.item()))
-        save_path = './model_weight/epoch_meaN_2/'
+        save_path = './model_weights/epoch_meaN_2/'
 
         if not os.path.exists(save_path):
             os.mkdir(save_path)

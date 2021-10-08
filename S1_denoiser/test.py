@@ -6,14 +6,14 @@ import scipy.io as scio
 from torch.utils.data import DataLoader
 import numpy as np
 import os
-from ..utils import calculate_psnr,calculate_ssim
+from utils import calculate_psnr,calculate_ssim
 import pickle
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 model = CHASTINET(4,128,4).to(device)
-epoch_ind = 10
-model.load_state_dict(torch.load('./train/epoch_meaN' + "/{}.pth".format(epoch_ind)))
+epoch_ind = 1
+model.load_state_dict(torch.load(f'./model_weights/epoch_meaN/{epoch_ind}.pth'))
 
 def normalizer(imgs,masks):
     mask_s = torch.sum(masks,3)
@@ -102,13 +102,13 @@ def test(test_dataloader):
             psnr_out = calculate_psnr(output,gts)
             print(f'Data {ind_data}, input noise images PSNR is {psnr_in}, output images PSNR is {psnr_out}.')
             print(f'This model improves PSNR by {(psnr_out-psnr_in)/psnr_in:.2%}')
-            if not os.path.exists('S1_result'):
-                os.mkdir('test/S1_result')
+            if not os.path.exists('result'):
+                os.mkdir('result')
             if len(data) >= 3:
-                with open(f"S1_result/test_{ind_data:04d}_spectra_input_psnr={psnr_in:.4f}_result_psnr={psnr_out:.4f}.npz","wb") as f:
+                with open(f"result/test_{ind_data:04d}_spectra_input_psnr={psnr_in:.4f}_result_psnr={psnr_out:.4f}.npz","wb") as f:
                     np.savez(f, gt_outp=gts,input=imgs_n,output=output,gt_orig=data[0],gt_leds=data[2])
             else:
-                with open(f"S1_result/test_{ind_data:04d}_rgb_input_psnr={psnr_in:.4f}_result_psnr={psnr_out:.4f}.npz","wb") as f:
+                with open(f"result/test_{ind_data:04d}_rgb_input_psnr={psnr_in:.4f}_result_psnr={psnr_out:.4f}.npz","wb") as f:
                     np.savez(f, gt_outp=gts,input=imgs_n,output=output,gt_orig=data[0])
 
 def validation_func():
