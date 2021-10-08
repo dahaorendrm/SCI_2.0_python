@@ -19,3 +19,5 @@
 *.npy
 *.mod
 *.svg
+S2_flow_predict/S2_result/
+S2_flow_predict/S2.5_result/
