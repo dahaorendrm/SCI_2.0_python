@@ -1,3 +1,0 @@
-# ninja log v5
-1	16264	1633707263000000000	/lustre/scratch/X_MA/SCI_2.0_python/S2_flow_predict/networks/dain/my_package/SeparableConvFlow/build/temp.linux-x86_64-3.9/separableconvflow_cuda.o	d33313ee4146367d
-1	35881	1633707283000000000	/lustre/scratch/X_MA/SCI_2.0_python/S2_flow_predict/networks/dain/my_package/SeparableConvFlow/build/temp.linux-x86_64-3.9/separableconvflow_cuda_kernel.o	86c246210c99d3cc

@@ -1,3 +1,0 @@
-# ninja log v5
-1	14561	1633707070000000000	/lustre/scratch/X_MA/SCI_2.0_python/S2_flow_predict/networks/dain/my_package/FlowProjection/build/temp.linux-x86_64-3.9/flowprojection_cuda.o	75392b221a9314f1
-0	33992	1633707089000000000	/lustre/scratch/X_MA/SCI_2.0_python/S2_flow_predict/networks/dain/my_package/FlowProjection/build/temp.linux-x86_64-3.9/flowprojection_cuda_kernel.o	a4b7caf555cf1108

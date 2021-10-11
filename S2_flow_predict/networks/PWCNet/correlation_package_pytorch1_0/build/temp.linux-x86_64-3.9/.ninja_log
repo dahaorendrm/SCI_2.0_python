@@ -1,3 +1,0 @@
-# ninja log v5
-1	15121	1633707517000000000	/lustre/scratch/X_MA/SCI_2.0_python/S2_flow_predict/networks/PWCNet/correlation_package_pytorch1_0/build/temp.linux-x86_64-3.9/correlation_cuda.o	351cbeef23fdcd26
-1	35414	1633707538000000000	/lustre/scratch/X_MA/SCI_2.0_python/S2_flow_predict/networks/PWCNet/correlation_package_pytorch1_0/build/temp.linux-x86_64-3.9/correlation_cuda_kernel.o	3cc49efdcaef701
