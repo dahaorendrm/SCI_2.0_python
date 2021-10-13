@@ -4,14 +4,14 @@ nvcc_args = [
     # Quadro: (None)
     # NVIDIA NVS: (None)
     # Jetson: (None)
-    '-gencode', 'arch=compute_37,code=sm_37',
+    # '-gencode', 'arch=compute_37,code=sm_37',
 
     # Tesla: (None)
     # Quadro: K1200, K620, M1200, M520, M5000M, M4000M, M3000M, M2000M, M1000M, K620M, M600M, M500M
     # NVIDIA NVS: 810
     # GeForce / Titan: GTX 750 Ti, GTX 750, GTX 960M, GTX 950M, 940M, 930M, GTX 860M, GTX 850M, 840M, 830M
     # Jetson: (None)
-    '-gencode', 'arch=compute_50,code=sm_50',
+    # '-gencode', 'arch=compute_50,code=sm_50',
 
     # Tesla: M60, M40
     # Quadro: M6000 24GB, M6000, M5000, M4000, M2000, M5500M, M2200, M620
@@ -39,10 +39,11 @@ nvcc_args = [
     # NVIDIA NVS: (None)
     # GeForce / Titan: TITAN RTX, RTX 2080 Ti, RTX 2080, RTX 2070, RTX 2060, RTX 2080, RTX 2070, RTX 2060
     # Jetson: (None)
-    # '-gencode', 'arch=compute_75,code=sm_75',
+    '-gencode', 'arch=compute_75,code=sm_75',
 
-    # '-gencode', 'arch=compute_70,code=sm_70',
-    # '-gencode', 'arch=compute_70,code=compute_70'
+    '-gencode', 'arch=compute_70,code=sm_70',
+    '-gencode', 'arch=compute_80,code=sm_80',
+    '-gencode', 'arch=compute_80,code=compute_80',
 
     '-w' # Ignore compiler warnings.
 ]

@@ -1,3 +1,3 @@
 # ninja log v5
-0	14839	1633707031000000000	/lustre/scratch/X_MA/SCI_2.0_python/S2_flow_predict/networks/dain/my_package/MinDepthFlowProjection/build/temp.linux-x86_64-3.9/mindepthflowprojection_cuda.o	b67aa64cd2946340
-1	34992	1633707051000000000	/lustre/scratch/X_MA/SCI_2.0_python/S2_flow_predict/networks/dain/my_package/MinDepthFlowProjection/build/temp.linux-x86_64-3.9/mindepthflowprojection_cuda_kernel.o	6989c701929ec5a8
+0	30409	1634135460000000000	/lustre/scratch/X_MA/SCI_2.0_python/S2_flow_predict/networks/my_package/MinDepthFlowProjection/build/temp.linux-x86_64-3.9/mindepthflowprojection_cuda.o	8fe692450cb9f4c0
+0	51111	1634135480000000000	/lustre/scratch/X_MA/SCI_2.0_python/S2_flow_predict/networks/my_package/MinDepthFlowProjection/build/temp.linux-x86_64-3.9/mindepthflowprojection_cuda_kernel.o	8580062fbd022d54

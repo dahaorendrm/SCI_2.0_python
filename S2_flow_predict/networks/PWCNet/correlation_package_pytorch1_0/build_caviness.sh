@@ -10,9 +10,9 @@
 
 #SBATCH --job-name=build_PWC
 # SBATCH --partition=_workgroup_
-#SBATCH --partition=standard
-# SBATCH --partition=devel
-#SBATCH --gres=gpu:t4
+# SBATCH --partition=standard
+#SBATCH --partition=devel
+#SBATCH --gres=gpu
 
 # !/usr/bin/env bash
 

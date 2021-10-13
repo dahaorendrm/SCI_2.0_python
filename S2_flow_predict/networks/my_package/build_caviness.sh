@@ -11,8 +11,8 @@
 #SBATCH --job-name=build
 # SBATCH --partition=_workgroup_
 #SBATCH --partition=standard
-# SBATCH --partition=devel
-#SBATCH --gres=gpu:t4
+#SBATCH --partition=devel
+#SBATCH --gres=gpu
 
 
 vpkg_require xm_pytorch/SCI_2.0_t4
