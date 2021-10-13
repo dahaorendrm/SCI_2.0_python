@@ -88,12 +88,12 @@ for data_name in data_list:
     print(f'The avg ssim of gaptv+ResNet+DAIN is {np.mean(ssim_out)}')
     MAX_V = 1
     ## Save
-    np.savetxt('S2_result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_psnr_gt_{np.mean(psnr_gt):.4f}.txt', psnr_gt, fmt='%.4f')
-    np.savetxt('S2_result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_ssim_gt_{np.mean(ssim_gt):.4f}.txt', ssim_gt, fmt='%.4f')
-    np.savetxt('S2_result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_psnr_in_{np.mean(psnr_in):.4f}.txt', psnr_in, fmt='%.4f')
-    np.savetxt('S2_result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_ssim_in_{np.mean(ssim_in):.4f}.txt', ssim_in, fmt='%.4f')
-    np.savetxt('S2_result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_psnr_out_{np.mean(psnr_out):.4f}.txt', psnr_out, fmt='%.4f')
-    np.savetxt('S2_result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_ssim_out_{np.mean(ssim_out):.4f}.txt', ssim_out, fmt='%.4f')
+    np.savetxt('result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_psnr_gt_{np.mean(psnr_gt):.4f}.txt', psnr_gt, fmt='%.4f')
+    np.savetxt('result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_ssim_gt_{np.mean(ssim_gt):.4f}.txt', ssim_gt, fmt='%.4f')
+    np.savetxt('result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_psnr_in_{np.mean(psnr_in):.4f}.txt', psnr_in, fmt='%.4f')
+    np.savetxt('result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_ssim_in_{np.mean(ssim_in):.4f}.txt', ssim_in, fmt='%.4f')
+    np.savetxt('result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_psnr_out_{np.mean(psnr_out):.4f}.txt', psnr_out, fmt='%.4f')
+    np.savetxt('result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_ssim_out_{np.mean(ssim_out):.4f}.txt', ssim_out, fmt='%.4f')
 
-    with open('S2_result/'+save_name+f'_MAX={MAX_V}_gtpsnr={np.mean(psnr_gt):.4f}_inputpsnr={np.mean(psnr_in):.4f}_outputpsnr={np.mean(psnr_out):.4f}.npz',"wb") as f:
+    with open('result/'+save_name+f'_MAX={MAX_V}_gtpsnr={np.mean(psnr_gt):.4f}_inputpsnr={np.mean(psnr_in):.4f}_outputpsnr={np.mean(psnr_out):.4f}.npz',"wb") as f:
         np.savez(f, re_gt=re_gt,re_in=re_in, re_out=re_out, ref=ref)
