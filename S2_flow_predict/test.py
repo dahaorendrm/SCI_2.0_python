@@ -2,6 +2,19 @@ from motion import Motion
 import pickle
 import numpy as np
 import os,utils
+from PIL import Image
+import itertools
+
+def saveintemp(data,name='test'):
+    if not os.path.exists('temp'):
+        os.makedirs('temp')
+    for idx in itertools.product(list(range(data.shape[2])),list(range(data.shape[3]))):
+        # print(idx)
+        im1 = data[:,:,idx[0],idx[1]]
+        im1 = np.round(im1 * 255.0)
+        im1 = Image.fromarray(im1)
+        im1 = im1.convert("L")
+        im1 = im1.save(f"temp/{name}_{idx}.jpg")
 
 def outputevalarray(data,ref):
     v_psnr = []
@@ -35,65 +48,71 @@ def process(data,ref):
     re_ledimg_4d,v_psnr,v_ssim = flow.get_motions(data, ref)
     return re_ledimg_4d
 
-path = 'data/test'
-data_list = os.listdir(path)
-name = '0000'
+def main():
+    path = 'data/test'
+    data_list = os.listdir(path)
+    name = '0000'
 
-for data_name in data_list:
-    if os.path.isdir(path + '/' + data_name):
-        continue 
-    # load data
-    #if name not in data_name:
-    #    continue
-    save_name = data_name[5:10]
-    with np.load(path + '/' + data_name) as data:
-        gt_outp = data['gt_outp']
-        input = data['input']
-        output = data['output']
-        gt_orig = data['gt_orig']
-        if 'gt_leds' in data.keys():
-            gt_leds = data['gt_leds']
+    for data_name in data_list:
+        if os.path.isdir(path + '/' + data_name):
+            continue 
+        # load data
+        #if name not in data_name:
+        #    continue
+        save_name = data_name[5:10]
+        with np.load(path + '/' + data_name) as data:
+            gt_outp = data['gt_outp']
+            input = data['input']
+            output = data['output']
+            gt_orig = data['gt_orig']
+            if 'gt_leds' in data.keys():
+                gt_leds = data['gt_leds']
 
-    # process data
-    if 'rgb' in data_name:
-        save_name = save_name + 'rgb_'
-        gt_outp = reshape_data(gt_outp,3)
-        input = reshape_data(input,3)
-        output = reshape_data(output,3)
-        orig_leds = np.squeeze(gt_orig)
-    if 'spectra' in data_name:
-        save_name = save_name + 'spectra_'
-        gt_outp = reshape_data(gt_outp,8)
-        input = reshape_data(input,8)
-        output = reshape_data(output,8)
-        orig_leds = np.squeeze(gt_leds)
-        orig_leds = orig_leds[...,:24]
-    #print(f'Shape check: data has shape of {data.shape}, orig_leds has shape of {orig_leds.shape}')
-    re_gt  = process(gt_outp,orig_leds)
-    re_in  = process(input,orig_leds)
-    re_out = process(output,orig_leds)
-    ref = orig_leds
-    # np.save('S2_result/'+save_name+'gt.npy',    re_gt)
-    # np.save('S2_result/'+save_name+'input.npy', re_in)
-    # np.save('S2_result/'+save_name+'output.npy', re_out)
-    # np.save('S2_result/'+save_name+'ref.npy', orig_leds)
-    psnr_gt,ssim_gt = outputevalarray(re_gt,ref)
-    print(f'The avg psnr of gt is {np.mean(psnr_gt)}')
-    print(f'The avg ssim of gt is {np.mean(ssim_gt)}')
-    psnr_in,ssim_in = outputevalarray(re_in,ref)
-    print(f'The avg psnr of gaptv+DAIN is {np.mean(psnr_in)}')
-    print(f'The avg ssim of gaptv+DAIN is {np.mean(ssim_in)}')
-    psnr_out,ssim_out = outputevalarray(re_out,ref)
-    print(f'The avg psnr of gaptv+ResNet+DAIN is {np.mean(psnr_out)}')
-    print(f'The avg ssim of gaptv+ResNet+DAIN is {np.mean(ssim_out)}')
-    MAX_V = 1
-    ## Save
-    np.savetxt('result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_psnr_gt_{np.mean(psnr_gt):.4f}.txt', psnr_gt, fmt='%.4f')
-    np.savetxt('result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_ssim_gt_{np.mean(ssim_gt):.4f}.txt', ssim_gt, fmt='%.4f')
-    np.savetxt('result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_psnr_in_{np.mean(psnr_in):.4f}.txt', psnr_in, fmt='%.4f')
-    np.savetxt('result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_ssim_in_{np.mean(ssim_in):.4f}.txt', ssim_in, fmt='%.4f')
-    np.savetxt('result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_psnr_out_{np.mean(psnr_out):.4f}.txt', psnr_out, fmt='%.4f')
-    np.savetxt('result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_ssim_out_{np.mean(ssim_out):.4f}.txt', ssim_out, fmt='%.4f')
+        # process data
+        if 'rgb' in data_name:
+            save_name = save_name + 'rgb_'
+            gt_outp = reshape_data(gt_outp,3)
+            input = reshape_data(input,3)
+            output = reshape_data(output,3)
+            orig_leds = np.squeeze(gt_orig)
+        if 'spectra' in data_name:
+            save_name = save_name + 'spectra_'
+            gt_outp = reshape_data(gt_outp,8)
+            input = reshape_data(input,8)
+            output = reshape_data(output,8)
+            orig_leds = np.squeeze(gt_leds)
+            orig_leds = orig_leds[...,:24]
+        #print(f'Shape check: data has shape of {data.shape}, orig_leds has shape of {orig_leds.shape}')
+        re_gt  = process(gt_outp,orig_leds)
+        re_in  = process(input,orig_leds)
+        re_out = process(output,orig_leds)
+        ref = orig_leds
+        # np.save('S2_result/'+save_name+'gt.npy',    re_gt)
+        # np.save('S2_result/'+save_name+'input.npy', re_in)
+        # np.save('S2_result/'+save_name+'output.npy', re_out)
+        # np.save('S2_result/'+save_name+'ref.npy', orig_leds)
+        
+        
+        psnr_gt,ssim_gt = outputevalarray(re_gt,ref)
+        print(f'The avg psnr of gt is {np.mean(psnr_gt)}')
+        print(f'The avg ssim of gt is {np.mean(ssim_gt)}')
+        psnr_in,ssim_in = outputevalarray(re_in,ref)
+        print(f'The avg psnr of gaptv+DAIN is {np.mean(psnr_in)}')
+        print(f'The avg ssim of gaptv+DAIN is {np.mean(ssim_in)}')
+        psnr_out,ssim_out = outputevalarray(re_out,ref)
+        print(f'The avg psnr of gaptv+ResNet+DAIN is {np.mean(psnr_out)}')
+        print(f'The avg ssim of gaptv+ResNet+DAIN is {np.mean(ssim_out)}')
+        MAX_V = 1
+        ## Save
+        np.savetxt('result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_psnr_gt_{np.mean(psnr_gt):.4f}.txt', psnr_gt, fmt='%.4f')
+        np.savetxt('result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_ssim_gt_{np.mean(ssim_gt):.4f}.txt', ssim_gt, fmt='%.4f')
+        np.savetxt('result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_psnr_in_{np.mean(psnr_in):.4f}.txt', psnr_in, fmt='%.4f')
+        np.savetxt('result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_ssim_in_{np.mean(ssim_in):.4f}.txt', ssim_in, fmt='%.4f')
+        np.savetxt('result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_psnr_out_{np.mean(psnr_out):.4f}.txt', psnr_out, fmt='%.4f')
+        np.savetxt('result/normed'+data_name[5:9]+f'_MAX={MAX_V}_array_ssim_out_{np.mean(ssim_out):.4f}.txt', ssim_out, fmt='%.4f')
 
-    with open('result/'+save_name+f'_MAX={MAX_V}_gtpsnr={np.mean(psnr_gt):.4f}_inputpsnr={np.mean(psnr_in):.4f}_outputpsnr={np.mean(psnr_out):.4f}.npz',"wb") as f:
-        np.savez(f, re_gt=re_gt,re_in=re_in, re_out=re_out, ref=ref)
+        with open('result/'+save_name+f'_MAX={MAX_V}_gtpsnr={np.mean(psnr_gt):.4f}_inputpsnr={np.mean(psnr_in):.4f}_outputpsnr={np.mean(psnr_out):.4f}.npz',"wb") as f:
+            np.savez(f, re_gt=re_gt,re_in=re_in, re_out=re_out, ref=ref)
+
+if __name__ == '__main__':
+    main()
