@@ -82,7 +82,7 @@ def test(test_dataloader):
                 output_ = np.squeeze(output_)
                 img_n = np.squeeze(img_n)
                 psnr_in  = calculate_psnr(img_n,gt)
-                psnr_out = calculate_psnr(output_,gt)
+                psnr_out = calculate_psnr(output_,gt - np.min(gt)) / (np.max(gt) - np.min(gt))
                 print(f'Data {ind_data} at frame {ind}, input noise images PSNR is {psnr_in}, output images PSNR is {psnr_out}.')
                 print(f'PSNR has been improved {(psnr_out-psnr_in)/psnr_in:.2%}')
             output = torch.cat(output,1)
@@ -98,6 +98,14 @@ def test(test_dataloader):
             output = output.numpy()
             output = np.moveaxis(output,1,-1)
             imgs_n = imgs_n.numpy()
+            # Normalize all data
+            gts = gts - np.min(gts)) / (np.max(gts) - np.min(gts)
+            imgs_n = imgs_n - np.min(imgs_n)) / (np.max(imgs_n) - np.min(imgs_n)
+            gt_orig = data[0]
+            gt_orig = gt_orig - np.min(gt_orig)) / (np.max(gt_orig) - np.min(gt_orig)
+            if len(data) >= 3:
+                gt_leds = data[2]
+                gt_leds = gt_leds - np.min(gt_leds)) / (np.max(gt_leds) - np.min(gt_leds)
             psnr_in  = calculate_psnr(imgs_n,gts)
             psnr_out = calculate_psnr(output,gts)
             print(f'Data {ind_data}, input noise images PSNR is {psnr_in}, output images PSNR is {psnr_out}.')
@@ -106,10 +114,10 @@ def test(test_dataloader):
                 os.mkdir('result')
             if len(data) >= 3:
                 with open(f"result/test_{ind_data:04d}_spectra_input_psnr={psnr_in:.4f}_result_psnr={psnr_out:.4f}.npz","wb") as f:
-                    np.savez(f, gt_outp=gts,input=imgs_n,output=output,gt_orig=data[0],gt_leds=data[2])
+                    np.savez(f, gt_outp=gts,input=imgs_n,output=output,gt_orig=gt_orig,gt_leds=gt_leds)
             else:
                 with open(f"result/test_{ind_data:04d}_rgb_input_psnr={psnr_in:.4f}_result_psnr={psnr_out:.4f}.npz","wb") as f:
-                    np.savez(f, gt_outp=gts,input=imgs_n,output=output,gt_orig=data[0])
+                    np.savez(f, gt_outp=gts,input=imgs_n,output=output,gt_orig=gt_orig)
 
 def validation_func():
     test_path = 'data/data/validation'
