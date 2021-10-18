@@ -12,7 +12,7 @@
 # SBATCH --partition=_workgroup_
 #SBATCH --partition=standard
 # SBATCH --partition=devel
-#SBATCH --gres=gpu:t4
+#SBATCH --gres=gpu
 
 #SBATCH --time=0-01:00:00
 # SBATCH --output=ArraySCI%A-%a.out
