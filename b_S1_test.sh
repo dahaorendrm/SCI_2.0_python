@@ -10,8 +10,8 @@
 
 #SBATCH --job-name=chasti_S1_test
 # SBATCH --partition=_workgroup_
-#SBATCH --partition=standard
-# SBATCH --partition=devel
+# SBATCH --partition=standard
+#SBATCH --partition=devel
 #SBATCH --gres=gpu
 
 #SBATCH --time=0-1:00:00

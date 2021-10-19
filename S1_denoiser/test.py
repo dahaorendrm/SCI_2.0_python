@@ -7,7 +7,7 @@ from torch.utils.data import DataLoader
 import numpy as np
 import os
 from utils import calculate_psnr,calculate_ssim
-import pickle
+import pickle,copy
 
 
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
@@ -82,7 +82,7 @@ def test(test_dataloader):
                 output_ = np.squeeze(output_)
                 img_n = np.squeeze(img_n)
                 psnr_in  = calculate_psnr(img_n,gt)
-                psnr_out = calculate_psnr(output_,gt - np.min(gt)) / (np.max(gt) - np.min(gt))
+                psnr_out = calculate_psnr(output_,(gt - np.nanmin(gt)) / (np.nanmax(gt) - np.nanmin(gt)))
                 print(f'Data {ind_data} at frame {ind}, input noise images PSNR is {psnr_in}, output images PSNR is {psnr_out}.')
                 print(f'PSNR has been improved {(psnr_out-psnr_in)/psnr_in:.2%}')
             output = torch.cat(output,1)
@@ -99,13 +99,13 @@ def test(test_dataloader):
             output = np.moveaxis(output,1,-1)
             imgs_n = imgs_n.numpy()
             # Normalize all data
-            gts = gts - np.min(gts)) / (np.max(gts) - np.min(gts)
-            imgs_n = imgs_n - np.min(imgs_n)) / (np.max(imgs_n) - np.min(imgs_n)
-            gt_orig = data[0]
-            gt_orig = gt_orig - np.min(gt_orig)) / (np.max(gt_orig) - np.min(gt_orig)
+            gts = (gts - np.nanmin(gts)) / (np.nanmax(gts) - np.nanmin(gts))
+            imgs_n = (imgs_n - np.nanmin(imgs_n)) / (np.nanmax(imgs_n) - np.nanmin(imgs_n))
+            gt_orig = copy.deepcopy(data[0])
+            gt_orig = (gt_orig - np.nanmin(gt_orig)) / (np.nanmax(gt_orig) - np.nanmin(gt_orig))
             if len(data) >= 3:
                 gt_leds = data[2]
-                gt_leds = gt_leds - np.min(gt_leds)) / (np.max(gt_leds) - np.min(gt_leds)
+                gt_leds = (gt_leds - np.nanmin(gt_leds)) / (np.nanmax(gt_leds) - np.nanmin(gt_leds))
             psnr_in  = calculate_psnr(imgs_n,gts)
             psnr_out = calculate_psnr(output,gts)
             print(f'Data {ind_data}, input noise images PSNR is {psnr_in}, output images PSNR is {psnr_out}.')
