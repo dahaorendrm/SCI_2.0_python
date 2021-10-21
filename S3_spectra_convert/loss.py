@@ -19,12 +19,12 @@ class XEDiceLoss(torch.nn.Module):
         xe_loss = xe_loss.masked_select(valid_pixel_mask).mean()
 
         # Dice loss
-        pred = torch.softmax(pred, dim=1)[:, 1]
-        pred = pred.masked_select(valid_pixel_mask)
-        true = true.masked_select(valid_pixel_mask)
-        dice_loss = 1 - (2.0 * torch.sum(pred * true)) / (torch.sum(pred + true) + 1e-7)
+        # pred = torch.softmax(pred, dim=1)[:, 1]
+        # pred = pred.masked_select(valid_pixel_mask)
+        # true = true.masked_select(valid_pixel_mask)
+        # dice_loss = 1 - (2.0 * torch.sum(pred * true)) / (torch.sum(pred + true) + 1e-7)
 
-        return (0.5 * xe_loss) + (0.5 * dice_loss)
+        return xe_loss
 
 
 def intersection_and_union(pred, true):

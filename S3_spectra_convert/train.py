@@ -1,38 +1,23 @@
 # import
 from pathlib import Path
 import numpy as np
-import pandas as pd
-import random
-random.seed(9) # set a seed for reproducibility
 import utils
 import torch
+import os
 
-from networks.STAC_model import FloodModel
+from ImgDataset import ImgDataset
+from networks.SpecConvModel import SpecConvModel
 import loss
 # process data
-DATA_PATH = Path("training_data")
-train_metadata = pd.read_csv(
-    DATA_PATH / "flood-training-metadata.csv", parse_dates=["scene_start"]
-)
-# Sample 3 random floods for validation set
-flood_ids = train_metadata.flood_id.unique().tolist()
-val_flood_ids = random.sample(flood_ids, 3)
-# Split data in two sets
-val = train_metadata[train_metadata.flood_id.isin(val_flood_ids)]
-train = train_metadata[~train_metadata.flood_id.isin(val_flood_ids)]
-# Separate features from labels
-val_x = utils.get_paths_by_chip(val)
-val_y = val[["chip_id", "label_path"]].drop_duplicates().reset_index(drop=True)
-train_x = utils.get_paths_by_chip(train)
-train_y = train[["chip_id", "label_path"]].drop_duplicates().reset_index(drop=True)
+
+dataset = ImgDataset('/lustre/scratch/X_MA/SCI_2.0_python/S3_spectra_convert/data/train/feature', '/lustre/scratch/X_MA/SCI_2.0_python/S3_spectra_convert/data/train/label')
+train_dataset,val_dataset = torch.utils.data.random_split(dataset, [370, 90], generator=torch.Generator().manual_seed(8))
 
 # set-up model
 hparams = {
     # Required hparams
-    "x_train": train_x,
-    "x_val": val_x,
-    "y_train": train_y,
-    "y_val": val_y,
+    "train_dataset": train_dataset,
+    "val_dataset": val_dataset,
     # Optional hparams
     "backbone": "resnet34",
     "weights": "imagenet",
@@ -47,15 +32,19 @@ hparams = {
     "output_path": "model-outputs",
     "log_path": "tensorboard_logs",
     "gpu": torch.cuda.is_available(),
-    "in_channels":9
+    "in_channels":8,
+    "out_channels":25
 }
 
-flood_model = FloodModel(hparams=hparams)
+model = SpecConvModel(hparams=hparams)
 
 # run model
-flood_model.fit()
+model.fit()
 # results
-print(f'Best IOU score is : {flood_model.trainer_params["callbacks"][0].best_model_score}')
+print(f'Best IOU score is : {model.trainer_params["callbacks"][0].best_model_score}')
 # save the weights to submitssion file
-weight_path = "model-outputs/flood_model.pt"
-torch.save(flood_model.state_dict(), weight_path)
+if not os.path.exists('model-outputs'):
+    os.mkdir('model-outputs')
+weight_path = "model-outputs/model.pt"
+model = SpecConvModel(hparams=hparams).load_from_checkpoint(model.trainer_params["callbacks"][0].best_model_path)
+%%%%%%torch.save(model.state_dict(), weight_path)
