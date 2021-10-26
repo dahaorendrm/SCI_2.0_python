@@ -47,4 +47,4 @@ if not os.path.exists('model-outputs'):
     os.mkdir('model-outputs')
 weight_path = "model-outputs/model.pt"
 model = SpecConvModel(hparams=hparams).load_from_checkpoint(model.trainer_params["callbacks"][0].best_model_path)
-%%%%%%torch.save(model.state_dict(), weight_path)
+torch.save(model.state_dict(), weight_path)
