@@ -10,7 +10,7 @@ from networks.SpecConvModel import SpecConvModel
 import loss
 # process data
 
-dataset = ImgDataset('/lustre/scratch/X_MA/SCI_2.0_python/S3_spectra_convert/data/train/feature', '/lustre/scratch/X_MA/SCI_2.0_python/S3_spectra_convert/data/train/label')
+dataset = ImgDataset('./data/train/feature', './data/train/label')
 train_dataset,val_dataset = torch.utils.data.random_split(dataset, [370, 90], generator=torch.Generator().manual_seed(8))
 
 # set-up model
@@ -21,12 +21,12 @@ hparams = {
     # Optional hparams
     "backbone": "resnet34",
     "weights": "imagenet",
-    "lr": 4e-4,
-    "min_epochs": 6,
+    "lr": 1e-5,
+    "min_epochs": 4,
     "max_epochs": 1000,
     "patience": 10,
     "batch_size": 32,
-    "num_workers": 32,
+    "num_workers": 16,
     "val_sanity_checks": 0,
     "fast_dev_run": False,
     "output_path": "model-outputs",

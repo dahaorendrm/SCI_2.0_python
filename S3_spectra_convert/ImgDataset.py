@@ -3,6 +3,7 @@ import torch
 import numpy as np
 import os
 import albumentations
+import tifffile
 # These transformations will be passed to our model class
 
 transformations = albumentations.Compose(
@@ -24,7 +25,7 @@ class ImgDataset(torch.utils.data.Dataset):
     label masks (where available).
     """
 
-    def __init__(self, x_paths, y_paths=None):
+    def __init__(self, x_path, y_path=None):
         self.feature_path = x_path
         self.data = os.listdir(x_path)
         self.label_path = y_path

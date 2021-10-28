@@ -6,6 +6,8 @@ temp
 **/temp
 **/result
 **/_result
+**/model-outputs
+**/tensorboard_logs
 *.out
 *.tar
 *.pth

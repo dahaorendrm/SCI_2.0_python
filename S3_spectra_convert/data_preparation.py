@@ -9,21 +9,32 @@
 import scipy.io as scio
 import tifffile
 import multiprocessing,os
-
+import numpy as np
+import os
+CUT_BAND = (4,2)
 BandsLed = scio.loadmat('data/BandsLed.mat')['BandsLed'] # (spec, iLED)
+BandsLed = BandsLed[CUT_BAND[0]:-CUT_BAND[1],:]
+BandsLed = BandsLed[np.newaxis,np.newaxis,:,:]
 
 def LEDprojection(data):
-    CUT_BAND = (4,2)
+    data = np.squeeze(data)
+    global BandsLed
+    global CUT_BAND
     data = data[:,:,CUT_BAND[0]:-CUT_BAND[1]] # Only 25 bands can be utilized by LEDs
-    BandsLed = BandsLed[CUT_BAND[0]:-CUT_BAND[1],:]
-    BandsLed = BandsLed[np.newaxis,np.newaxis,:,:]
     data = data[:,:,:,np.newaxis]
     data_led = np.sum(data*BandsLed,2)
     return data_led
 
 
-def process(path,name,savepath='./S3_spectra_convert/data/train'):
+def process(path,name,savepath='./data/train'):
+    if not os.path.exists(savepath):
+        os.mkdir(savepath)
+    if not os.path.exists(savepath+'/'+'label'):
+        os.mkdir(savepath+'/'+'label')
+    if not os.path.exists(savepath+'/'+'feature'):
+         os.mkdir(savepath+'/'+'feature')
     data = scio.loadmat(path+'/'+name)
+    print(f'file name is {name}')
     data = data['cube']
     led_data = LEDprojection(data)
     tifffile.imwrite(savepath+f'/label/{name[8:12]}.tiff',data) # label
@@ -31,8 +42,8 @@ def process(path,name,savepath='./S3_spectra_convert/data/train'):
 
 def processes():
     pool = multiprocessing.Pool()
-    name_f = os.listdir('/lustre/scratch/X_MA/data/ntire2020/NTIRE2020_Train_Spectral')
-    comp_input = [('/lustre/scratch/X_MA/data/ntire2020/NTIRE2020_Train_Spectral',file) for file in name_f]
+    name_f = os.listdir('../../data/ntire2020/spectral')
+    comp_input = [('../../data/ntire2020/spectral',file) for file in name_f]
     pool.starmap(process, comp_input)
 
 if __name__ == '__main__':

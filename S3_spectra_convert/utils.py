@@ -142,9 +142,9 @@ def calculate_psnr(img1, img2, maxv=1, border=0):
     img1 = img1[border:h-border, border:w-border]
     img2 = img2[border:h-border, border:w-border]
 
-    img1 = img1.astype(np.float64)
-    img2 = img2.astype(np.float64)
-    mse = np.mean((img1 - img2)**2)
+    #img1 = img1.astype(np.float64)
+    #img2 = img2.astype(np.float64)
+    mse = ((img1 - img2)**2).mean()
     if mse == 0:
         return float('inf')
     return 20 * math.log10(maxv / math.sqrt(mse))

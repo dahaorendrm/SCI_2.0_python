@@ -12,7 +12,7 @@ import cv2
 
 class SpecConvModel(pl.LightningModule):
     def __init__(self, hparams):
-        super(FloodModel, self).__init__()
+        super(SpecConvModel, self).__init__()
         self.hparams.update(hparams)
         self.save_hyperparameters()
         self.backbone = self.hparams.get("backbone", "resnext50_32x4d")
@@ -49,6 +49,7 @@ class SpecConvModel(pl.LightningModule):
         return self.model(image)
 
     def training_step(self, batch, batch_idx):
+        CUT_BAND = (4,2)
         # Switch on training mode
         self.model.train()
         torch.set_grad_enabled(True)
@@ -57,6 +58,7 @@ class SpecConvModel(pl.LightningModule):
         #print(f'shape chip:{batch["chip"].shape} nasadem:{batch["nasadem"].shape} recurrence:{batch["recurrence"].shape}')
         x = batch["feature"].float()
         y = batch["label"].float()
+        y = y[:,CUT_BAND[0]:-CUT_BAND[1],...]
         if self.gpu:
             x, y = x.cuda(non_blocking=True), y.cuda(non_blocking=True)
 
@@ -65,6 +67,7 @@ class SpecConvModel(pl.LightningModule):
 
         # Calculate training loss
         criterion = XEDiceLoss()
+        #print(f'shape of preds is {preds.shape}, shape of y is {y.shape}')
         loss = criterion(preds, y)
 
         # Log batch xe_dice_loss
@@ -80,12 +83,14 @@ class SpecConvModel(pl.LightningModule):
 
     def validation_step(self, batch, batch_idx):
         # Switch on validation mode
+        CUT_BAND = (4,2)
         self.model.eval()
         torch.set_grad_enabled(False)
 
         # Load images and labels
         x = batch["feature"].float()
         y = batch["label"].float()
+        y = y[:,CUT_BAND[0]:-CUT_BAND[1],...]
         if self.gpu:
             x, y = x.cuda(non_blocking=True), y.cuda(non_blocking=True)
 
@@ -103,7 +108,7 @@ class SpecConvModel(pl.LightningModule):
         #     Image.fromarray((np.squeeze(preds.cpu().numpy()[i,...])*255).astype(np.uint8)).save(f"temp/vali{i}_pred.jpg")
 
         # Calculate validation IOU (global)
-        psnr_val = utils.calculate_psnr(img_n.to("cpu"),gt.to("cpu"))
+        psnr_val = utils.calculate_psnr(preds.to("cpu"),y.to("cpu"))
         # ssim_val = utils.calculate_ssim(img_n,gt) %%% switch back the dimension
         self.psnr_val.append(psnr_val)
         # self.ssim_val.append(ssim_val)
@@ -111,13 +116,13 @@ class SpecConvModel(pl.LightningModule):
         # Log batch IOU
         self.log(
             'psnr',psnr_val,
-            'ssim',0,
+            #'ssim',0,
             on_step=True,
             on_epoch=True,
             prog_bar=False,
             logger=True
         )
-        return batch_iou
+        return psnr_val
 
     def train_dataloader(self):
         # DataLoader class for training
@@ -157,7 +162,7 @@ class SpecConvModel(pl.LightningModule):
     def validation_epoch_end(self, outputs):
         # Calculate IOU at end of epoch
         val_psnr = sum(self.psnr_val)/len(self.psnr_val)
-        val_ssim = sum(self.psnr_val)/len(self.psnr_val)
+        #val_ssim = sum(self.psnr_val)/len(self.psnr_val)
 
         # Reset metrics before next epoch
         self.psnr_val = []
@@ -165,7 +170,7 @@ class SpecConvModel(pl.LightningModule):
 
         # Log epoch validation IOU
         self.log("val_psnr", val_psnr, on_epoch=True, prog_bar=True, logger=True)
-        return epoch_iou
+        return val_psnr
 
     ## Convenience Methods ##
 
