@@ -1,5 +1,5 @@
 import torch
-import rasterio
+#import rasterio
 import numpy as np
 import os
 import albumentations
