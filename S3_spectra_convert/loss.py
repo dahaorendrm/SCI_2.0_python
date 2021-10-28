@@ -8,13 +8,14 @@ class XEDiceLoss(torch.nn.Module):
 
     def __init__(self):
         super().__init__()
-        self.xe = torch.nn.CrossEntropyLoss()
+        self.xe = torch.nn.MSELoss()
 
     def forward(self, pred, true):
         #valid_pixel_mask = true.ne(255)  # valid pixel mask
 
         # Cross-entropy loss
         #temp_true = torch.where((true == 255), 0, true)  # cast 255 to 0 temporarily
+        #print(f'pred max is {pred.max()}, true max is {true.max()}')
         xe_loss = self.xe(pred, true)
         #xe_loss = xe_loss.mean()
 
