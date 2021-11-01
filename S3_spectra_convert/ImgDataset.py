@@ -95,7 +95,7 @@ class TestDataset(torch.utils.data.Dataset):
         else:
              label = None
         # Prepare sample dictionary
-        feature = np.transpose(feature, [2, 0, 1])
-        label = np.transpose(label, [2, 0, 1])
+        feature = np.transpose(feature, [2, 0, 1, 3])
+        label = np.transpose(label, [2, 0, 1, 3])
         sample = {"id": self.data[idx], "feature":feature, "label":label}
         return sample

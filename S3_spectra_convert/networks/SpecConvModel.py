@@ -133,14 +133,18 @@ class SpecConvModel(pl.LightningModule):
 
         # Load images and labels
         x = batch["feature"].float()
-        if batch["label"]
+        if batch["label"]:
             y = batch["label"].float()
             y = y[:,CUT_BAND[0]:-CUT_BAND[1],...]
         if self.gpu:
             x, y = x.cuda(non_blocking=True), y.cuda(non_blocking=True)
 
         # Forward pass & softmax
-        preds = self.forward(x)
+        preds = []
+        for i in range(x.size()[4]):
+            x_temp = x[...,i]
+            pred = self.forward(x_temp)
+            preds.append(pred)
         #print(f'preds shape {preds.shape}')
         # preds = torch.softmax(preds, dim=1)[:, 1]
 
@@ -153,8 +157,9 @@ class SpecConvModel(pl.LightningModule):
         #     Image.fromarray((np.squeeze(preds.cpu().numpy()[i,...])*255).astype(np.uint8)).save(f"temp/vali{i}_pred.jpg")
 
         # Calculate validation IOU (global)
+        preds = torch.cat(preds,4)
         psnr_val = None
-        if batch["label"]
+        if batch["label"]:
             psnr_val = utils.calculate_psnr(preds.to("cpu"),y.to("cpu"))
             # ssim_val = utils.calculate_ssim(img_n,gt) %%% switch back the dimension
             self.psnr_val.append(psnr_val)
