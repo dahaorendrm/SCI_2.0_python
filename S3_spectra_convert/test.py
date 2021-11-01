@@ -39,5 +39,6 @@ hparams = {
 model = SpecConvModel(hparams=hparams)
 model.load_state_dict(torch.load("model-outputs/model.pt"))
 
-trainer = Trainer()
-trainer.test(model)
+#trainer = Trainer()
+#trainer.test(model)
+model.test()
