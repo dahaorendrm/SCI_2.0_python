@@ -292,3 +292,8 @@ class SpecConvModel(pl.LightningModule):
         # Set up and fit Trainer object
         self.trainer = pl.Trainer(**self.trainer_params)
         self.trainer.fit(self)
+
+    def test(self):
+        # Set up and fit Trainer object
+        self.trainer = pl.Trainer(**self.trainer_params)
+        self.trainer.test(self)
