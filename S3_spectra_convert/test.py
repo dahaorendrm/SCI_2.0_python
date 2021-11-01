@@ -8,10 +8,11 @@ import os
 from ImgDataset import TestDataset
 from networks.SpecConvModel import SpecConvModel
 import loss
+import pytorch_lightning as pl
 # process data
 
 
-dataset = TestDataset('./data/test/feature','./data/test/label')
+test_dataset = TestDataset('./data/test/feature','./data/test/label')
 
 
 # set-up model
