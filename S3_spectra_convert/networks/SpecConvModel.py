@@ -133,7 +133,7 @@ class SpecConvModel(pl.LightningModule):
 
         # Load images and labels
         x = batch["feature"].float()
-        if batch["label"]
+        if batch["label"]:
             y = batch["label"].float()
             y = y[:,CUT_BAND[0]:-CUT_BAND[1],...]
         if self.gpu:
@@ -154,7 +154,7 @@ class SpecConvModel(pl.LightningModule):
 
         # Calculate validation IOU (global)
         psnr_val = None
-        if batch["label"]
+        if batch["label"]:
             psnr_val = utils.calculate_psnr(preds.to("cpu"),y.to("cpu"))
             # ssim_val = utils.calculate_ssim(img_n,gt) %%% switch back the dimension
             self.psnr_val.append(psnr_val)

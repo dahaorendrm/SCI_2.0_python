@@ -69,7 +69,7 @@ class TestDataset(torch.utils.data.Dataset):
 
     def __init__(self, x_path,y_path=None):
         self.feature_path = x_path
-        self.data = [name for name in os.listdir(x_path) if os.path.isfile(name)]
+        self.data = [name for name in os.listdir(x_path) if os.path.isfile(self.feature_path+'/'+name)]
         self.label_path = y_path
 
     def __len__(self):
@@ -77,6 +77,8 @@ class TestDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         feature = np.load(self.feature_path+'/'+self.data[idx])
+        feature = feature['re_out']
+        #print(f'feature type : {feature.type()}')
         # Min-max normalization
         min_norm = np.nanmin(feature)
         max_norm = np.nanmax(feature)
@@ -84,7 +86,7 @@ class TestDataset(torch.utils.data.Dataset):
 
         # Load label if available - training only
         if self.label_path is not None:
-            label = tifffile.imread(self.label_path+'/'+self.data[idx])
+            label = tifffile.imread(self.label_path+'/'+self.data[idx][:4]+'.tiff')
             min_norm = np.nanmin(label)
             max_norm = np.nanmax(label)
             label = (label - min_norm) / (max_norm - min_norm)
