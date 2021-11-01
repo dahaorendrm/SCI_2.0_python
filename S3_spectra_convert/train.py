@@ -21,7 +21,7 @@ hparams = {
     # Optional hparams
     "backbone": "resnet34",
     "weights": "imagenet",
-    "lr": 1e-5,
+    "lr": 1e-3,
     "min_epochs": 4,
     "max_epochs": 1000,
     "patience": 10,
