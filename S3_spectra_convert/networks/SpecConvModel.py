@@ -133,9 +133,9 @@ class SpecConvModel(pl.LightningModule):
 
         # Load images and labels
         x = batch["feature"].float()
-        if batch["label"]:
+        if batch["label"] is not None:
             y = batch["label"].float()
-            y = y[:,CUT_BAND[0]:-CUT_BAND[1],...]
+            #y = y[:,CUT_BAND[0]:-CUT_BAND[1],...]
         if self.gpu:
             x, y = x.cuda(non_blocking=True), y.cuda(non_blocking=True)
 
@@ -157,21 +157,25 @@ class SpecConvModel(pl.LightningModule):
         #     Image.fromarray((np.squeeze(preds.cpu().numpy()[i,...])*255).astype(np.uint8)).save(f"temp/vali{i}_pred.jpg")
 
         # Calculate validation IOU (global)
-        preds = torch.cat(preds,4)
+        preds = torch.stack(preds,4)
+        #print(f'shape of preds {preds.shape}, shape of y {y.shape}')
         psnr_val = None
-        if batch["label"]:
+        if batch["label"] is not None:
             psnr_val = utils.calculate_psnr(preds.to("cpu"),y.to("cpu"))
             # ssim_val = utils.calculate_ssim(img_n,gt) %%% switch back the dimension
+            print(f'psnr value is {psnr_val}.')
             self.psnr_val.append(psnr_val)
             # self.ssim_val.append(ssim_val)
-        np.save(f'result/{batch["id"]}.npy',pred) ####name needed
+        preds = torch.squeeze(preds)
+        preds = torch.moveaxis(preds,0,2)
+        np.save(f'result/{batch["id"][0]}.npy',preds.cpu().numpy()) ####name needed
         # Log batch IOU
         self.log(
             'psnr',psnr_val,
             #'ssim',0,
             on_step=True,
             on_epoch=True,
-            prog_bar=False,
+            prog_bar=True,
             logger=True
         )
         return (preds,psnr_val)
