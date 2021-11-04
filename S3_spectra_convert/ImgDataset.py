@@ -90,10 +90,6 @@ class TestDataset(torch.utils.data.Dataset):
             min_norm = np.nanmin(label)
             max_norm = np.nanmax(label)
             label = (label - min_norm) / (max_norm - min_norm)
-            transformed = transformations(image=feature,image1=label)
-            feature = transformed['image']
-            label = transformed['image1']
-
         else:
              label = None
         # Prepare sample dictionary
