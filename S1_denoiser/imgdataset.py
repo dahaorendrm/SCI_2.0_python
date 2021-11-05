@@ -1,62 +1,65 @@
-from torch.utils.data import Dataset
-import os
 import torch
-import scipy.io as scio
-import tifffile,pickle
+#import rasterio
+import numpy as np
+import os
+import albumentations
+import tifffile
 
-MAXLEN = 200
+transformations = albumentations.Compose(
+    [
+        #albumentations.RandomCrop(256,256),
+        albumentations.RandomRotate90(),
+        albumentations.HorizontalFlip(),
+        albumentations.VerticalFlip(),
+    ],
+    additional_targets={
+        'image1': 'image',
+        'image2': 'image',
+        'image3': 'image',
+        'image4': 'image'
+    }
+)
 
-class Imgdataset(Dataset):
+class ImgDataset(torch.utils.data.Dataset):
 
     def __init__(self, path):
-        super(Imgdataset, self).__init__()
+        super(ImgDataset, self).__init__()
         #self.data = []
         if os.path.exists(path):
-            ground_truth_path = path + '/gt'
-            measurement_path = path + '/feature'
-            gt_led_path = path + '/gt_led'
-            if os.path.exists(ground_truth_path) and os.path.exists(measurement_path):
-                gt_names = os.listdir(ground_truth_path)
-                feature_names = os.listdir(measurement_path)
-                self.data = []
-                for i in range(len(feature_names)):
-                    if os.path.exists(gt_led_path + '/' + feature_names[i]):
-                        self.data.append({'ground_truth': ground_truth_path + '/' + feature_names[i],
-                                      'measurement': measurement_path + '/' + feature_names[i],
-                                      'gt_led': gt_led_path + '/' + feature_names[i]})
-                    else:
-                        self.data.append({'ground_truth': ground_truth_path + '/' + feature_names[i],
-                                          'measurement': measurement_path + '/' + feature_names[i]})
-            else:
-                raise FileNotFoundError('path doesnt exist!')
+            self.gt_path = path + '/gt'
+            self.mea_path = path + '/mea'
+            self.img_n_path = path + '/img_n'
+            self.gt_led_path = path + '/gt_led'
+            self.mask = scio.loadmat('./data/lesti_mask.mat')['mask']
+            self.data = os.listdir(mea_path)
         else:
             raise FileNotFoundError('path doesnt exist!')
 
-
-
     def __getitem__(self, index):
-        #print(index)
-        #print(f'Data length :{len(self.data)}')
-        #print(f'Data length 2:{len(self.data[0])}')
-        #print(self.data)
-        ground_truth = self.data[index]['ground_truth']
-        measurement = self.data[index]['measurement']
-        gt = tifffile.imread(ground_truth)
-        #print(f'imgdataset:{ground_truth} gt shape is {gt.shape}')
-        meas = tifffile.imread(measurement)
-        gt = torch.from_numpy(gt).float()
-        meas = torch.from_numpy(meas).float()
-        if 'gt_led' in self.data[index]:
-            gt_led = self.data[index]['gt_led']
-            gt_led = tifffile.imread(gt_led)
-            print(f'imgdataset:gt_led shape is {gt_led.shape}')
-            gt_led = torch.from_numpy(gt_led).float()
-            return gt, meas, gt_led
-        #print(f'Path of gt is {ground_truth}')
-        #gt = torch.from_numpy(gt / 255)
-        #meas = torch.from_numpy(meas / 255)
-        #gt = gt.permute(2, 0, 1)
-        return gt, meas
+
+        file_name = self.data[index]
+        mea = tifffile.imread(self.mea_path + '/' + file_name)
+        img_n = tifffile.imread(self.img_n_path + '/' + file_name)
+        mask = self.mask[:,:,:img_n.shape[2]]
+        #noise =
+        if os.path.exists(self.gt_led_path + '/' + file_name):
+            gt = tifffile.imread(self.gt_led_path + '/' + file_name)
+
+        elif os.path.exists(self.gt_path + '/' + file_name):
+            gt = tifffile.imread(self.gt_path + '/' + file_name)
+        else:
+            gt = None
+
+        transformed = transformations(image=mea,image1=img_n,
+                                image2=mask,image3=gt)
+        if gt is not None:
+            sample = {'id':file_name.split('.')[0], 'mea':transformed['image'],
+                'img_n':transformed['image1'], 'mask':transformed['image2'],
+                    'gt':transformed['image3']}
+        else:
+            sample = {'id':file_name.split('.')[0], 'mea':transformed['image'],
+                'img_n':transformed['image1'], 'mask':transformed['image2']}
+        return sample
 
     def __len__(self):
 

@@ -59,7 +59,7 @@ class MultipleBasicBlock(nn.Module):
 
         self.block1= nn.Sequential(*[
             nn.Conv2d(input_feature, intermediate_feature,
-                      kernel_size=7, stride=1, padding=3, bias=True),
+                      kernel_size=3, stride=1, padding=3, bias=True),
             nn.LeakyReLU(inplace=True)
         ])
 

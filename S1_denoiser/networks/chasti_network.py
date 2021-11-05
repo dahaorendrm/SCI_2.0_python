@@ -1,59 +1,244 @@
-# -*- coding: utf-8 -*-
 import torch
-import torch.nn as nn
-import time
-from . import Resblock
+import numpy as np
+from pathlib import Path
+
+import pytorch_lightning as pl
+import segmentation_models_pytorch as smp
+
+from loss import *
+import utils
+
+class CHASTINET(pl.LightningModule):
+    def __init__(self, hparams):
+        super(SpecConvModel, self).__init__()
+        self.hparams.update(hparams)
+        self.save_hyperparameters()
+        self.learning_rate = self.hparams.get("lr", 1e-3)
+        self.max_epochs = self.hparams.get("max_epochs", 1000)
+        self.min_epochs = self.hparams.get("min_epochs", 6)
+        self.patience = self.hparams.get("patience", 4)
+        self.num_workers = self.hparams.get("num_workers", 8)
+        self.batch_size = self.hparams.get("batch_size", 32)
+        self.train_dataset = self.hparams.get("train_dataset",None)
+        self.val_dataset = self.hparams.get("val_dataset",None)
+        self.test_dataset = self.hparams.get("test_dataset",None)
+        self.output_path = self.hparams.get("output_path", "model-outputs")
+        self.gpu = self.hparams.get("gpu", False)
+        self.input_layers = self.hparams.get("input_layers", 4)
+        self.hidden_layers = self.hparams.get("hidden_layers", 64)
+        self.num_blocks = self.hparams.get("num_blocks", 4)
+
+        # Where final model will be saved
+        self.output_path = Path.cwd() / self.output_path
+        self.output_path.mkdir(exist_ok=True)
+
+        # Track validation IOU globally (reset each epoch)
+        self.psnr_val = []
+        self.ssim_val = []
+
+        # Instantiate datasets, model, and trainer params
+        self.model = self._prepare_model()
+        self.trainer_params = self._get_trainer_params()
+
+    ## Required LightningModule methods ##
+
+    def forward(self, image):
+        # Forward pass
+        return self.model(image)
+
+    def training_step(self, batch, batch_idx):
+        self.model.train()
+        torch.set_grad_enabled(True)
+        y = batch['label']
+        mea = batch['mea']
+        if self.gpu:
+            mea, y = mea.cuda(non_blocking=True), y.cuda(non_blocking=True)
+        preds = []
+        for i in range(batch['img_n'].shape[3]):
+            img_n = batch['img_n'][...,i]
+            mask = batch['mask'][...,i]
+            if self.gpu:
+                img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
+            pred = model(torch.stack((mea,img_n,mask),3))
+            preds.append(pred)
+        preds = torch.stack(preds,3)
+        criterion = XEDiceLoss()
+        loss = criterion(preds, y)
+        self.log(
+            "loss",
+            loss,
+            #on_step=True,
+            on_epoch=True,
+            prog_bar=False,
+            logger=True,
+        )
+        return loss
 
 
+    def validation_step(self, batch, batch_idx):
+        self.model.eval()
+        torch.set_grad_enabled(False)
+        y = batch['label']
+        mea = batch['mea']
+        if self.gpu:
+            mea, y = mea.cuda(non_blocking=True), y.cuda(non_blocking=True)
+        preds = []
+        for i in range(batch['img_n'].shape[3]):
+            img_n = batch['img_n'][...,i]
+            mask = batch['mask'][...,i]
+            if self.gpu:
+                img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
+            pred = model(torch.stack((mea,img_n,mask),3))
+            preds.append(pred)
+        preds = torch.stack(preds,3)
+        psnr_val = utils.calculate_psnr(preds.cpu().numpy(), y.cpu().numpy())
+        self.psnr_val.append(psnr_val)
+        self.log(
+            "val_psnr",
+            psnr_val,
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            logger=True,
+        )
+        return (preds,psnr_val)
+
+    def test_step(self, batch, batch_idx):
+        self.model.eval()
+        torch.set_grad_enabled(False)
+        mea = batch['mea']
+        if self.gpu:
+            mea, y = mea.cuda(non_blocking=True), y.cuda(non_blocking=True)
+        preds = []
+        for i in range(batch['img_n'].shape[3]):
+            img_n = batch['img_n'][...,i]
+            mask = batch['mask'][...,i]
+            if self.gpu:
+                img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
+            pred = model(torch.stack((mea,img_n,mask),3))
+            preds.append(pred)
+        preds = torch.stack(preds,3)
+        psnr_val = None
+        if 'label' in batch.keys():
+            y = batch['label']
+            psnr_val = utils.calculate_psnr(preds.cpu().numpy(), y.numpy())
+            self.log(
+                "psnr",
+                psnr_val,
+                on_step=True,
+                on_epoch=True,
+                prog_bar=True,
+                logger=True,
+            )
+        preds = torch.squeeze(preds)
+        tifffile.imwrite(f'result/{batch["id"][0]}.tiff',preds.cpu().numpy()) ####name needed
+        return (preds,psnr_val)
+
+    def train_dataloader(self):
+        # DataLoader class for training
+        return torch.utils.data.DataLoader(
+            self.train_dataset,
+            batch_size=self.batch_size,
+            num_workers=self.num_workers,
+            shuffle=True,
+            pin_memory=True,
+        )
+
+    def val_dataloader(self):
+        # DataLoader class for validation
+        return torch.utils.data.DataLoader(
+            self.val_dataset,
+            batch_size=self.batch_size,
+            num_workers=0,
+            shuffle=False,
+            pin_memory=True,
+        )
+
+    def test_dataloader(self):
+        # DataLoader class for validation
+        return torch.utils.data.DataLoader(
+            self.test_dataset,
+            batch_size=self.batch_size,
+            num_workers=0,
+            shuffle=False,
+            pin_memory=True,
+        )
+
+    def configure_optimizers(self):
+        # Define optimizer
+        optimizer = torch.optim.Adam(self.model.parameters(), lr=self.learning_rate)
+
+        # Define scheduler
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer, mode="max", factor=0.5, patience=self.patience
+        )
+        scheduler = {
+            "scheduler": scheduler,
+            "interval": "epoch",
+            "monitor": "val_psnr",
+        }  # logged value to monitor
+        return [optimizer], [scheduler]
+
+    def validation_epoch_end(self, outputs):
+        # Calculate IOU at end of epoch
+        val_psnr = sum(self.psnr_val)/len(self.psnr_val)
+        #val_ssim = sum(self.psnr_val)/len(self.psnr_val)
+
+        # Reset metrics before next epoch
+        self.psnr_val = []
+        self.ssim_val = []
+
+        # Log epoch validation IOU
+        self.log("val_psnr", val_psnr, on_epoch=True, prog_bar=True, logger=True)
+        self.log("lr", self.learning_rate, on_epoch=True, prog_bar=True, logger=True)
+        return val_psnr
 
 
-class CHASTINET(torch.nn.Module):
-    def __init__(self,input_layers,hidden_layers,num_blocks):
+    ## Convenience Methods ##
 
-        # base class initialization
-        super(CHASTINET, self).__init__()
+    def _prepare_model(self):
+        resnet = Resblock.__dict__['MultipleBasicBlock_4'](self.input_layers,self.hidden_layers,self.num_blocks)
+        torch.nn.init.xavier_uniform_(resnet.weight.data)
+        return resnet
 
-        #*********************************************
-        #num_blocks = 6 # max:7
-        self.ResNet = Resblock.__dict__['MultipleBasicBlock_4'](input_layers,hidden_layers,num_blocks)
+    def _get_trainer_params(self):
+        # Define callback behavior
+        checkpoint_callback = pl.callbacks.ModelCheckpoint(
+            dirpath=self.output_path,
+            monitor="val_psnr",
+            mode="max",
+            verbose=True,
+        )
+        early_stop_callback = pl.callbacks.early_stopping.EarlyStopping(
+            monitor="val_psnr",
+            patience=(self.patience * 3),
+            mode="max",
+            verbose=True,
+        )
 
-        self._initialize_weights()
+        # Specify where TensorBoard logs will be saved
+        self.log_path = Path.cwd() / self.hparams.get("log_path", "tensorboard-logs")
+        self.log_path.mkdir(exist_ok=True)
+        logger = pl.loggers.TensorBoardLogger(self.log_path)
 
+        trainer_params = {
+            "callbacks": [checkpoint_callback, early_stop_callback],
+            "max_epochs": self.max_epochs,
+            "min_epochs": self.min_epochs,
+            "default_root_dir": self.output_path,
+            "logger": logger,
+            "gpus": None if not self.gpu else 1,
+            "fast_dev_run": self.hparams.get("fast_dev_run", False),
+            "num_sanity_val_steps": self.hparams.get("val_sanity_checks", 0),
+        }
+        return trainer_params
 
-    def _initialize_weights(self):
-        count = 0
-        for m in self.modules():
-            if isinstance(m, nn.Conv2d):
-                # n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-                # m.weight.data.normal_(0, math.sqrt(2. / n))
-                # print(m)
-                count+=1
-                # print(count)
-                # weight_init.xavier_uniform(m.weight.data)
-                nn.init.xavier_uniform_(m.weight.data)
-                # weight_init.kaiming_uniform(m.weight.data, a = 0, mode='fan_in')
-                if m.bias is not None:
-                    m.bias.data.zero_()
-            elif isinstance(m, nn.BatchNorm2d):
-                m.weight.data.fill_(1)
-                m.bias.data.zero_()
-            elif isinstance(m, nn.Linear):
-                m.weight.data.normal_(0, 0.01)
-                m.bias.data.zero_()
-            # else:
-            #     print(m)
+    def fit(self):
+        # Set up and fit Trainer object
+        self.trainer = pl.Trainer(**self.trainer_params)
+        self.trainer.fit(self)
 
-    def forward(self, input):
-        """
-        Parameters
-        ----------
-        input: shape (batch, stack, width, height)
-        -----------
-        """
-        device = torch.cuda.current_device()
-        #print(f'Print from CHASTINET input shape : {input.size()}')
-        temp = self.ResNet(input)
-        #print(f'Print from CHASTINET temp shape : {temp.size()}')
-        cur_output_rectified = temp# + input[:,0:1,...]
-        #print(f'Print from CHASTINET output shape : {cur_output_rectified.size()}')
-        return cur_output_rectified
+    def test(self):
+        # Set up and fit Trainer object
+        self.trainer = pl.Trainer(**self.trainer_params)
+        self.trainer.test(self)
