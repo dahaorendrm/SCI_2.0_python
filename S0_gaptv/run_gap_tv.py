@@ -140,7 +140,7 @@ def save_crops(path,index,fname,crops_mea,crops_img,crops_gt=None,crops_led=None
     for ind,crop_mea in enumerate(crops_mea):
         name = '_'.join((fname,'%.4d'%(index)))+'.tiff'
         os.mkdir(path+'/mea/') if not os.path.exists(path+'/mea') else None
-        threads.append(threading.Thread(target=save_tiff,args=['data/mea/'+name,crop_mea]))
+        threads.append(threading.Thread(target=save_tiff,args=[path+'/mea/'+name,crop_mea]))
         threads[-1].start()
         os.mkdir(path+'/img_n/') if not os.path.exists(path+'/img_n') else None
         threads.append(threading.Thread(target=save_tiff,args=[path+'/img_n/'+name,crops_img[ind]]))
