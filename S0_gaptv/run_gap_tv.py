@@ -12,6 +12,7 @@ import itertools as itert
 import time
 from func import utils,recon_model,result,measurement
 from collections import namedtuple
+import datetime
 
 MODEL='chasti_sst'
 MASK = scio.loadmat('lesti_mask.mat')['mask']
@@ -123,29 +124,34 @@ def generate_crops(block_im,num_crops,ind_r,ind_c):
     return result
     #return block_im
 
-def save_crops(index,fname,crops_mea,crops_img,crops_gt=None,crops_led=None,transform_type=None):
+def save_crops(path,index,fname,crops_mea,crops_img,crops_gt=None,crops_led=None,transform_type=None):
     if not os.path.exists('data'):
         try:
             os.mkdir('data')
         except:
             pass
+    if not os.path.exists(path):
+        try:
+            os.mkdir(path)
+        except:
+            pass    
     save_tiff = lambda name,crop: tifffile.imwrite(name,crop)
     threads = []
     for ind,crop_mea in enumerate(crops_mea):
         name = '_'.join((fname,'%.4d'%(index)))+'.tiff'
-        os.mkdir('data/mea') if not os.path.exists('data/mea')
-        threads.append(threading.Thread(target=save_tiff,args=[name,crop_mea]))
+        os.mkdir(path+'/mea/') if not os.path.exists(path+'/mea') else None
+        threads.append(threading.Thread(target=save_tiff,args=['data/mea/'+name,crop_mea]))
         threads[-1].start()
-        os.mkdir('data/img_n') if not os.path.exists('data/img_n')
-        threads.append(threading.Thread(target=save_tiff,args=[name,crops_img[index]]))
+        os.mkdir(path+'/img_n/') if not os.path.exists(path+'/img_n') else None
+        threads.append(threading.Thread(target=save_tiff,args=[path+'/img_n/'+name,crops_img[ind]]))
         threads[-1].start()
         if crops_gt:
-            os.mkdir('data/gt') if not os.path.exists('data/gt')
-            threads.append(threading.Thread(target=save_tiff,args=[name,crops_gt[index]]))
+            os.mkdir(path+'/gt/') if not os.path.exists(path+'/gt') else None
+            threads.append(threading.Thread(target=save_tiff,args=[path+'/gt/'+name,crops_gt[ind]]))
             threads[-1].start()
         if crops_led:
-            os.mkdir('data/gt_led') if not os.path.exists('data/gt_led')
-            threads.append(threading.Thread(target=save_tiff,args=[name,crops_led[index]]))
+            os.mkdir(path+'/gt_led/') if not os.path.exists(path+'/gt_led') else None
+            threads.append(threading.Thread(target=save_tiff,args=[path+'/gt_led/'+name,crops_led[ind]]))
             threads[-1].start()
         index+=1
     for thread in threads:
@@ -157,7 +163,7 @@ def entry_process(path,COMP_FRAME):
     name_f = os.listdir(path)
     name_f = sorted(name_f)
     output_i = 0
-    pool = multiprocessing.Pool()
+    pool = multiprocessing.Pool(20)
     for ind in range(0,len(name_f)-COMP_FRAME,COMP_FRAME):
         pic_block = []
         for ind_im in range(ind,ind+COMP_FRAME):
@@ -190,12 +196,14 @@ def entry_process(path,COMP_FRAME):
         print(f'Start multiprocessing with {len(li_crops)} datasets...')
         comp_input = [(MODEL,crop) for crop in li_crops]
         return_crops_data = pool.starmap(compressive_model, comp_input) # contain (mea, gaptv_result)
+        crops_mea = []
+        crops_img = []
         for (mea,re) in return_crops_data:
             crops_mea.append(mea)
             crops_img.append(re)
         print(f'Finished multiprocessing.{len(return_crops_data)} datasets are created.')
         #print(f'{}') mea re
-        save_crops(output_i,file_name,crops_mea,crops_img, crops_gt=li_crops)
+        save_crops('data/train',output_i,file_name,crops_mea,crops_img, crops_gt=li_crops)
         output_i += len_crops*4
 
 def train_data_generation():
@@ -232,10 +240,12 @@ def test_data_generation():
         crops.append(imgs_down[:,:,:,ind:ind+COMP_FRAME])
     comp_input = [(MODEL,crop) for crop in crops]
     return_crops_data = pool.starmap(compressive_model, comp_input) # contain (mea, gaptv_result)
+    crops_mea = []
+    crops_img = []
     for (mea,re) in return_crops_data:
         crops_mea.append(mea)
         crops_img.append(re)
-    save_crops(0,'F86',crops_mea,crops_img, crops_gt=crops)
+    save_crops('data/test',0,'F86',crops_mea,crops_img, crops_gt=crops)
 
     MODEL = 'lesti_sst'
     COMP_FRAME = 16
@@ -248,12 +258,15 @@ def test_data_generation():
         crops.append(imgs[:,:,4:-2,ind:ind+COMP_FRAME])
     comp_input = [(MODEL,crop) for crop in crops]
     return_crops_data = pool.starmap(compressive_model, comp_input) # contain (original led project, mea, gaptv_result)
+    crops_mea = []
+    crops_img = []
+    crops_led = []
     for (orig_leds,mea,re) in return_crops_data:
         crops_mea.append(mea)
         crops_img.append(re)
         crops_led.append(orig_leds)
     ### (orig_leds,mea,re)
-    save_crops(0,'4D_lego',crops_mea,crops_img, crops_gt=crops, crops_led=crops_led)
+    save_crops('data/test',0,'4D_lego',crops_mea,crops_img, crops_gt=crops, crops_led=crops_led)
 
 
     MODEL = 'lesti_sst' ### (orig_leds,mea,re)
@@ -267,7 +280,6 @@ def test_data_generation():
         crops.append(imgs[:,:,4:-2,ind:ind+COMP_FRAME])
     comp_input = [(MODEL,crop) for crop in crops]
     return_crops_data = pool.starmap(compressive_model, comp_input) # contain (original led project, mea, gaptv_result)
-    return_crops_data = [[mea],[re],[orig_leds] for (orig_leds,mea,re) in return_crops_data]
     crops_mea = []
     crops_img = []
     crops_led = []
@@ -275,8 +287,10 @@ def test_data_generation():
         crops_mea.append(mea)
         crops_img.append(re)
         crops_led.append(orig_leds)
-    save_crops(0,'4D_blocks',crops_mea,crops_img, crops_gt=crops, crops_led=crops_led)
+    save_crops('data/test',0,'4D_blocks',crops_mea,crops_img, crops_gt=crops, crops_led=crops_led)
 
 if __name__ == '__main__':
+    print(f'Start time:{datetime.datetime.now()}')
     train_data_generation()
     test_data_generation()
+    print(f'End time:{datetime.datetime.now()}')
