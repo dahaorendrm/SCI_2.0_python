@@ -7,7 +7,7 @@ import segmentation_models_pytorch as smp
 import albumentations
 
 from loss import *
-import utils
+from .. import utils
 import cv2
 
 class SpecConvModel(pl.LightningModule):

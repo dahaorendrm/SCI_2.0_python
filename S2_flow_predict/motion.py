@@ -8,7 +8,7 @@ import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 import networks as dain_net
-import utils
+from .. import utils
 #from torchsummary import summary
 
 logger = utils.init_logger(__name__)

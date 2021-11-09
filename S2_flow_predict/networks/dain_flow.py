@@ -12,7 +12,7 @@ from . import S2D_models
 from . import Resblock
 from . import MegaDepth
 import time
-import utils
+from .. import utils
 logger = utils.init_logger(__name__)
 class DAIN_flow(torch.nn.Module):
     def __init__(self,
