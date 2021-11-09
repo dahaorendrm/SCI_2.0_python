@@ -1,7 +1,7 @@
 # import
 from pathlib import Path
 import numpy as np
-import utils
+from .. import utils
 import torch
 import os
 

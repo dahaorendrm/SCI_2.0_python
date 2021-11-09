@@ -39,26 +39,41 @@ class ImgDataset(torch.utils.data.Dataset):
 
         file_name = self.data[index]
         mea = tifffile.imread(self.mea_path + '/' + file_name)
+        min_norm = mea.amin()
+        max_norm = mea.amax()
+        mea = (mea - min_norm) / (max_norm - min_norm)
         img_n = tifffile.imread(self.img_n_path + '/' + file_name)
+        min_norm = 0
+        max_norm = img_n.amax()
+        img_n = (img_n - min_norm) / (max_norm - min_norm)
         mask = self.mask[:,:,:img_n.shape[2]]
         #noise =
         if os.path.exists(self.gt_led_path + '/' + file_name):
             gt = tifffile.imread(self.gt_led_path + '/' + file_name)
-
+            min_norm = gt.amin()
+            max_norm = gt.amax()
+            gt = (gt - min_norm) / (max_norm - min_norm)
         elif os.path.exists(self.gt_path + '/' + file_name):
             gt = tifffile.imread(self.gt_path + '/' + file_name)
+            min_norm = gt.amin()
+            max_norm = gt.amax()
+            gt = (gt - min_norm) / (max_norm - min_norm)
         else:
             gt = None
 
         transformed = transformations(image=mea,image1=img_n,
                                 image2=mask,image3=gt)
+        mea = np.expand_dims(transformed['image'],0)
+        img_n = np.expand_dims(transformed['image1'],0)
+        mask = np.expand_dims(transformed['image2'],0)
         if gt is not None:
-            sample = {'id':file_name.split('.')[0], 'mea':transformed['image'],
-                'img_n':transformed['image1'], 'mask':transformed['image2'],
-                    'gt':transformed['image3']}
-        else:
-            sample = {'id':file_name.split('.')[0], 'mea':transformed['image'],
-                'img_n':transformed['image1'], 'mask':transformed['image2']}
+            gt = np.expand_dims(transformed['image3'],0)
+            sample = {'id':file_name.split('.')[0], 'mea':mea,
+                'img_n':img_n, 'mask':mask,
+                    'gt':gt}
+            eturn sample
+        sample = {'id':file_name.split('.')[0], 'mea':transformed['image'],
+            'img_n':transformed['image1'], 'mask':transformed['image2']}
         return sample
 
     def __len__(self):

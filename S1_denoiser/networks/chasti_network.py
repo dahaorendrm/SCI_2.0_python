@@ -6,7 +6,7 @@ import pytorch_lightning as pl
 import segmentation_models_pytorch as smp
 
 from loss import *
-import utils
+from .. import utils
 
 class CHASTINET(pl.LightningModule):
     def __init__(self, hparams):
@@ -91,11 +91,21 @@ class CHASTINET(pl.LightningModule):
             pred = model(torch.stack((mea,img_n,mask),3))
             preds.append(pred)
         preds = torch.stack(preds,3)
+        utils.saveintemp(preds.cpu().numpy(),batch['id'])
         psnr_val = utils.calculate_psnr(preds.cpu().numpy(), y.cpu().numpy())
+        ssim_val = utils.calculate_ssim(preds.cpu().numpy(), y.cpu().numpy())
         self.psnr_val.append(psnr_val)
         self.log(
             "val_psnr",
             psnr_val,
+            on_step=True,
+            on_epoch=True,
+            prog_bar=True,
+            logger=True,
+        )
+        self.log(
+            "val_ssim",
+            ssim_val,
             on_step=True,
             on_epoch=True,
             prog_bar=True,

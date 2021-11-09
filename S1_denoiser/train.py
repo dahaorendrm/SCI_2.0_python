@@ -1,7 +1,7 @@
 # import
 from pathlib import Path
 import numpy as np
-import utils
+from .. import utils
 import torch
 import os
 
@@ -10,8 +10,8 @@ from networks.chasti_network import CHASTINET
 import loss
 # process data
 
-train_dataset = ImgDataset('./data/train/')
-val_dataset = ImgDataset('./data/validation/')
+train_dataset = ImgDataset('../S0_gaptv/data/train/')
+val_dataset = ImgDataset('../S0_gaptv/data/val/')
 
 # set-up model
 hparams = {
