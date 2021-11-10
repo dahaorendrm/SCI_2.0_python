@@ -1,11 +1,10 @@
 # import
 from pathlib import Path
 import numpy as np
-from .. import utils
 import torch
 import os
 
-from ImgDataset import ImgDataset
+from imgdataset import ImgDataset
 from networks.chasti_network import CHASTINET
 import loss
 # process data
@@ -23,14 +22,14 @@ hparams = {
     "min_epochs": 4,
     "max_epochs": 1000,
     "patience": 10,
-    "batch_size": 32,
+    "batch_size": 8,
     "num_workers": 16,
     "val_sanity_checks": 0,
     "fast_dev_run": False,
     "output_path": "model-outputs",
     "log_path": "tensorboard_logs",
     "gpu": torch.cuda.is_available(),
-    "input_layers":4,
+    "input_layers":3,
     "hidden_layers":64,
     "num_blocks":4
 }

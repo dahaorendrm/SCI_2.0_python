@@ -4,6 +4,7 @@ import numpy as np
 import os
 import albumentations
 import tifffile
+import scipy.io as scio
 
 transformations = albumentations.Compose(
     [
@@ -30,8 +31,8 @@ class ImgDataset(torch.utils.data.Dataset):
             self.mea_path = path + '/mea'
             self.img_n_path = path + '/img_n'
             self.gt_led_path = path + '/gt_led'
-            self.mask = scio.loadmat('./data/lesti_mask.mat')['mask']
-            self.data = os.listdir(mea_path)
+            self.mask = scio.loadmat('../S0_gaptv/lesti_mask.mat')['mask']
+            self.data = os.listdir(self.mea_path)
         else:
             raise FileNotFoundError('path doesnt exist!')
 
@@ -39,39 +40,43 @@ class ImgDataset(torch.utils.data.Dataset):
 
         file_name = self.data[index]
         mea = tifffile.imread(self.mea_path + '/' + file_name)
-        min_norm = mea.amin()
-        max_norm = mea.amax()
+        min_norm = np.amin(mea)
+        max_norm = np.amax(mea)
         mea = (mea - min_norm) / (max_norm - min_norm)
         img_n = tifffile.imread(self.img_n_path + '/' + file_name)
         min_norm = 0
-        max_norm = img_n.amax()
+        max_norm = np.amax(img_n)
         img_n = (img_n - min_norm) / (max_norm - min_norm)
         mask = self.mask[:,:,:img_n.shape[2]]
         #noise =
         if os.path.exists(self.gt_led_path + '/' + file_name):
             gt = tifffile.imread(self.gt_led_path + '/' + file_name)
-            min_norm = gt.amin()
-            max_norm = gt.amax()
+            min_norm = np.amin(gt)
+            max_norm = np.amax(gt)
             gt = (gt - min_norm) / (max_norm - min_norm)
         elif os.path.exists(self.gt_path + '/' + file_name):
             gt = tifffile.imread(self.gt_path + '/' + file_name)
-            min_norm = gt.amin()
-            max_norm = gt.amax()
+            min_norm = np.amin(gt)
+            max_norm = np.amax(gt)
             gt = (gt - min_norm) / (max_norm - min_norm)
         else:
             gt = None
 
         transformed = transformations(image=mea,image1=img_n,
                                 image2=mask,image3=gt)
-        mea = np.expand_dims(transformed['image'],0)
-        img_n = np.expand_dims(transformed['image1'],0)
-        mask = np.expand_dims(transformed['image2'],0)
+        mea = transformed['image']
+        img_n = transformed['image1']
+        mask = transformed['image2']
+        #mea = np.expand_dims(transformed['image'],0)
+        #img_n = np.expand_dims(transformed['image1'],0)
+        #mask = np.expand_dims(transformed['image2'],0)
         if gt is not None:
-            gt = np.expand_dims(transformed['image3'],0)
+            gt = transformed['image3']
+            #gt = np.expand_dims(transformed['image3'],0)
             sample = {'id':file_name.split('.')[0], 'mea':mea,
                 'img_n':img_n, 'mask':mask,
-                    'gt':gt}
-            eturn sample
+                    'label':gt}
+            return sample
         sample = {'id':file_name.split('.')[0], 'mea':transformed['image'],
             'img_n':transformed['image1'], 'mask':transformed['image2']}
         return sample

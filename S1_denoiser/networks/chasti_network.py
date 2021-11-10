@@ -4,13 +4,13 @@ from pathlib import Path
 
 import pytorch_lightning as pl
 import segmentation_models_pytorch as smp
-
+from . import Resblock
 from loss import *
-from .. import utils
+from utils import *
 
 class CHASTINET(pl.LightningModule):
     def __init__(self, hparams):
-        super(SpecConvModel, self).__init__()
+        super(CHASTINET, self).__init__()
         self.hparams.update(hparams)
         self.save_hyperparameters()
         self.learning_rate = self.hparams.get("lr", 1e-3)
@@ -45,25 +45,42 @@ class CHASTINET(pl.LightningModule):
     def forward(self, image):
         # Forward pass
         return self.model(image)
+    def selectFrames(self, gt):
+        '''
+        create reference label from gt to only keep desired frames
+        '''
+        new_size = list(gt.size())
+        new_size.pop(3)
+        new_gt = torch.empty(new_size, dtype=torch.float, device = gt.get_device())
+        ch_idx = 0
+        for f_idx in range(gt.size()[4]):
+            new_gt[:,:,:,f_idx] = gt[:,:,:,ch_idx,f_idx]
+            ch_idx+=1
+            if ch_idx==gt.size()[3]:
+                ch_idx = 0
+        return new_gt
+
 
     def training_step(self, batch, batch_idx):
         self.model.train()
         torch.set_grad_enabled(True)
-        y = batch['label']
-        mea = batch['mea']
+        y = batch['label'].float()
+        mea = batch['mea'].float()
         if self.gpu:
             mea, y = mea.cuda(non_blocking=True), y.cuda(non_blocking=True)
         preds = []
         for i in range(batch['img_n'].shape[3]):
-            img_n = batch['img_n'][...,i]
-            mask = batch['mask'][...,i]
+            img_n = batch['img_n'][...,i].float()
+            mask = batch['mask'][...,i].float()
             if self.gpu:
                 img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
-            pred = model(torch.stack((mea,img_n,mask),3))
-            preds.append(pred)
+            # print(f'shape of input is {torch.stack((mea,img_n,mask),1).size()}')
+            pred = self.model(torch.stack((mea,img_n,mask),1))
+            preds.append(torch.squeeze(pred))
         preds = torch.stack(preds,3)
         criterion = XEDiceLoss()
-        loss = criterion(preds, y)
+        # print(f'shape of preds is {preds.size()}, shape of y is {y.size()}')
+        loss = criterion(preds, self.selectFrames(y))
         self.log(
             "loss",
             loss,
@@ -78,22 +95,24 @@ class CHASTINET(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         self.model.eval()
         torch.set_grad_enabled(False)
-        y = batch['label']
-        mea = batch['mea']
+        y = batch['label'].float()
+        y = self.selectFrames(y)
+        mea = batch['mea'].float()
         if self.gpu:
             mea, y = mea.cuda(non_blocking=True), y.cuda(non_blocking=True)
         preds = []
         for i in range(batch['img_n'].shape[3]):
-            img_n = batch['img_n'][...,i]
-            mask = batch['mask'][...,i]
+            img_n = batch['img_n'][...,i].float()
+            mask = batch['mask'][...,i].float()
             if self.gpu:
                 img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
-            pred = model(torch.stack((mea,img_n,mask),3))
-            preds.append(pred)
+            pred = self.model(torch.stack((mea,img_n,mask),1))
+            preds.append(torch.squeeze(pred))
         preds = torch.stack(preds,3)
-        utils.saveintemp(preds.cpu().numpy(),batch['id'])
-        psnr_val = utils.calculate_psnr(preds.cpu().numpy(), y.cpu().numpy())
-        ssim_val = utils.calculate_ssim(preds.cpu().numpy(), y.cpu().numpy())
+        saveintemp(preds.cpu().numpy(),batch['id'])
+        #print(f'shape of preds is {preds.size()}, label is {y.size()}')
+        psnr_val = calculate_psnr(preds.cpu().numpy(), y.cpu().numpy())
+        ssim_val = calculate_ssim(preds.cpu().numpy(), y.cpu().numpy())
         self.psnr_val.append(psnr_val)
         self.log(
             "val_psnr",
@@ -126,12 +145,13 @@ class CHASTINET(pl.LightningModule):
             if self.gpu:
                 img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
             pred = model(torch.stack((mea,img_n,mask),3))
-            preds.append(pred)
+            preds.append(torch.squeeze(pred))
         preds = torch.stack(preds,3)
         psnr_val = None
         if 'label' in batch.keys():
             y = batch['label']
-            psnr_val = utils.calculate_psnr(preds.cpu().numpy(), y.numpy())
+            y = self.selectFrames(y)
+            psnr_val = calculate_psnr(preds.cpu().numpy(), y.numpy())
             self.log(
                 "psnr",
                 psnr_val,
@@ -208,7 +228,7 @@ class CHASTINET(pl.LightningModule):
 
     def _prepare_model(self):
         resnet = Resblock.__dict__['MultipleBasicBlock_4'](self.input_layers,self.hidden_layers,self.num_blocks)
-        torch.nn.init.xavier_uniform_(resnet.weight.data)
+        #torch.nn.init.xavier_uniform_(resnet.weight.data)
         return resnet
 
     def _get_trainer_params(self):
