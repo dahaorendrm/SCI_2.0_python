@@ -84,7 +84,7 @@ class CHASTINET(pl.LightningModule):
         self.log(
             "loss",
             loss,
-            #on_step=True,
+            on_step=True,
             on_epoch=True,
             prog_bar=False,
             logger=True,
@@ -117,7 +117,7 @@ class CHASTINET(pl.LightningModule):
         self.log(
             "val_psnr",
             psnr_val,
-            on_step=True,
+            #on_step=True,
             on_epoch=True,
             prog_bar=True,
             logger=True,
@@ -125,7 +125,7 @@ class CHASTINET(pl.LightningModule):
         self.log(
             "val_ssim",
             ssim_val,
-            on_step=True,
+            #on_step=True,
             on_epoch=True,
             prog_bar=True,
             logger=True,
