@@ -48,10 +48,10 @@ class ImgDataset(torch.utils.data.Dataset):
         max_norm = np.amax(img_n)
         img_n = (img_n - min_norm) / (max_norm - min_norm)
         mask = self.mask[:,:,:img_n.shape[2]]
-        oth_n = torch.empty_like(img_n)
+        oth_n = np.empty_like(img_n)
         temp = img_n*mask
-        for i in range(oth_n.size()[-1]):
-            oth_n[...,i] = torch.mean(torch.cat(temp[...,:i],temp[...,i:],2), 2)
+        for i in range(oth_n.shape[-1]):
+            oth_n[...,i] = np.mean(np.concatenate((temp[...,:i],temp[...,i:]),2), 2)
         min_norm = np.amin(oth_n)
         max_norm = np.amax(oth_n)
         oth_n = (oth_n - min_norm) / (max_norm - min_norm)
