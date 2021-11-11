@@ -48,7 +48,14 @@ class ImgDataset(torch.utils.data.Dataset):
         max_norm = np.amax(img_n)
         img_n = (img_n - min_norm) / (max_norm - min_norm)
         mask = self.mask[:,:,:img_n.shape[2]]
-        #noise =
+        oth_n = torch.empty_like(img_n)
+        temp = img_n*mask
+        for i in range(oth_n.size()[-1]):
+            oth_n[...,i] = torch.mean(torch.cat(temp[...,:i],temp[...,i:],2), 2)
+        min_norm = np.amin(oth_n)
+        max_norm = np.amax(oth_n)
+        oth_n = (oth_n - min_norm) / (max_norm - min_norm)
+
         if os.path.exists(self.gt_led_path + '/' + file_name):
             gt = tifffile.imread(self.gt_led_path + '/' + file_name)
             min_norm = np.amin(gt)
@@ -63,10 +70,11 @@ class ImgDataset(torch.utils.data.Dataset):
             gt = None
 
         transformed = transformations(image=mea,image1=img_n,
-                                image2=mask,image3=gt)
+                                image2=mask,image3=gt,image4=oth_n)
         mea = transformed['image']
         img_n = transformed['image1']
         mask = transformed['image2']
+        oth_n = transformed['image4']
         #mea = np.expand_dims(transformed['image'],0)
         #img_n = np.expand_dims(transformed['image1'],0)
         #mask = np.expand_dims(transformed['image2'],0)
@@ -74,11 +82,11 @@ class ImgDataset(torch.utils.data.Dataset):
             gt = transformed['image3']
             #gt = np.expand_dims(transformed['image3'],0)
             sample = {'id':file_name.split('.')[0], 'mea':mea,
-                'img_n':img_n, 'mask':mask,
+                'img_n':img_n, 'mask':mask,'oth_n':oth_n,
                     'label':gt}
             return sample
-        sample = {'id':file_name.split('.')[0], 'mea':transformed['image'],
-            'img_n':transformed['image1'], 'mask':transformed['image2']}
+        sample = {'id':file_name.split('.')[0], 'mea':mea,
+            'img_n':img_n, 'mask':mask, 'oth_n':oth_n}
         return sample
 
     def __len__(self):

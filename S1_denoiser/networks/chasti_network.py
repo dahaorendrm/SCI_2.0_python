@@ -45,6 +45,7 @@ class CHASTINET(pl.LightningModule):
     def forward(self, image):
         # Forward pass
         return self.model(image)
+
     def selectFrames(self, gt):
         '''
         create reference label from gt to only keep desired frames
@@ -71,12 +72,18 @@ class CHASTINET(pl.LightningModule):
         preds = []
         for i in range(batch['img_n'].shape[3]):
             img_n = batch['img_n'][...,i].float()
+            oth_n = batch['oth_n'][...,i].float()
             mask = batch['mask'][...,i].float()
             if self.gpu:
                 img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
             # print(f'shape of input is {torch.stack((mea,img_n,mask),1).size()}')
+<<<<<<< HEAD
             pred = self.model(torch.stack((mea,img_n,mask),1))
             preds.append(torch.squeeze(pred,1))
+=======
+            pred = self.model(torch.stack((mea,img_n,mask,oth_n),1))
+            preds.append(torch.squeeze(pred))
+>>>>>>> deafb10 (add oth_n term)
         preds = torch.stack(preds,3)
         criterion = XEDiceLoss()
         # print(f'shape of preds is {preds.size()}, shape of y is {y.size()}')
@@ -104,6 +111,7 @@ class CHASTINET(pl.LightningModule):
         for i in range(batch['img_n'].shape[3]):
             img_n = batch['img_n'][...,i].float()
             mask = batch['mask'][...,i].float()
+            oth_n = batch['oth_n'][...,i].float()
             if self.gpu:
                 img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
             pred = self.model(torch.stack((mea,img_n,mask),1))
@@ -149,8 +157,9 @@ class CHASTINET(pl.LightningModule):
             mea, y = mea.cuda(non_blocking=True), y.cuda(non_blocking=True)
         preds = []
         for i in range(batch['img_n'].shape[3]):
-            img_n = batch['img_n'][...,i]
-            mask = batch['mask'][...,i]
+            img_n = batch['img_n'][...,i].float()
+            mask = batch['mask'][...,i].float()
+            oth_n = batch['oth_n'][...,i].float()
             if self.gpu:
                 img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
             pred = model(torch.stack((mea,img_n,mask),3))
