@@ -178,7 +178,7 @@ class CHASTINET(pl.LightningModule):
         # DataLoader class for validation
         return torch.utils.data.DataLoader(
             self.val_dataset,
-            batch_size=self.batch_size,
+            batch_size=1,
             num_workers=0,
             shuffle=False,
             pin_memory=True,

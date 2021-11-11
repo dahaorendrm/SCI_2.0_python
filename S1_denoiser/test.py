@@ -22,7 +22,7 @@ hparams = {
     "max_epochs": 1000,
     "patience": 10,
     "batch_size": 1,
-    "num_workers": 16,
+    "num_workers": 2,
     "val_sanity_checks": 0,
     "fast_dev_run": False,
     "output_path": "model-outputs",
