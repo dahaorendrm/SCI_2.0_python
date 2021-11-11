@@ -31,7 +31,11 @@ hparams = {
     "log_path": "tensorboard_logs",
     "gpu": torch.cuda.is_available(),
     "input_layers":4,
+<<<<<<< HEAD
     "hidden_layers":32,
+=======
+    "hidden_layers":64,
+>>>>>>> deafb10 (add oth_n term)
     "num_blocks":4
 }
 
