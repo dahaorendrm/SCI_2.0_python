@@ -21,7 +21,7 @@ hparams = {
     "min_epochs": 4,
     "max_epochs": 1000,
     "patience": 10,
-    "batch_size": 32,
+    "batch_size": 1,
     "num_workers": 16,
     "val_sanity_checks": 0,
     "fast_dev_run": False,
