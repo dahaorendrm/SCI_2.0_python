@@ -111,8 +111,11 @@ class CHASTINET(pl.LightningModule):
                 img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
             pred = self.model(torch.stack((mea,img_n,mask,oth_n),1))
 <<<<<<< HEAD
+<<<<<<< HEAD
             preds.append(torch.squeeze(pred,1))
 =======
+=======
+>>>>>>> 7ebbaa2 (add oth_n term)
             preds.append(torch.squeeze(pred))
 >>>>>>> 23814fb (add oth_n term)
         preds = torch.stack(preds,3)
@@ -168,8 +171,11 @@ class CHASTINET(pl.LightningModule):
                 img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
             pred = model(torch.stack((mea,img_n,mask,oth_n),3))
 <<<<<<< HEAD
+<<<<<<< HEAD
             preds.append(torch.squeeze(pred,1))
 =======
+=======
+>>>>>>> 7ebbaa2 (add oth_n term)
             preds.append(torch.squeeze(pred))
 >>>>>>> 23814fb (add oth_n term)
         preds = torch.stack(preds,3)
