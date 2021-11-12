@@ -5,7 +5,7 @@ from .. import utils
 import torch
 import os
 
-from ImgDataset import ImgDataset
+from imgdataset import ImgDataset
 from networks.chasti_network import CHASTINET
 import loss
 # process data

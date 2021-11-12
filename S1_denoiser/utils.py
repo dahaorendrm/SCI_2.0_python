@@ -13,6 +13,7 @@ from PIL import Image
 import itertools
 
 def saveintemp(data,name='test'):
+    data = np.squeeze(data)
     if not os.path.exists('temp'):
         os.makedirs('temp')
     if data.ndim == 3:
