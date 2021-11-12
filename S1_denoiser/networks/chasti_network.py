@@ -119,7 +119,7 @@ class CHASTINET(pl.LightningModule):
             "val_psnr_in",
             psnr_val_n,
             on_step=True,
-            on_epoch=True,
+            on_epoch=False,
             prog_bar=True,
             logger=True,
         )
@@ -127,7 +127,7 @@ class CHASTINET(pl.LightningModule):
             "val_psnr",
             psnr_val,
             on_step=True,
-            on_epoch=True,
+            on_epoch=False,
             prog_bar=True,
             logger=True,
         )
@@ -135,7 +135,7 @@ class CHASTINET(pl.LightningModule):
             "val_ssim",
             ssim_val,
             on_step=True,
-            on_epoch=True,
+            on_epoch=False,
             prog_bar=True,
             logger=True,
         )
@@ -165,7 +165,7 @@ class CHASTINET(pl.LightningModule):
                 "psnr",
                 psnr_val,
                 on_step=True,
-                on_epoch=True,
+                on_epoch=False,
                 prog_bar=True,
                 logger=True,
             )
