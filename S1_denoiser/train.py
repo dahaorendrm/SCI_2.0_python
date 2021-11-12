@@ -22,7 +22,7 @@ hparams = {
     "min_epochs": 4,
     "max_epochs": 1000,
     "patience": 3,
-    "batch_size": 8,
+    "batch_size": 10,
     "num_workers": 16,
     "val_sanity_checks": 0,
     "fast_dev_run": False,
@@ -30,7 +30,7 @@ hparams = {
     "log_path": "tensorboard_logs",
     "gpu": torch.cuda.is_available(),
     "input_layers":4,
-    "hidden_layers":64,
+    "hidden_layers":32,
     "num_blocks":4
 }
 
