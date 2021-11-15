@@ -214,7 +214,7 @@ class CHASTINET(pl.LightningModule):
         scheduler = {
             "scheduler": scheduler,
             "interval": "epoch",
-            "monitor": "val_psnr",
+            "monitor": "val_psnr_mean",
         }  # logged value to monitor
         return [optimizer], [scheduler]
 
@@ -228,7 +228,7 @@ class CHASTINET(pl.LightningModule):
         self.ssim_val = []
 
         # Log epoch validation IOU
-        self.log("val_psnr", val_psnr, on_epoch=True, prog_bar=True, logger=True)
+        self.log("val_psnr_mean", val_psnr, on_epoch=True, prog_bar=True, logger=True)
         self.log("lr", self.learning_rate, on_epoch=True, prog_bar=True, logger=True)
         return val_psnr
 
@@ -244,12 +244,12 @@ class CHASTINET(pl.LightningModule):
         # Define callback behavior
         checkpoint_callback = pl.callbacks.ModelCheckpoint(
             dirpath=self.output_path,
-            monitor="val_psnr",
+            monitor="val_psnr_mean",
             mode="max",
             verbose=True,
         )
         early_stop_callback = pl.callbacks.early_stopping.EarlyStopping(
-            monitor="val_psnr",
+            monitor="val_psnr_mean",
             patience=(self.patience * 3),
             mode="max",
             verbose=True,
