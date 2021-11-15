@@ -110,14 +110,7 @@ class CHASTINET(pl.LightningModule):
             if self.gpu:
                 img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
             pred = self.model(torch.stack((mea,img_n,mask,oth_n),1))
-<<<<<<< HEAD
-<<<<<<< HEAD
             preds.append(torch.squeeze(pred,1))
-=======
-=======
->>>>>>> 7ebbaa2 (add oth_n term)
-            preds.append(torch.squeeze(pred))
->>>>>>> 23814fb (add oth_n term)
         preds = torch.stack(preds,3)
         saveintemp(preds.cpu().numpy(),batch['id'][0])
         #print(f'shape of preds is {preds.size()}, label is {y.size()}')
@@ -170,14 +163,7 @@ class CHASTINET(pl.LightningModule):
             if self.gpu:
                 img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
             pred = model(torch.stack((mea,img_n,mask,oth_n),3))
-<<<<<<< HEAD
-<<<<<<< HEAD
             preds.append(torch.squeeze(pred,1))
-=======
-=======
->>>>>>> 7ebbaa2 (add oth_n term)
-            preds.append(torch.squeeze(pred))
->>>>>>> 23814fb (add oth_n term)
         preds = torch.stack(preds,3)
         psnr_val = None
         if 'label' in batch.keys():
