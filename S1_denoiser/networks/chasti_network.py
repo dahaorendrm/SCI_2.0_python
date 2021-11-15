@@ -112,31 +112,36 @@ class CHASTINET(pl.LightningModule):
         saveintemp(preds.cpu().numpy(),batch['id'][0])
         #print(f'shape of preds is {preds.size()}, label is {y.size()}')
         psnr_val_n = calculate_psnr(batch['img_n'].cpu().numpy(), y.cpu().numpy())
-        psnr_val = calculate_psnr(preds.cpu().numpy(), y.cpu().numpy())
-        ssim_val = calculate_ssim(preds.cpu().numpy(), y.cpu().numpy())
+        preds = preds.cpu().numpy()
+        y = y.cpu().numpy()
+        preds = np.squeeze(np.moveaxis(preds,0,-1))
+        y = np.squeeze(np.moveaxis(y,0,-1))
+        psnr_val = calculate_psnr(preds, y)
+        ssim_val = calculate_ssim(preds, y)
         self.psnr_val.append(psnr_val)
+        self.ssim_val.append(ssim_val)
         self.log(
             "val_psnr_in",
             psnr_val_n,
             on_step=True,
-            on_epoch=True,
-            prog_bar=True,
+            on_epoch=False,
+            prog_bar=False,
             logger=True,
         )
         self.log(
-            "val_psnr",
+            "val_psnr_step",
             psnr_val,
             on_step=True,
-            on_epoch=True,
-            prog_bar=True,
+            on_epoch=False,
+            prog_bar=False,
             logger=True,
         )
         self.log(
-            "val_ssim",
+            "val_ssim_step",
             ssim_val,
             on_step=True,
-            on_epoch=True,
-            prog_bar=True,
+            on_epoch=False,
+            prog_bar=False,
             logger=True,
         )
         return (preds,psnr_val)
@@ -162,10 +167,10 @@ class CHASTINET(pl.LightningModule):
             y = self.selectFrames(y)
             psnr_val = calculate_psnr(preds.cpu().numpy(), y.numpy())
             self.log(
-                "psnr",
+                "psnr_step",
                 psnr_val,
                 on_step=True,
-                on_epoch=True,
+                on_epoch=False,
                 prog_bar=True,
                 logger=True,
             )
@@ -209,7 +214,8 @@ class CHASTINET(pl.LightningModule):
 
         # Define scheduler
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-            optimizer, mode="max", factor=0.5, patience=self.patience
+            optimizer, mode="max", factor=0.1, patience=self.patience,
+            threshold = 0.3,verbose = True
         )
         scheduler = {
             "scheduler": scheduler,
