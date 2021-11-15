@@ -77,13 +77,8 @@ class CHASTINET(pl.LightningModule):
             if self.gpu:
                 img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
             # print(f'shape of input is {torch.stack((mea,img_n,mask),1).size()}')
-<<<<<<< HEAD
-            pred = self.model(torch.stack((mea,img_n,mask),1))
-            preds.append(torch.squeeze(pred,1))
-=======
             pred = self.model(torch.stack((mea,img_n,mask,oth_n),1))
-            preds.append(torch.squeeze(pred))
->>>>>>> deafb10 (add oth_n term)
+            preds.append(torch.squeeze(pred,1))
         preds = torch.stack(preds,3)
         criterion = XEDiceLoss()
         # print(f'shape of preds is {preds.size()}, shape of y is {y.size()}')
@@ -114,7 +109,7 @@ class CHASTINET(pl.LightningModule):
             oth_n = batch['oth_n'][...,i].float()
             if self.gpu:
                 img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
-            pred = self.model(torch.stack((mea,img_n,mask,oth_n),1))
+            pred = self.model(torch.stack((mea,img_n,mask),1))
             preds.append(torch.squeeze(pred,1))
         preds = torch.stack(preds,3)
         saveintemp(preds.cpu().numpy(),batch['id'][0])
@@ -127,7 +122,7 @@ class CHASTINET(pl.LightningModule):
             "val_psnr_in",
             psnr_val_n,
             on_step=True,
-            on_epoch=True,
+            on_epoch=False,
             prog_bar=True,
             logger=True,
         )
@@ -135,7 +130,7 @@ class CHASTINET(pl.LightningModule):
             "val_psnr",
             psnr_val,
             on_step=True,
-            on_epoch=True,
+            on_epoch=False,
             prog_bar=True,
             logger=True,
         )
@@ -162,7 +157,7 @@ class CHASTINET(pl.LightningModule):
             oth_n = batch['oth_n'][...,i].float()
             if self.gpu:
                 img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
-            pred = model(torch.stack((mea,img_n,mask,oth_n),3))
+            pred = model(torch.stack((mea,img_n,mask),3))
             preds.append(torch.squeeze(pred,1))
         preds = torch.stack(preds,3)
         psnr_val = None
