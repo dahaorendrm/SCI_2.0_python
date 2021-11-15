@@ -76,7 +76,7 @@ class CHASTINET(pl.LightningModule):
                 img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
             # print(f'shape of input is {torch.stack((mea,img_n,mask),1).size()}')
             pred = self.model(torch.stack((mea,img_n,mask),1))
-            preds.append(torch.squeeze(pred))
+            preds.append(torch.squeeze(pred,1))
         preds = torch.stack(preds,3)
         criterion = XEDiceLoss()
         # print(f'shape of preds is {preds.size()}, shape of y is {y.size()}')
