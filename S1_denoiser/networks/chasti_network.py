@@ -221,6 +221,7 @@ class CHASTINET(pl.LightningModule):
             "scheduler": scheduler,
             "interval": "epoch",
             "monitor": "val_psnr_mean",
+            "name":'lr_monitor'
         }  # logged value to monitor
         return [optimizer], [scheduler]
 
@@ -235,7 +236,6 @@ class CHASTINET(pl.LightningModule):
 
         # Log epoch validation IOU
         self.log("val_psnr_mean", val_psnr, on_epoch=True, prog_bar=True, logger=True)
-        self.log("lr", self.learning_rate, on_epoch=True, prog_bar=True, logger=True)
         return val_psnr
 
 
@@ -248,6 +248,7 @@ class CHASTINET(pl.LightningModule):
 
     def _get_trainer_params(self):
         # Define callback behavior
+        lrmonitor_callback = pl.callbacks.LearningRateMonitor('epoch')
         checkpoint_callback = pl.callbacks.ModelCheckpoint(
             dirpath=self.output_path,
             monitor="val_psnr_mean",
@@ -267,7 +268,7 @@ class CHASTINET(pl.LightningModule):
         logger = pl.loggers.TensorBoardLogger(self.log_path)
 
         trainer_params = {
-            "callbacks": [checkpoint_callback, early_stop_callback],
+            "callbacks": [checkpoint_callback, early_stop_callback, lrmonitor_callback],
             "max_epochs": self.max_epochs,
             "min_epochs": self.min_epochs,
             "default_root_dir": self.output_path,
