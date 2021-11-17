@@ -112,7 +112,7 @@ class CHASTINET(pl.LightningModule):
             pred = self.model(torch.stack((mea,img_n,mask,oth_n),1))
             preds.append(torch.squeeze(pred,1))
         preds = torch.stack(preds,3)
-        saveintemp(preds.cpu().numpy(),batch['id'][0])
+        # saveintemp(preds.cpu().numpy(),batch['id'][0])
         #print(f'shape of preds is {preds.size()}, label is {y.size()}')
         psnr_val_n = calculate_psnr(batch['img_n'].cpu().numpy(), y.cpu().numpy())
         preds = preds.cpu().numpy()
@@ -152,7 +152,12 @@ class CHASTINET(pl.LightningModule):
     def test_step(self, batch, batch_idx):
         self.model.eval()
         torch.set_grad_enabled(False)
-        mea = batch['mea']
+        if batch['label'] is not None:
+            y = batch['label'].float()
+            y = self.selectFrames(y)
+        else:
+            y=None
+        mea = batch['mea'].float()
         if self.gpu:
             mea, y = mea.cuda(non_blocking=True), y.cuda(non_blocking=True)
         preds = []
@@ -162,25 +167,24 @@ class CHASTINET(pl.LightningModule):
             oth_n = batch['oth_n'][...,i].float()
             if self.gpu:
                 img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
-            pred = model(torch.stack((mea,img_n,mask,oth_n),3))
+            pred = self.model(torch.stack((mea,img_n,mask,oth_n),1))
             preds.append(torch.squeeze(pred,1))
         preds = torch.stack(preds,3)
+        saveintemp(preds.cpu().numpy(),batch['id'][0])
         psnr_val = None
-        if 'label' in batch.keys():
-            y = batch['label']
-            y = self.selectFrames(y)
-            psnr_val = calculate_psnr(preds.cpu().numpy(), y.numpy())
-            self.log(
-                "psnr_step",
-                psnr_val,
-                on_step=True,
-                on_epoch=False,
-                prog_bar=True,
-                logger=True,
-            )
-        preds = torch.squeeze(preds)
-        tifffile.imwrite(f'result/{batch["id"][0]}.tiff',preds.cpu().numpy()) ####name needed
-        return (preds,psnr_val)
+        if y is not None:
+            ref_y = y.cpu().numpy()
+            ref_y = np.squeeze(np.moveaxis(ref_y,0,-1))
+            img_n = batch['img_n'].cpu().numpy()
+            img_n = np.squeeze(np.moveaxis(img_n,0,-1))
+            preds = preds.cpu().numpy()
+            preds = np.squeeze(np.moveaxis(preds,0,-1))
+            psnr_in = calculate_psnr(img_n, ref_y)
+            ssim_in = calculate_ssim(img_n, ref_y)
+            psnr_re = calculate_psnr(preds, ref_y)
+            ssim_re = calculate_ssim(preds, ref_y)
+            print(f"Name:{batch['id'][0]}, inputPSNR:{psnr_in:.4f}dB, outputPSNR:{psnr_re:.4f}dB, inputSSIM:{ssim_in:.6f}, outputSSIM:{ssim_re:.6f}.")
+        # return (preds,psnr_val)
 
     def train_dataloader(self):
         # DataLoader class for training
@@ -206,7 +210,7 @@ class CHASTINET(pl.LightningModule):
         # DataLoader class for validation
         return torch.utils.data.DataLoader(
             self.test_dataset,
-            batch_size=self.batch_size,
+            batch_size=1,
             num_workers=0,
             shuffle=False,
             pin_memory=True,

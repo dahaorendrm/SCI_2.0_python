@@ -1,7 +1,7 @@
 # import
 from pathlib import Path
 import numpy as np
-from .. import utils
+import utils
 import torch
 import os
 
@@ -10,7 +10,7 @@ from networks.chasti_network import CHASTINET
 import loss
 # process data
 
-dataset = ImgDataset('./data/test/')
+dataset = ImgDataset('../S0_gaptv/data/test/')
 
 # set-up model
 hparams = {
@@ -37,7 +37,7 @@ hparams = {
 
 
 model = CHASTINET(hparams=hparams)
-model.load_state_dict(torch.load("model-outputs/model.pt"))
+model.load_state_dict(torch.load("model-outputs/S1_noise/model.pt"))
 
 #trainer = Trainer()
 #trainer.test(model)
