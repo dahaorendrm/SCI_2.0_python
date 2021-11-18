@@ -5,15 +5,15 @@ from .. import utils
 import torch
 import os
 
-from ImgDataset import TestDataset
+from ImgDataset import ImgDataset,TestDataset
 from networks.SpecConvModel import SpecConvModel
 import loss
 import pytorch_lightning as pl
 # process data
 
 
-test_dataset = TestDataset('./data/test/feature','./data/test/label')
-
+# test_dataset = TestDataset('./data/test/feature','./data/test/label')
+test_dataset = ImgDataset('../S2_flow_predict/result/re_spct','../S0_gaptv/data/test/gt', f_trans = True)
 
 # set-up model
 hparams = {

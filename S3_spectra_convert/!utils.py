@@ -7,35 +7,6 @@ import functools
 import time, os
 import reprlib
 import matplotlib.pyplot as plt
-import tifffile
-from pathlib import Path
-from PIL import Image
-import itertools
-
-def saveintemp(data,name='test'):
-    data = np.squeeze(data)
-    if not os.path.exists('temp'):
-        os.makedirs('temp')
-    if data.ndim == 3:
-        for idx in range(data.shape[2]):
-            # print(idx)
-            im1 = data[:,:,idx]
-            im1 = np.round(im1 * 255.0)
-            im1 = Image.fromarray(im1)
-            im1 = im1.convert("L")
-            im1 = im1.save(f"temp/{name}_{idx}.jpg")
-    elif data.ndim == 4:
-        for idx in itertools.product(list(range(data.shape[2])),list(range(data.shape[3]))):
-            # print(idx)
-            im1 = data[:,:,idx[0],idx[1]]
-            im1 = np.round(im1 * 255.0)
-            im1 = Image.fromarray(im1)
-            im1 = im1.convert("L")
-            im1 = im1.save(f"temp/{name}_{idx}.jpg")
-
-def loadTiffFile(path,name):
-    p = Path(path)
-    return tifffile.imread(p / name)
 
 def display_highdimdatacube(data,rgb=False,transpose=False):
     if rgb is True:
@@ -171,9 +142,9 @@ def calculate_psnr(img1, img2, maxv=1, border=0):
     img1 = img1[border:h-border, border:w-border]
     img2 = img2[border:h-border, border:w-border]
 
-    img1 = img1.astype(np.float64)
-    img2 = img2.astype(np.float64)
-    mse = np.mean((img1 - img2)**2)
+    #img1 = img1.astype(np.float64)
+    #img2 = img2.astype(np.float64)
+    mse = ((img1 - img2)**2).mean()
     if mse == 0:
         return float('inf')
     return 20 * math.log10(maxv / math.sqrt(mse))
@@ -185,7 +156,7 @@ def calculate_psnr(img1, img2, maxv=1, border=0):
 def calculate_ssim(img1, img2, max_v=1, border=0):
     '''calculate SSIM
     the same outputs as MATLAB's
-    img1, img2: [0, 255]
+    img1, img2: [0, 1]
     '''
     #img1 = img1.squeeze()
     #img2 = img2.squeeze()
