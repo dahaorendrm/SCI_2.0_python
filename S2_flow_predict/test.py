@@ -45,32 +45,47 @@ def main():
     name = '0000'
 
     for data_name in data_list:
-        if os.path.isdir(path / data_name):
+        if os.path.isdir(path /'img_n'/ data_name):
             continue
         # load data
         #if name not in data_name:
         #    continue
         save_name = data_name.split('.')[0]
-        input = tifffile.imread(path / data_name)
-        if os.path.exist(path/'gt_leds'/data_name):
-            gt_orig = tifffile.imread(path/'gt_leds'/data_name)
-        elif os.path.exist(path/'gt'/data_name):
+        print(f'Processing data {save_name}')
+        input = tifffile.imread(path /'img_n'/ data_name)
+        if os.path.exists(path/'gt_led'/data_name):
+            gt_orig = tifffile.imread(path/'gt_led'/data_name)
+        elif os.path.exists(path/'gt'/data_name):
             gt_orig = tifffile.imread(path/'gt'/data_name)
+            gt_orig = gt_orig/255. # all data in gt has 255 max value
         else:
             gt_orig = None
         #print(f'Shape check: data has shape of {data.shape}, orig_leds has shape of {orig_leds.shape}')
+        if '4D' in data_name:
+            input = reshape_data(input,8)
+        else:
+            input = reshape_data(input,3)
         re  = process(input,gt_orig)
         # np.save('S2_result/'+save_name+'gt.npy',    re_gt)
         # np.save('S2_result/'+save_name+'input.npy', re_in)
         # np.save('S2_result/'+save_name+'output.npy', re_out)
         # np.save('S2_result/'+save_name+'ref.npy', orig_leds)
         print(f'shape of re is {re.shape}')
-        utils.saveintemp(re,'result')
-        psnr_gt,ssim_gt = outputevalarray(re,gt_orig)
-        print(f'The avg psnr of gt is {np.mean(psnr_gt)}')
-        print(f'The avg ssim of gt is {np.mean(ssim_gt)}')
+        utils.saveintemp(re,save_name)
+        utils.saveintemp(gt_orig,'orig'+save_name)
+        psnr_re,ssim_re = outputevalarray(re,gt_orig)
+        print(f'The avg psnr of gt is {np.mean(psnr_re)}')
+        print(f'The avg ssim of gt is {np.mean(ssim_re)}')
         ## Save
-        tiff.imwrite(Path('./result/re')/data_name)
+        if not os.path.exists('./result/re') or not os.path.exists('./result/eval'):
+            os.mkdir('result')
+            os.mkdir('result/re')
+            os.mkdir('result/eval')
+        np.savetxt(Path('result')/'eval'/(save_name+f'_psnr_{np.mean(psnr_re):.4f}.txt'), psnr_re, fmt='%.4f')
+        np.savetxt(Path('result')/'eval'/(save_name+f'_ssim_{np.mean(ssim_re):.6f}.txt'), ssim_re, fmt='%.6f')
+
+
+        tifffile.imwrite(Path('./result/re')/data_name,re)
 
 
 

@@ -5,9 +5,11 @@ from pathlib import Path
 import pytorch_lightning as pl
 import segmentation_models_pytorch as smp
 import albumentations
-
+import numpy as np
+import tifffile
+import os
 from loss import *
-from .. import utils
+import utils
 import cv2
 
 class SpecConvModel(pl.LightningModule):
@@ -161,14 +163,25 @@ class SpecConvModel(pl.LightningModule):
         #print(f'shape of preds {preds.shape}, shape of y {y.shape}')
         psnr_val = None
         if batch["label"] is not None:
-            psnr_val = utils.calculate_psnr(preds.to("cpu"),y.to("cpu"))
-            # ssim_val = utils.calculate_ssim(img_n,gt) %%% switch back the dimension
-            print(f'psnr value is {psnr_val}.')
+            preds = preds.cpu().numpy()
+            preds = np.squeeze(np.moveaxis(preds,1,-2))
+            y = y.cpu().numpy()
+            y = np.squeeze(np.moveaxis(y,1,-2))
+            psnr_val = utils.calculate_psnr(preds,y)
+            ssim_val = utils.calculate_ssim(preds,y) # %%% switch back the dimension
+            print(f"Data {batch['id'][0]}, psnr : {psnr_val:.4f}, SSIM : {ssim_val:.6f}.")
             self.psnr_val.append(psnr_val)
             # self.ssim_val.append(ssim_val)
-        preds = torch.squeeze(preds)
-        preds = torch.moveaxis(preds,0,2)
-        np.save(f'result/{batch["id"][0]}.npy',preds.cpu().numpy()) ####name needed
+        #preds = torch.squeeze(preds)
+        #preds = torch.moveaxis(preds,0,2)
+        if not os.path.exists('./result/re'):
+            os.mkdir('result')
+            os.mkdir('result/re')
+        tifffile.imwrite(f"result/re/{batch['id'][0]}",preds)
+        save_name = batch['id'][0].split('.')[0]
+        utils.saveintemp(preds,save_name)
+        utils.saveintemp(y,'orig'+save_name)
+        #np.save(f'result/{batch["id"][0]}.npy',preds.cpu().numpy()) ####name needed
         # Log batch IOU
         self.log(
             'psnr',psnr_val,

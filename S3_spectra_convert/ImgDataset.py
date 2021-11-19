@@ -25,10 +25,11 @@ class ImgDataset(torch.utils.data.Dataset):
     label masks (where available).
     """
 
-    def __init__(self, x_path, y_path=None):
+    def __init__(self, x_path, y_path=None, f_trans=True):
         self.feature_path = x_path
         self.data = os.listdir(x_path)
         self.label_path = y_path
+        self.f_trans = f_trans
 
     def __len__(self):
         return len(self.data)
@@ -41,24 +42,27 @@ class ImgDataset(torch.utils.data.Dataset):
         feature = (feature - min_norm) / (max_norm - min_norm)
 
         # Load label if available - training only
-        if self.label_path is not None:
+        if os.path.exists(self.label_path+'/'+self.data[idx]):
             label = tifffile.imread(self.label_path+'/'+self.data[idx])
             min_norm = np.nanmin(label)
             max_norm = np.nanmax(label)
             label = (label - min_norm) / (max_norm - min_norm)
-            transformed = transformations(image=feature,image1=label)
-            feature = transformed['image']
-            label = transformed['image1']
+            if self.f_trans:
+                transformed = transformations(image=feature,image1=label)
+                feature = transformed['image']
+                label = transformed['image1']
 
         else:
              label = None
         # Prepare sample dictionary
-        feature = np.transpose(feature, [2, 0, 1])
-        label = np.transpose(label, [2, 0, 1])
+        if feature.ndim == 4:
+            feature = np.transpose(feature, [2, 0, 1, 3])
+            label = np.transpose(label, [2, 0, 1, 3])
+        else:               
+            feature = np.transpose(feature, [2, 0, 1])
+            label = np.transpose(label, [2, 0, 1])
         sample = {"id": self.data[idx], "feature":feature, "label":label}
         return sample
-
-
 
 
 class TestDataset(torch.utils.data.Dataset):
