@@ -1,7 +1,7 @@
 # import
 from pathlib import Path
 import numpy as np
-from .. import utils
+import utils
 import torch
 import os
 
@@ -13,7 +13,7 @@ import pytorch_lightning as pl
 
 
 # test_dataset = TestDataset('./data/test/feature','./data/test/label')
-test_dataset = ImgDataset('../S2_flow_predict/result/re_spct','../S0_gaptv/data/test/gt', f_trans = True)
+test_dataset = ImgDataset('../S2_flow_predict/result/re_spct','../S0_gaptv/data/test/gt', f_trans = False)
 
 # set-up model
 hparams = {
