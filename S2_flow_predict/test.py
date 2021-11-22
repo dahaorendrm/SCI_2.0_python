@@ -7,22 +7,6 @@ import itertools
 import tifffile
 from pathlib import Path
 
-def outputevalarray(data,ref):
-    v_psnr = []
-    v_ssim = []
-    for indr in range(data.shape[3]):
-        temp_psnr = []
-        temp_ssim = []
-        for indc in range(data.shape[2]):
-            psnr_ = utils.calculate_psnr(
-                       ref[:,:,indc,indr],data[:,:,indc,indr])
-            ssim_ = utils.calculate_ssim(
-                       ref[:,:,indc,indr],data[:,:,indc,indr])
-            temp_ssim.append(ssim_)
-            temp_psnr.append(psnr_)
-        v_psnr.append(temp_psnr)
-        v_ssim.append(temp_ssim)
-    return np.array(v_psnr),np.array(v_ssim)
 
 def reshape_data(data,step):
     data = np.squeeze(data)
@@ -73,7 +57,7 @@ def main():
         print(f'shape of re is {re.shape}')
         utils.saveintemp(re,save_name)
         utils.saveintemp(gt_orig,'orig'+save_name)
-        psnr_re,ssim_re = outputevalarray(re,gt_orig)
+        psnr_re,ssim_re = utils.outputevalarray(re,gt_orig)
         print(f'The avg psnr of gt is {np.mean(psnr_re)}')
         print(f'The avg ssim of gt is {np.mean(ssim_re)}')
         ## Save
