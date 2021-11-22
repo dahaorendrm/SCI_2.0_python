@@ -10,7 +10,7 @@ from networks.chasti_network import CHASTINET
 import loss
 # process data
 
-dataset = ImgDataset('../S0_gaptv/data/test/')
+dataset = ImgDataset('../S0_gaptv/data/test/',f_trans=False)
 
 # set-up model
 hparams = {
@@ -37,7 +37,7 @@ hparams = {
 
 
 model = CHASTINET(hparams=hparams)
-model.load_state_dict(torch.load("model-outputs/S1_noise/model.pt"))
+model.load_state_dict(torch.load("model-outputs/rgbonly_64/model.pt"))
 
 #trainer = Trainer()
 #trainer.test(model)

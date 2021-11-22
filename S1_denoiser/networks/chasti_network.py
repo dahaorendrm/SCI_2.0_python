@@ -171,14 +171,16 @@ class CHASTINET(pl.LightningModule):
             preds.append(torch.squeeze(pred,1))
         preds = torch.stack(preds,3)
         saveintemp(preds.cpu().numpy(),batch['id'][0])
+        saveintemp(batch['img_n'].cpu().numpy(),'img_ni_'+batch['id'][0])
+        preds = preds.cpu().numpy()
+        preds = np.squeeze(np.moveaxis(preds,0,-1))
+        tifffile.imwrite(f"result/{batch['id'][0]}.tiff",preds)
         psnr_val = None
         if y is not None:
             ref_y = y.cpu().numpy()
             ref_y = np.squeeze(np.moveaxis(ref_y,0,-1))
             img_n = batch['img_n'].cpu().numpy()
             img_n = np.squeeze(np.moveaxis(img_n,0,-1))
-            preds = preds.cpu().numpy()
-            preds = np.squeeze(np.moveaxis(preds,0,-1))
             psnr_in = calculate_psnr(img_n, ref_y)
             ssim_in = calculate_ssim(img_n, ref_y)
             psnr_re = calculate_psnr(preds, ref_y)
