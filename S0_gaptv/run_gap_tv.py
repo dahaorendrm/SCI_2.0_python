@@ -13,6 +13,7 @@ import time
 from func import utils,recon_model,result,measurement
 from collections import namedtuple
 import datetime
+from pathlib import Path
 
 MODEL='chasti_sst'
 MASK = scio.loadmat('lesti_mask.mat')['mask']
@@ -71,6 +72,40 @@ def compressive_model(MODEL,input):
         print(f'Return result with {len(result__)} elements!')
         return result__
 
+    if MODEL == 'lesti_3d':
+        BandsLed = scio.loadmat('BandsLed.mat')['BandsLed']
+        BandsLed = BandsLed[4:-2,:]
+        data = (
+        input,
+        MASK, #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
+        BandsLed
+        )
+        #print(f'test:shape of input is {input.shape}')
+        mea = measurement.Measurement(model = 'lesti', dim = 3, inputs=data, configs={'NUMF':input.shape[3], 'SCALE_DATA':1, 'CUT_BAND':None})
+        model = recon_model.ReModel('gap','tv_chambolle')
+        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
+                'ITERs': 30, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
+                'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7}})
+        re = result.Result(model, mea, modul = mea.mask, orig = mea.orig_leds)
+        re = np.array(re)
+        re[re<0] = 0
+        re = re/np.amax(re)
+        orig_leds = mea.orig_leds
+        orig_leds[orig_leds<0] = 0
+        orig_leds = orig_leds/np.amax(orig_leds)
+        mea = np.array(mea.mea)
+        # print('shape of re is '+str(mea.shape))
+        result__ = (orig_leds,mea,re)
+        print(f'Return result with {len(result__)} elements!')
+        return result__
+    if MODEL == 'cassi':
+        mask = scio.loadmat('cassi_mask.mat')['mask']
+        input = rgb2gray(input)
+        assert MASK.ndim is 2
+        mask = MASK[:,:,np.newaxis]
+        temp = mask*input
+        temp = utils.shifter(temp,0)
+        return np.mean(temp,2)
 
     if MODEL == 'chasti_sst':
         data = (
@@ -134,7 +169,7 @@ def save_crops(path,index,fname,crops_mea,crops_img,crops_gt=None,crops_led=None
         try:
             os.mkdir(path)
         except:
-            pass    
+            pass
     save_tiff = lambda name,crop: tifffile.imwrite(name,crop)
     threads = []
     for ind,crop_mea in enumerate(crops_mea):
@@ -289,8 +324,27 @@ def test_data_generation():
         crops_led.append(orig_leds)
     save_crops('data/test',0,'4D_blocks',crops_mea,crops_img, crops_gt=crops, crops_led=crops_led)
 
+
+def S3train_data_generation():
+    pool = multiprocessing.Pool()
+    MODEL = 'lesti_3d'
+    path = Path(???)
+    datalist = os.listdir(path)
+    comp_input = []
+    for name in datalist:
+        imgs = scio.loadmat(path/name)['cube']
+        comp_input.append((MODEL,imgs))
+    print(f'Input data max is {np.amax(imgs)}.')
+    return_crops_data = pool.starmap(compressive_model, comp_input) # contain (mea, gaptv_result)
+    crops_mea = []
+    crops_img = []
+    for (mea,re) in return_crops_data:
+        crops_mea.append(mea)
+        crops_img.append(re)
+    save_crops('data/test',0,'ntire_',crops_mea,crops_img, crops_gt=crops)
 if __name__ == '__main__':
     print(f'Start time:{datetime.datetime.now()}')
-    train_data_generation()
-    test_data_generation()
+    #train_data_generation()
+    #test_data_generation()
+    S3train_data_generation()
     print(f'End time:{datetime.datetime.now()}')
