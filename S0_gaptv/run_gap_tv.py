@@ -17,7 +17,8 @@ from pathlib import Path
 
 MODEL='chasti_sst'
 MASK = scio.loadmat('lesti_mask.mat')['mask']
-
+MASK = np.reshape(MASK,(512,512,32))
+MASK = MASK[:482,...]
 def compressive_model(MODEL,input):
     '''
         <aodel> + gaptv
@@ -81,7 +82,7 @@ def compressive_model(MODEL,input):
         BandsLed
         )
         #print(f'test:shape of input is {input.shape}')
-        mea = measurement.Measurement(model = 'lesti', dim = 3, inputs=data, configs={'NUMF':input.shape[3], 'SCALE_DATA':1, 'CUT_BAND':None})
+        mea = measurement.Measurement(model = 'lesti', dim = 3, inputs=data, configs={'SCALE_DATA':1, 'CUT_BAND':None, 'MAXV':1})
         model = recon_model.ReModel('gap','tv_chambolle')
         model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
                 'ITERs': 30, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
@@ -326,22 +327,30 @@ def test_data_generation():
 
 
 def S3train_data_generation():
-    pool = multiprocessing.Pool()
+    #pool = multiprocessing.Pool(10)
     MODEL = 'lesti_3d'
-    path = Path(???)
+    path = Path('../../data/ntire2020/spectral')
     datalist = os.listdir(path)
     comp_input = []
     for name in datalist:
         imgs = scio.loadmat(path/name)['cube']
+        imgs = imgs[...,4:-2]
         comp_input.append((MODEL,imgs))
     print(f'Input data max is {np.amax(imgs)}.')
-    return_crops_data = pool.starmap(compressive_model, comp_input) # contain (mea, gaptv_result)
     crops_mea = []
     crops_img = []
-    for (mea,re) in return_crops_data:
+    crops_led = []
+    for i in range(len(datalist)):
+        orig_led,mea,re = compressive_model(*comp_input[i])
+        crops_led.append(orig_led)
         crops_mea.append(mea)
         crops_img.append(re)
-    save_crops('data/test',0,'ntire_',crops_mea,crops_img, crops_gt=crops)
+    #return_crops_data = pool.starmap_async(compressive_model, comp_input) # contain (mea, gaptv_result)
+    #for (orig_leds,mea,re) in return_crops_data:
+    #    crops_led.append(orig_leds)
+    #    crops_mea.append(mea)
+    #    crops_img.append(re)
+    save_crops('data/trainS3',0,'ntire_',crops_mea,crops_img, crops_gt=crops, crops_led=crops_led)
 if __name__ == '__main__':
     print(f'Start time:{datetime.datetime.now()}')
     #train_data_generation()
