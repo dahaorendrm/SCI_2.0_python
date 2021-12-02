@@ -6,7 +6,7 @@ from skimage import color as skic
 from skimage import transform as skitrans
 from skimage import io as skio
 import tifffile,pickle
-import multiprocessing,threading
+import multiprocessing,threading,queue
 import PIL
 import itertools as itert
 import time
@@ -173,27 +173,48 @@ def save_crops(path,index,fname,crops_mea,crops_img,crops_gt=None,crops_led=None
         except:
             pass
     save_tiff = lambda name,crop: tifffile.imwrite(name,crop)
+    qu = queue.Queue()
     threads = []
+    num_idx = 0
+    if type(index) is int:
+        num_idx = index
     for ind,crop_mea in enumerate(crops_mea):
-        name = '_'.join((fname,'%.4d'%(index)))+'.tiff'
+        if type(index) is list:
+            name = '_'.join((fname,index[ind]+'.tiff'))
+        else:
+            name = '_'.join((fname,'%.4d'%(num_idx)+'.tiff'))
         os.mkdir(path+'/mea/') if not os.path.exists(path+'/mea') else None
-        threads.append(threading.Thread(target=save_tiff,args=[path+'/mea/'+name,crop_mea]))
-        threads[-1].start()
+        #qu.put(threading.Thread(target=save_tiff,args=[path+'/mea/'+name,crop_mea]))
+        qu.put([path+'/mea/'+name,crop_mea])
+        #threads[-1].start()
         os.mkdir(path+'/img_n/') if not os.path.exists(path+'/img_n') else None
-        threads.append(threading.Thread(target=save_tiff,args=[path+'/img_n/'+name,crops_img[ind]]))
-        threads[-1].start()
+        #qu.put(threading.Thread(target=save_tiff,args=[path+'/img_n/'+name,crops_img[ind]]))
+        qu.put([path+'/img_n/'+name,crops_img[ind]])
+        #threads[-1].start()
         if crops_gt:
             os.mkdir(path+'/gt/') if not os.path.exists(path+'/gt') else None
-            threads.append(threading.Thread(target=save_tiff,args=[path+'/gt/'+name,crops_gt[ind]]))
-            threads[-1].start()
+            #qu.put(threading.Thread(target=save_tiff,args=[path+'/gt/'+name,crops_gt[ind]]))
+            qu.put([path+'/gt/'+name,crops_gt[ind]])
+            #threads[-1].start()
         if crops_led:
             os.mkdir(path+'/gt_led/') if not os.path.exists(path+'/gt_led') else None
-            threads.append(threading.Thread(target=save_tiff,args=[path+'/gt_led/'+name,crops_led[ind]]))
-            threads[-1].start()
-        index+=1
-    for thread in threads:
-        thread.join()
+            #qu.put(threading.Thread(target=save_tiff,args=[path+'/gt_led/'+name,crops_led[ind]]))
+            qu.put([path+'/gt_led/'+name,crops_led[ind]]) 
+            #threads[-1].start()
+        num_idx+=1
+    for _ in range(200):
+        worker = threading.Thread(target=thread_worker, args=(qu,))
+        worker.start()
+    print("waiting for queue to complete", qu.qsize(), "tasks")
+    qu.join()
+    print("all threads cleared")
+    #for thread in threads:
+    #    thread.join()
 
+def thread_worker(qu):
+    while not qu.empty():
+        tifffile.imwrite(*qu.get())
+        qu.task_done()
 
 def entry_process(path,COMP_FRAME):
     global MODEL
@@ -334,7 +355,9 @@ def S3train_data_generation():
     datalist = os.listdir(path)
     comp_input = []
     crops = []
+    name_list = []
     for name in datalist:
+        name_list.append(name[8:12])
         imgs = scio.loadmat(path/name)['cube']
         imgs = imgs[...,4:-2]
         comp_input.append((MODEL,imgs))
@@ -353,7 +376,7 @@ def S3train_data_generation():
         crops_led.append(orig_leds)
         crops_mea.append(mea)
         crops_img.append(re)
-    save_crops('data/trainS3',0,'ntire_',crops_mea,crops_img, crops_gt=crops, crops_led=crops_led)
+    save_crops('data/trainS3',name_list,'ntire',crops_mea,crops_img, crops_gt=crops, crops_led=crops_led)
 if __name__ == '__main__':
     print(f'Start time:{datetime.datetime.now()}')
     #train_data_generation()
