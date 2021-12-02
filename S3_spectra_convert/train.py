@@ -10,7 +10,7 @@ from networks.SpecConvModel import SpecConvModel
 import loss
 # process data
 
-dataset = ImgDataset('./data/train/feature', './data/train/label')
+dataset = ImgDataset('../S0_gaptv/data/trainS3/img_n', '../S0_gaptv/data/trainS3/gt')
 train_dataset,val_dataset = torch.utils.data.random_split(dataset, [370, 90], generator=torch.Generator().manual_seed(8))
 
 # set-up model
