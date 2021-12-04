@@ -61,7 +61,7 @@ class SpecConvModel(pl.LightningModule):
         #print(f'shape chip:{batch["chip"].shape} nasadem:{batch["nasadem"].shape} recurrence:{batch["recurrence"].shape}')
         x = batch["feature"].float()
         y = batch["label"].float()
-        y = y[:,CUT_BAND[0]:-CUT_BAND[1],...]
+        #y = y[:,CUT_BAND[0]:-CUT_BAND[1],...]
         if self.gpu:
             x, y = x.cuda(non_blocking=True), y.cuda(non_blocking=True)
 
@@ -93,7 +93,7 @@ class SpecConvModel(pl.LightningModule):
         # Load images and labels
         x = batch["feature"].float()
         y = batch["label"].float()
-        y = y[:,CUT_BAND[0]:-CUT_BAND[1],...]
+        #y = y[:,CUT_BAND[0]:-CUT_BAND[1],...]
         if self.gpu:
             x, y = x.cuda(non_blocking=True), y.cuda(non_blocking=True)
 
