@@ -20,7 +20,8 @@ hparams = {
     # Required hparams
     "test_dataset": test_dataset,
     # Optional hparams
-    "backbone": "resnet34",
+    # "backbone": "resnet34",
+    "backbone": "resnext50_32x4d",
     "weights": "imagenet",
     "lr": 1e-3,
     "min_epochs": 4,
@@ -38,8 +39,8 @@ hparams = {
 }
 
 model = SpecConvModel(hparams=hparams)
-model.load_state_dict(torch.load("model-outputs/model.pt"))
 
+model.load_state_dict(torch.load("model-outputs/gaptv_train_ssim/model.pt"))
 #trainer = Trainer()
 #trainer.test(model)
 model.test()
