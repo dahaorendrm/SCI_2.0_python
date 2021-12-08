@@ -25,18 +25,20 @@ def process(data,ref=None):
 
 def main():
     path = Path('../S0_gaptv/data/test')
-    data_list = os.listdir(path/'img_n')
+    # dataPath = Path(path/'img_n')
+    dataPath = Path('../S1_denoiser/result')
+    data_list = os.listdir(dataPath)
     name = '0000'
 
     for data_name in data_list:
-        if os.path.isdir(path /'img_n'/ data_name):
+        if os.path.isdir(dataPath /  data_name):
             continue
         # load data
         #if name not in data_name:
         #    continue
         save_name = data_name.split('.')[0]
         print(f'Processing data {save_name}')
-        input = tifffile.imread(path /'img_n'/ data_name)
+        input = tifffile.imread(dataPath / data_name)
         if os.path.exists(path/'gt_led'/data_name):
             gt_orig = tifffile.imread(path/'gt_led'/data_name)
         elif os.path.exists(path/'gt'/data_name):

@@ -61,7 +61,7 @@ class SpecConvModel(pl.LightningModule):
         #print(f'shape chip:{batch["chip"].shape} nasadem:{batch["nasadem"].shape} recurrence:{batch["recurrence"].shape}')
         x = batch["feature"].float()
         y = batch["label"].float()
-        y = y[:,CUT_BAND[0]:-CUT_BAND[1],...]
+        #y = y[:,CUT_BAND[0]:-CUT_BAND[1],...]
         if self.gpu:
             x, y = x.cuda(non_blocking=True), y.cuda(non_blocking=True)
 
@@ -93,7 +93,7 @@ class SpecConvModel(pl.LightningModule):
         # Load images and labels
         x = batch["feature"].float()
         y = batch["label"].float()
-        y = y[:,CUT_BAND[0]:-CUT_BAND[1],...]
+        #y = y[:,CUT_BAND[0]:-CUT_BAND[1],...]
         if self.gpu:
             x, y = x.cuda(non_blocking=True), y.cuda(non_blocking=True)
 
@@ -111,16 +111,30 @@ class SpecConvModel(pl.LightningModule):
         #     Image.fromarray((np.squeeze(preds.cpu().numpy()[i,...])*255).astype(np.uint8)).save(f"temp/vali{i}_pred.jpg")
 
         # Calculate validation IOU (global)
-        psnr_val = utils.calculate_psnr(preds.to("cpu"),y.to("cpu"))
+        preds = preds.cpu().numpy()
+        preds = np.squeeze(np.moveaxis(preds,1,-2))
+        y = y.cpu().numpy()
+        y = np.squeeze(np.moveaxis(y,1,-2))
+        psnr_val = utils.calculate_psnr(preds,y)
+        ssim_val = utils.calculate_ssim(preds,y)
+        #psnr_val = utils.calculate_psnr(preds.to("cpu").numpy(),y.to("cpu").numpy())
         # ssim_val = utils.calculate_ssim(img_n,gt) %%% switch back the dimension
         self.psnr_val.append(psnr_val)
-        # self.ssim_val.append(ssim_val)
+        self.ssim_val.append(ssim_val)
 
         # Log batch IOU
         self.log(
             'psnr',psnr_val,
             #'ssim',0,
-            on_step=True,
+            #on_step=True,
+            on_epoch=True,
+            prog_bar=False,
+            logger=True
+        )
+        self.log(
+            'ssim',ssim_val,
+            #'ssim',0,
+            #on_step=True,
             on_epoch=True,
             prog_bar=False,
             logger=True
@@ -237,22 +251,23 @@ class SpecConvModel(pl.LightningModule):
         scheduler = {
             "scheduler": scheduler,
             "interval": "epoch",
-            "monitor": "val_psnr",
+            "monitor": "val_ssim",
         }  # logged value to monitor
         return [optimizer], [scheduler]
 
     def validation_epoch_end(self, outputs):
         # Calculate IOU at end of epoch
         val_psnr = sum(self.psnr_val)/len(self.psnr_val)
-        #val_ssim = sum(self.psnr_val)/len(self.psnr_val)
-
+        val_ssim = sum(self.ssim_val)/len(self.ssim_val)
+        
         # Reset metrics before next epoch
         self.psnr_val = []
         self.ssim_val = []
 
         # Log epoch validation IOU
         self.log("val_psnr", val_psnr, on_epoch=True, prog_bar=True, logger=True)
-        self.log("lr", self.learning_rate, on_epoch=True, prog_bar=True, logger=True)
+        self.log("val_ssim", val_ssim, on_epoch=True, prog_bar=True, logger=True)
+        #self.log("lr", self.learning_rate, on_epoch=True, prog_bar=True, logger=True)
         return val_psnr
 
 

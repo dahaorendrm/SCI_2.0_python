@@ -1,7 +1,7 @@
 # import
 from pathlib import Path
 import numpy as np
-from .. import utils
+import utils
 import torch
 import os
 
@@ -10,6 +10,7 @@ from networks.SpecConvModel import SpecConvModel
 import loss
 # process data
 
+#dataset = ImgDataset('./data/train/feature', './data/train/label')
 dataset = ImgDataset('../S0_gaptv/data/trainS3/img_n', '../S0_gaptv/data/trainS3/gt')
 train_dataset,val_dataset = torch.utils.data.random_split(dataset, [370, 90], generator=torch.Generator().manual_seed(8))
 
@@ -19,14 +20,14 @@ hparams = {
     "train_dataset": train_dataset,
     "val_dataset": val_dataset,
     # Optional hparams
-    "backbone": "resnet34",
+    "backbone": "resnext50_32x4d",
     "weights": "imagenet",
     "lr": 1e-3,
     "min_epochs": 4,
     "max_epochs": 1000,
-    "patience": 10,
+    "patience": 15,
     "batch_size": 32,
-    "num_workers": 16,
+    "num_workers": 4,
     "val_sanity_checks": 0,
     "fast_dev_run": False,
     "output_path": "model-outputs",

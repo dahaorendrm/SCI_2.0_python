@@ -221,7 +221,8 @@ def lesti(orig, mask, led_curve, SHIFTD=None, CUT_BAND = (4,2), RESAMPLE = False
     # Generate the measurement
     # mea = np.sum(shift_orig * modul, axis=2)
     mea = np.zeros((nr,nc))
-    for indl in range(nl):
+    mask = np.squeeze(mask)
+    for indl in range(nled):
         mea += orig_leds[:,:,indl] * mask[:,:,indl]
 
     # Resample
