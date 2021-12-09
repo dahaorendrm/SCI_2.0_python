@@ -9,9 +9,9 @@ import scipy.io as scio
 import matplotlib.pyplot as plt
 from skimage.restoration import (denoise_tv_chambolle, denoise_bilateral,
                                  denoise_wavelet, estimate_sigma)
-from func import utils
-from func.denoiser import denoiser
-from func.utils import load_data,timer
+from .func import utils
+from .func.denoiser import denoiser
+from .func.utils import load_data,timer
 
 logger = utils.init_logger(__name__)
 

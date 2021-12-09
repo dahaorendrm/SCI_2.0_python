@@ -10,7 +10,7 @@ import multiprocessing,threading,queue
 import PIL
 import itertools as itert
 import time
-from func import utils,recon_model,result,measurement
+from .func import utils,recon_model,result,measurement
 from collections import namedtuple
 import datetime
 from pathlib import Path
@@ -199,7 +199,7 @@ def save_crops(path,index,fname,crops_mea,crops_img,crops_gt=None,crops_led=None
         if crops_led:
             os.mkdir(path+'/gt_led/') if not os.path.exists(path+'/gt_led') else None
             #qu.put(threading.Thread(target=save_tiff,args=[path+'/gt_led/'+name,crops_led[ind]]))
-            qu.put([path+'/gt_led/'+name,crops_led[ind]]) 
+            qu.put([path+'/gt_led/'+name,crops_led[ind]])
             #threads[-1].start()
         num_idx+=1
     for _ in range(200):

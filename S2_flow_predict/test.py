@@ -1,7 +1,8 @@
-from motion import Motion
+from .motion import Motion
+import .utils
 import pickle
 import numpy as np
-import os,utils
+import os
 from PIL import Image
 import itertools
 import tifffile
@@ -23,10 +24,10 @@ def process(data,ref=None):
     re_ledimg_4d,v_psnr,v_ssim = flow.get_motions(data, ref)
     return re_ledimg_4d
 
-def main():
+def test(datapath):
     path = Path('../S0_gaptv/data/test')
     # dataPath = Path(path/'img_n')
-    dataPath = Path('../S1_denoiser/result')
+    dataPath = Path(datapath)
     data_list = os.listdir(dataPath)
     name = '0000'
 
@@ -76,4 +77,4 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    test('../S1_denoiser/result')

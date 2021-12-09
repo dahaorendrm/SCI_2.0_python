@@ -4,9 +4,9 @@ import numpy as np
 import torch
 import os
 
-from imgdataset import ImgDataset
-from networks.chasti_network import CHASTINET
-import loss
+from .imgdataset import ImgDataset
+from .networks.chasti_network import CHASTINET
+import .loss
 # process data
 
 train_dataset = ImgDataset('../S0_gaptv/data/train/')

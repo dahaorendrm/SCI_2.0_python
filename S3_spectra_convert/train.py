@@ -5,9 +5,9 @@ import utils
 import torch
 import os
 
-from ImgDataset import ImgDataset
-from networks.SpecConvModel import SpecConvModel
-import loss
+from .ImgDataset import ImgDataset
+from .networks.SpecConvModel import SpecConvModel
+import .loss
 # process data
 
 #dataset = ImgDataset('./data/train/feature', './data/train/label')

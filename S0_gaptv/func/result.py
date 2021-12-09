@@ -2,7 +2,7 @@ import numpy as np
 import datetime
 import matplotlib.pyplot as plt
 import pickle
-from func import utils
+from .func import utils
 import math
 import matplotlib.gridspec as gridspec
 
