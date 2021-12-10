@@ -11,7 +11,7 @@ from . import loss
 # process data
 
 def test(path):
-    dataset = ImgDataset(path)
+    dataset = ImgDataset(path,f_trans=False)
     # set-up model
     hparams = {
         "test_dataset": dataset,

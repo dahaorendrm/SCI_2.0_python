@@ -19,9 +19,9 @@ def outputevalarray(data,ref):
         raise RuntimeError('data shape not match')
     if data.ndim == 3:
         for indr in range(data.shape[2]):
-            psnr_ = utils.calculate_psnr(
+            psnr_ = calculate_psnr(
                        ref[:,:,indr],data[:,:,indr])
-            ssim_ = utils.calculate_ssim(
+            ssim_ = calculate_ssim(
                        ref[:,:,indr],data[:,:,indr])
             v_psnr.append(psnr_)
             v_ssim.append(ssim_)
@@ -31,9 +31,9 @@ def outputevalarray(data,ref):
             temp_psnr = []
             temp_ssim = []
             for indc in range(data.shape[2]):
-                psnr_ = utils.calculate_psnr(
+                psnr_ = calculate_psnr(
                            ref[:,:,indc,indr],data[:,:,indc,indr])
-                ssim_ = utils.calculate_ssim(
+                ssim_ = calculate_ssim(
                            ref[:,:,indc,indr],data[:,:,indc,indr])
                 temp_ssim.append(ssim_)
                 temp_psnr.append(psnr_)

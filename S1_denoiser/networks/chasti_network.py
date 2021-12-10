@@ -150,6 +150,7 @@ class CHASTINET(pl.LightningModule):
         return (preds,psnr_val)
 
     def test_step(self, batch, batch_idx):
+        save_name = batch['id'][0]
         self.model.eval()
         torch.set_grad_enabled(False)
         if batch['label'] is not None:
@@ -171,18 +172,22 @@ class CHASTINET(pl.LightningModule):
             preds.append(torch.squeeze(pred,1))
         preds = torch.stack(preds,3)
         saveintemp(preds.cpu().numpy(),batch['id'][0])
+        saveintemp(batch['img_n'].cpu().numpy(),'img_n_'+batch['id'][0])
+        preds = preds.cpu().numpy()
+        preds = np.squeeze(np.moveaxis(preds,0,-1))
+        tifffile.imwrite(f"result/{batch['id'][0]}.tiff",preds)
         psnr_val = None
         if y is not None:
+            saveintemp(y.cpu().numpy(),'ref_'+batch['id'][0])
             ref_y = y.cpu().numpy()
             ref_y = np.squeeze(np.moveaxis(ref_y,0,-1))
             img_n = batch['img_n'].cpu().numpy()
             img_n = np.squeeze(np.moveaxis(img_n,0,-1))
-            preds = preds.cpu().numpy()
-            preds = np.squeeze(np.moveaxis(preds,0,-1))
             psnr_in = calculate_psnr(img_n, ref_y)
             ssim_in = calculate_ssim(img_n, ref_y)
             psnr_re = calculate_psnr(preds, ref_y)
             ssim_re = calculate_ssim(preds, ref_y)
+            
             psnr_n,ssim_n = outputevalarray(img_n,ref_y)
             psnr_p,ssim_p = outputevalarray(preds,ref_y)
             np.savetxt(Path('/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/result')/'eval'/(save_name+f'_psnr_{np.mean(psnr_re):.4f}.txt'), psnr_p, fmt='%.4f')

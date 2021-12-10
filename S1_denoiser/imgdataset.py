@@ -23,9 +23,10 @@ transformations = albumentations.Compose(
 
 class ImgDataset(torch.utils.data.Dataset):
 
-    def __init__(self, path):
+    def __init__(self, path, f_trans=True):
         super(ImgDataset, self).__init__()
         #self.data = []
+        self.f_trans= f_trans
         if os.path.exists(path):
             self.gt_path = path + '/gt'
             self.mea_path = path + '/mea'
@@ -68,19 +69,15 @@ class ImgDataset(torch.utils.data.Dataset):
             gt = (gt - min_norm) / (max_norm - min_norm)
         else:
             gt = None
-
-        transformed = transformations(image=mea,image1=img_n,
+        if self.f_trans:
+            transformed = transformations(image=mea,image1=img_n,
                                 image2=mask,image3=gt,image4=oth_n)
-        mea = transformed['image']
-        img_n = transformed['image1']
-        mask = transformed['image2']
-        oth_n = transformed['image4']
-        #mea = np.expand_dims(transformed['image'],0)
-        #img_n = np.expand_dims(transformed['image1'],0)
-        #mask = np.expand_dims(transformed['image2'],0)
-        if gt is not None:
+            mea = transformed['image']
+            img_n = transformed['image1']
+            mask = transformed['image2']
+            oth_n = transformed['image4']
             gt = transformed['image3']
-            #gt = np.expand_dims(transformed['image3'],0)
+        if gt is not None:
             sample = {'id':file_name.split('.')[0], 'mea':mea,
                 'img_n':img_n, 'mask':mask,'oth_n':oth_n,
                     'label':gt}

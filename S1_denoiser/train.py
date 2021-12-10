@@ -9,9 +9,10 @@ from .networks.chasti_network import CHASTINET
 import .loss
 # process data
 
-train_dataset = ImgDataset('../S0_gaptv/data/train/')
-val_dataset = ImgDataset('../S0_gaptv/data/val/')
-
+#train_dataset = ImgDataset('../S0_gaptv/data/train/')
+#val_dataset = ImgDataset('../S0_gaptv/data/val/')
+dataset = ImgDataset('../S0_gaptv/data/train/')
+train_dataset,val_dataset = torch.utils.data.random_split(dataset, [2635, 650], generator=torch.Generator().manual_seed(8))
 # set-up model
 hparams = {
 
@@ -22,15 +23,15 @@ hparams = {
     "min_epochs": 4,
     "max_epochs": 1000,
     "patience": 3,
-    "batch_size": 8,
-    "num_workers": 16,
+    "batch_size": 12,
+    "num_workers": 12,
     "val_sanity_checks": 0,
     "fast_dev_run": False,
     "output_path": "model-outputs",
     "log_path": "tensorboard_logs",
     "gpu": torch.cuda.is_available(),
     "input_layers":4,
-    "hidden_layers":64,
+    "hidden_layers":32,
     "num_blocks":4
 }
 
