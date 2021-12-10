@@ -1,5 +1,5 @@
 from .motion import Motion
-import .utils
+from . import utils
 import pickle
 import numpy as np
 import os
@@ -25,7 +25,7 @@ def process(data,ref=None):
     return re_ledimg_4d
 
 def test(datapath):
-    path = Path('../S0_gaptv/data/test')
+    path = Path('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/data/test')
     # dataPath = Path(path/'img_n')
     dataPath = Path(datapath)
     data_list = os.listdir(dataPath)
@@ -40,6 +40,7 @@ def test(datapath):
         save_name = data_name.split('.')[0]
         print(f'Processing data {save_name}')
         input = tifffile.imread(dataPath / data_name)
+        #print(path/'gt_led'/data_name)
         if os.path.exists(path/'gt_led'/data_name):
             gt_orig = tifffile.imread(path/'gt_led'/data_name)
         elif os.path.exists(path/'gt'/data_name):
@@ -47,6 +48,7 @@ def test(datapath):
             gt_orig = gt_orig/255. # all data in gt has 255 max value
         else:
             gt_orig = None
+            print(f'No orig data founded asocciate with {data_name}!')
         #print(f'Shape check: data has shape of {data.shape}, orig_leds has shape of {orig_leds.shape}')
         if '4D' in data_name:
             input = reshape_data(input,8)
@@ -64,15 +66,15 @@ def test(datapath):
         print(f'The avg psnr of gt is {np.mean(psnr_re)}')
         print(f'The avg ssim of gt is {np.mean(ssim_re)}')
         ## Save
-        if not os.path.exists('./result/re') or not os.path.exists('./result/eval'):
-            os.mkdir('result')
-            os.mkdir('result/re')
-            os.mkdir('result/eval')
-        np.savetxt(Path('result')/'eval'/(save_name+f'_psnr_{np.mean(psnr_re):.4f}.txt'), psnr_re, fmt='%.4f')
-        np.savetxt(Path('result')/'eval'/(save_name+f'_ssim_{np.mean(ssim_re):.6f}.txt'), ssim_re, fmt='%.6f')
+        if not os.path.exists('/lustre/arce/X_MA/SCI_2.0_python/S2_flow_predict/result/re') or not os.path.exists('/lustre/arce/X_MA/SCI_2.0_python/S2_flow_predict/result/eval'):
+            os.mkdir('/lustre/arce/X_MA/SCI_2.0_python/S2_flow_predict/result')
+            os.mkdir('/lustre/arce/X_MA/SCI_2.0_python/S2_flow_predict/result/re')
+            os.mkdir('/lustre/arce/X_MA/SCI_2.0_python/S2_flow_predict/result/eval')
+        np.savetxt(Path('/lustre/arce/X_MA/SCI_2.0_python/S2_flow_predict/result')/'eval'/(save_name+f'_psnr_{np.mean(psnr_re):.4f}.txt'), psnr_re, fmt='%.4f')
+        np.savetxt(Path('/lustre/arce/X_MA/SCI_2.0_python/S2_flow_predict/result')/'eval'/(save_name+f'_ssim_{np.mean(ssim_re):.6f}.txt'), ssim_re, fmt='%.6f')
 
 
-        tifffile.imwrite(Path('./result/re')/data_name,re)
+        tifffile.imwrite(Path('/lustre/arce/X_MA/SCI_2.0_python/S2_flow_predict/result/re')/data_name,re)
 
 
 

@@ -8,8 +8,8 @@ import albumentations
 import numpy as np
 import tifffile
 import os
-from loss import *
-import utils
+from ..loss import *
+from .. import utils
 import cv2
 
 class SpecConvModel(pl.LightningModule):

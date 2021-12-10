@@ -1,0 +1,161 @@
+2021-12-09 15:01:29,813 : INFO : S2_flow_predict.motion : Logger S2_flow_predict.motion initiated.
+2021-12-09 15:01:33,178 : INFO : S0_gaptv.func.forward_model : LESTI_4D super spectral-temporal model got run.
+2021-12-09 15:01:33,983 : INFO : S0_gaptv.func.recon_model : gap model Initialized with tv_chambolle denoiser.
+2021-12-09 15:01:33,984 : INFO : S0_gaptv.func.recon_model : Parameter lambda is set to: 1
+2021-12-09 15:01:33,984 : INFO : S0_gaptv.func.recon_model : Parameter ASSESE is set to: 1
+2021-12-09 15:01:33,984 : INFO : S0_gaptv.func.recon_model : Parameter ACC is set to: True
+2021-12-09 15:01:33,984 : INFO : S0_gaptv.func.recon_model : Parameter ITERs is set to: 30
+2021-12-09 15:01:33,984 : INFO : S0_gaptv.func.recon_model : Denoiser parameter TV_WEIGHT is set to: 0.2
+2021-12-09 15:01:33,984 : INFO : S0_gaptv.func.recon_model : Denoiser parameter TV_ITER is set to: 7
+2021-12-09 15:01:34,135 : INFO : S0_gaptv.func.recon_model : Gap model running...
+2021-12-09 15:01:34,135 : INFO : S0_gaptv.func.recon_model : No initialization.
+2021-12-09 15:01:34,598 : INFO : S0_gaptv.func.forward_model : LESTI_4D super spectral-temporal model got run.
+2021-12-09 15:01:34,663 : INFO : S0_gaptv.func.recon_model : Iteration   1, Sigma = 1.00, PSNR = -7.10 dB, SSIM = -0.0249.
+2021-12-09 15:01:35,134 : INFO : S0_gaptv.func.recon_model : Iteration   2, Sigma = 1.00, PSNR = 6.16 dB, SSIM = -0.1787.
+2021-12-09 15:01:35,642 : INFO : S0_gaptv.func.recon_model : gap model Initialized with tv_chambolle denoiser.
+2021-12-09 15:01:35,643 : INFO : S0_gaptv.func.recon_model : Parameter lambda is set to: 1
+2021-12-09 15:01:35,643 : INFO : S0_gaptv.func.recon_model : Parameter ASSESE is set to: 1
+2021-12-09 15:01:35,643 : INFO : S0_gaptv.func.recon_model : Parameter ACC is set to: True
+2021-12-09 15:01:35,643 : INFO : S0_gaptv.func.recon_model : Parameter ITERs is set to: 30
+2021-12-09 15:01:35,643 : INFO : S0_gaptv.func.recon_model : Denoiser parameter TV_WEIGHT is set to: 0.2
+2021-12-09 15:01:35,643 : INFO : S0_gaptv.func.recon_model : Denoiser parameter TV_ITER is set to: 7
+2021-12-09 15:01:35,651 : INFO : S0_gaptv.func.recon_model : Iteration   3, Sigma = 1.00, PSNR = 9.87 dB, SSIM = -0.0065.
+2021-12-09 15:01:35,893 : INFO : S0_gaptv.func.recon_model : Gap model running...
+2021-12-09 15:01:35,895 : INFO : S0_gaptv.func.recon_model : No initialization.
+2021-12-09 15:01:36,285 : INFO : S0_gaptv.func.recon_model : Iteration   4, Sigma = 1.00, PSNR = 11.45 dB, SSIM = 0.3317.
+2021-12-09 15:01:36,622 : INFO : S0_gaptv.func.recon_model : Iteration   1, Sigma = 1.00, PSNR = -5.09 dB, SSIM = -0.0298.
+2021-12-09 15:01:36,970 : INFO : S0_gaptv.func.forward_model : LESTI_4D super spectral-temporal model got run.
+2021-12-09 15:01:37,108 : INFO : S0_gaptv.func.recon_model : Iteration   5, Sigma = 1.00, PSNR = 12.11 dB, SSIM = 0.3842.
+2021-12-09 15:01:37,380 : INFO : S0_gaptv.func.recon_model : Iteration   2, Sigma = 1.00, PSNR = 6.67 dB, SSIM = -0.1812.
+2021-12-09 15:01:37,787 : INFO : S0_gaptv.func.recon_model : Iteration   6, Sigma = 1.00, PSNR = 12.85 dB, SSIM = 0.4600.
+2021-12-09 15:01:38,122 : INFO : S0_gaptv.func.recon_model : Iteration   3, Sigma = 1.00, PSNR = 10.42 dB, SSIM = -0.0548.
+2021-12-09 15:01:38,593 : INFO : S0_gaptv.func.recon_model : Iteration   7, Sigma = 1.00, PSNR = 13.69 dB, SSIM = 0.5321.
+2021-12-09 15:01:38,835 : INFO : S0_gaptv.func.recon_model : Iteration   4, Sigma = 1.00, PSNR = 11.84 dB, SSIM = 0.3307.
+2021-12-09 15:01:38,962 : INFO : S0_gaptv.func.recon_model : gap model Initialized with tv_chambolle denoiser.
+2021-12-09 15:01:38,966 : INFO : S0_gaptv.func.recon_model : Parameter lambda is set to: 1
+2021-12-09 15:01:38,966 : INFO : S0_gaptv.func.recon_model : Parameter ASSESE is set to: 1
+2021-12-09 15:01:38,966 : INFO : S0_gaptv.func.recon_model : Parameter ACC is set to: True
+2021-12-09 15:01:38,967 : INFO : S0_gaptv.func.recon_model : Parameter ITERs is set to: 30
+2021-12-09 15:01:38,967 : INFO : S0_gaptv.func.recon_model : Denoiser parameter TV_WEIGHT is set to: 0.2
+2021-12-09 15:01:38,967 : INFO : S0_gaptv.func.recon_model : Denoiser parameter TV_ITER is set to: 7
+2021-12-09 15:01:39,255 : INFO : S0_gaptv.func.recon_model : Gap model running...
+2021-12-09 15:01:39,266 : INFO : S0_gaptv.func.recon_model : No initialization.
+2021-12-09 15:01:39,729 : INFO : S0_gaptv.func.recon_model : Iteration   5, Sigma = 1.00, PSNR = 12.28 dB, SSIM = 0.3786.
+2021-12-09 15:01:39,839 : INFO : S0_gaptv.func.recon_model : Iteration   8, Sigma = 1.00, PSNR = 14.39 dB, SSIM = 0.5735.
+2021-12-09 15:01:40,073 : INFO : S0_gaptv.func.recon_model : Iteration   1, Sigma = 1.00, PSNR = -4.81 dB, SSIM = -0.0252.
+2021-12-09 15:01:40,666 : INFO : S0_gaptv.func.recon_model : Iteration   6, Sigma = 1.00, PSNR = 12.88 dB, SSIM = 0.4496.
+2021-12-09 15:01:40,834 : INFO : S0_gaptv.func.recon_model : Iteration   9, Sigma = 1.00, PSNR = 14.98 dB, SSIM = 0.5971.
+2021-12-09 15:01:41,014 : INFO : S0_gaptv.func.recon_model : Iteration   2, Sigma = 1.00, PSNR = 6.67 dB, SSIM = -0.1844.
+2021-12-09 15:01:41,606 : INFO : S0_gaptv.func.recon_model : Iteration   7, Sigma = 1.00, PSNR = 13.61 dB, SSIM = 0.5188.
+2021-12-09 15:01:41,859 : INFO : S0_gaptv.func.recon_model : Iteration  10, Sigma = 1.00, PSNR = 15.56 dB, SSIM = 0.6172.
+2021-12-09 15:01:41,964 : INFO : S0_gaptv.func.recon_model : Iteration   3, Sigma = 1.00, PSNR = 10.41 dB, SSIM = -0.0635.
+2021-12-09 15:01:42,544 : INFO : S0_gaptv.func.recon_model : Iteration   8, Sigma = 1.00, PSNR = 14.24 dB, SSIM = 0.5568.
+2021-12-09 15:01:42,886 : INFO : S0_gaptv.func.recon_model : Iteration  11, Sigma = 1.00, PSNR = 16.11 dB, SSIM = 0.6342.
+2021-12-09 15:01:42,912 : INFO : S0_gaptv.func.recon_model : Iteration   4, Sigma = 1.00, PSNR = 11.80 dB, SSIM = 0.3428.
+2021-12-09 15:01:43,493 : INFO : S0_gaptv.func.recon_model : Iteration   9, Sigma = 1.00, PSNR = 14.78 dB, SSIM = 0.5767.
+2021-12-09 15:01:43,848 : INFO : S0_gaptv.func.recon_model : Iteration   5, Sigma = 1.00, PSNR = 12.22 dB, SSIM = 0.3936.
+2021-12-09 15:01:43,943 : INFO : S0_gaptv.func.recon_model : Iteration  12, Sigma = 1.00, PSNR = 16.64 dB, SSIM = 0.6470.
+2021-12-09 15:01:44,437 : INFO : S0_gaptv.func.recon_model : Iteration  10, Sigma = 1.00, PSNR = 15.30 dB, SSIM = 0.5957.
+2021-12-09 15:01:44,779 : INFO : S0_gaptv.func.recon_model : Iteration   6, Sigma = 1.00, PSNR = 12.82 dB, SSIM = 0.4672.
+2021-12-09 15:01:44,954 : INFO : S0_gaptv.func.recon_model : Iteration  13, Sigma = 1.00, PSNR = 17.11 dB, SSIM = 0.6538.
+2021-12-09 15:01:45,383 : INFO : S0_gaptv.func.recon_model : Iteration  11, Sigma = 1.00, PSNR = 15.80 dB, SSIM = 0.6126.
+2021-12-09 15:01:45,738 : INFO : S0_gaptv.func.recon_model : Iteration   7, Sigma = 1.00, PSNR = 13.55 dB, SSIM = 0.5372.
+2021-12-09 15:01:45,954 : INFO : S0_gaptv.func.recon_model : Iteration  14, Sigma = 1.00, PSNR = 17.55 dB, SSIM = 0.6599.
+2021-12-09 15:01:46,320 : INFO : S0_gaptv.func.recon_model : Iteration  12, Sigma = 1.00, PSNR = 16.27 dB, SSIM = 0.6251.
+2021-12-09 15:01:46,681 : INFO : S0_gaptv.func.recon_model : Iteration   8, Sigma = 1.00, PSNR = 14.17 dB, SSIM = 0.5732.
+2021-12-09 15:01:46,968 : INFO : S0_gaptv.func.recon_model : Iteration  15, Sigma = 1.00, PSNR = 17.98 dB, SSIM = 0.6670.
+2021-12-09 15:01:47,255 : INFO : S0_gaptv.func.recon_model : Iteration  13, Sigma = 1.00, PSNR = 16.71 dB, SSIM = 0.6330.
+2021-12-09 15:01:47,632 : INFO : S0_gaptv.func.recon_model : Iteration   9, Sigma = 1.00, PSNR = 14.70 dB, SSIM = 0.5902.
+2021-12-09 15:01:47,990 : INFO : S0_gaptv.func.recon_model : Iteration  16, Sigma = 1.00, PSNR = 18.37 dB, SSIM = 0.6710.
+2021-12-09 15:01:48,152 : INFO : S0_gaptv.func.recon_model : Iteration  14, Sigma = 1.00, PSNR = 17.09 dB, SSIM = 0.6358.
+2021-12-09 15:01:48,585 : INFO : S0_gaptv.func.recon_model : Iteration  10, Sigma = 1.00, PSNR = 15.22 dB, SSIM = 0.6076.
+2021-12-09 15:01:48,940 : INFO : S0_gaptv.func.recon_model : Iteration  17, Sigma = 1.00, PSNR = 18.72 dB, SSIM = 0.6740.
+2021-12-09 15:01:49,076 : INFO : S0_gaptv.func.recon_model : Iteration  15, Sigma = 1.00, PSNR = 17.46 dB, SSIM = 0.6426.
+2021-12-09 15:01:49,533 : INFO : S0_gaptv.func.recon_model : Iteration  11, Sigma = 1.00, PSNR = 15.71 dB, SSIM = 0.6236.
+2021-12-09 15:01:49,911 : INFO : S0_gaptv.func.recon_model : Iteration  18, Sigma = 1.00, PSNR = 19.03 dB, SSIM = 0.6768.
+2021-12-09 15:01:50,016 : INFO : S0_gaptv.func.recon_model : Iteration  16, Sigma = 1.00, PSNR = 17.79 dB, SSIM = 0.6462.
+2021-12-09 15:01:50,469 : INFO : S0_gaptv.func.recon_model : Iteration  12, Sigma = 1.00, PSNR = 16.18 dB, SSIM = 0.6352.
+2021-12-09 15:01:50,881 : INFO : S0_gaptv.func.recon_model : Iteration  19, Sigma = 1.00, PSNR = 19.32 dB, SSIM = 0.6798.
+2021-12-09 15:01:50,957 : INFO : S0_gaptv.func.recon_model : Iteration  17, Sigma = 1.00, PSNR = 18.09 dB, SSIM = 0.6480.
+2021-12-09 15:01:51,414 : INFO : S0_gaptv.func.recon_model : Iteration  13, Sigma = 1.00, PSNR = 16.60 dB, SSIM = 0.6416.
+2021-12-09 15:01:51,838 : INFO : S0_gaptv.func.recon_model : Iteration  20, Sigma = 1.00, PSNR = 19.58 dB, SSIM = 0.6829.
+2021-12-09 15:01:51,900 : INFO : S0_gaptv.func.recon_model : Iteration  18, Sigma = 1.00, PSNR = 18.35 dB, SSIM = 0.6503.
+2021-12-09 15:01:52,330 : INFO : S0_gaptv.func.recon_model : Iteration  14, Sigma = 1.00, PSNR = 16.99 dB, SSIM = 0.6449.
+2021-12-09 15:01:52,829 : INFO : S0_gaptv.func.recon_model : Iteration  21, Sigma = 1.00, PSNR = 19.81 dB, SSIM = 0.6863.
+2021-12-09 15:01:52,856 : INFO : S0_gaptv.func.recon_model : Iteration  19, Sigma = 1.00, PSNR = 18.59 dB, SSIM = 0.6528.
+2021-12-09 15:01:53,277 : INFO : S0_gaptv.func.recon_model : Iteration  15, Sigma = 1.00, PSNR = 17.35 dB, SSIM = 0.6510.
+2021-12-09 15:01:53,795 : INFO : S0_gaptv.func.recon_model : Iteration  22, Sigma = 1.00, PSNR = 20.02 dB, SSIM = 0.6898.
+2021-12-09 15:01:53,799 : INFO : S0_gaptv.func.recon_model : Iteration  20, Sigma = 1.00, PSNR = 18.80 dB, SSIM = 0.6555.
+2021-12-09 15:01:54,228 : INFO : S0_gaptv.func.recon_model : Iteration  16, Sigma = 1.00, PSNR = 17.68 dB, SSIM = 0.6533.
+2021-12-09 15:01:54,742 : INFO : S0_gaptv.func.recon_model : Iteration  23, Sigma = 1.00, PSNR = 20.20 dB, SSIM = 0.6937.
+2021-12-09 15:01:54,752 : INFO : S0_gaptv.func.recon_model : Iteration  21, Sigma = 1.00, PSNR = 18.99 dB, SSIM = 0.6586.
+2021-12-09 15:01:55,184 : INFO : S0_gaptv.func.recon_model : Iteration  17, Sigma = 1.00, PSNR = 17.97 dB, SSIM = 0.6548.
+2021-12-09 15:01:55,698 : INFO : S0_gaptv.func.recon_model : Iteration  24, Sigma = 1.00, PSNR = 20.37 dB, SSIM = 0.6978.
+2021-12-09 15:01:55,708 : INFO : S0_gaptv.func.recon_model : Iteration  22, Sigma = 1.00, PSNR = 19.16 dB, SSIM = 0.6620.
+2021-12-09 15:01:56,137 : INFO : S0_gaptv.func.recon_model : Iteration  18, Sigma = 1.00, PSNR = 18.23 dB, SSIM = 0.6565.
+2021-12-09 15:01:56,656 : INFO : S0_gaptv.func.recon_model : Iteration  23, Sigma = 1.00, PSNR = 19.31 dB, SSIM = 0.6659.
+2021-12-09 15:01:56,667 : INFO : S0_gaptv.func.recon_model : Iteration  25, Sigma = 1.00, PSNR = 20.52 dB, SSIM = 0.7022.
+2021-12-09 15:01:57,098 : INFO : S0_gaptv.func.recon_model : Iteration  19, Sigma = 1.00, PSNR = 18.46 dB, SSIM = 0.6586.
+2021-12-09 15:01:57,605 : INFO : S0_gaptv.func.recon_model : Iteration  24, Sigma = 1.00, PSNR = 19.44 dB, SSIM = 0.6702.
+2021-12-09 15:01:57,644 : INFO : S0_gaptv.func.recon_model : Iteration  26, Sigma = 1.00, PSNR = 20.65 dB, SSIM = 0.7067.
+2021-12-09 15:01:58,050 : INFO : S0_gaptv.func.recon_model : Iteration  20, Sigma = 1.00, PSNR = 18.67 dB, SSIM = 0.6613.
+2021-12-09 15:01:58,573 : INFO : S0_gaptv.func.recon_model : Iteration  25, Sigma = 1.00, PSNR = 19.57 dB, SSIM = 0.6750.
+2021-12-09 15:01:58,608 : INFO : S0_gaptv.func.recon_model : Iteration  27, Sigma = 1.00, PSNR = 20.77 dB, SSIM = 0.7113.
+2021-12-09 15:01:59,007 : INFO : S0_gaptv.func.recon_model : Iteration  21, Sigma = 1.00, PSNR = 18.85 dB, SSIM = 0.6643.
+2021-12-09 15:01:59,530 : INFO : S0_gaptv.func.recon_model : Iteration  26, Sigma = 1.00, PSNR = 19.67 dB, SSIM = 0.6800.
+2021-12-09 15:01:59,576 : INFO : S0_gaptv.func.recon_model : Iteration  28, Sigma = 1.00, PSNR = 20.87 dB, SSIM = 0.7159.
+2021-12-09 15:01:59,963 : INFO : S0_gaptv.func.recon_model : Iteration  22, Sigma = 1.00, PSNR = 19.01 dB, SSIM = 0.6678.
+2021-12-09 15:02:00,493 : INFO : S0_gaptv.func.recon_model : Iteration  27, Sigma = 1.00, PSNR = 19.77 dB, SSIM = 0.6850.
+2021-12-09 15:02:00,541 : INFO : S0_gaptv.func.recon_model : Iteration  29, Sigma = 1.00, PSNR = 20.96 dB, SSIM = 0.7203.
+2021-12-09 15:02:00,909 : INFO : S0_gaptv.func.recon_model : Iteration  23, Sigma = 1.00, PSNR = 19.16 dB, SSIM = 0.6715.
+2021-12-09 15:02:01,452 : INFO : S0_gaptv.func.recon_model : Iteration  28, Sigma = 1.00, PSNR = 19.86 dB, SSIM = 0.6901.
+2021-12-09 15:02:01,502 : INFO : S0_gaptv.func.recon_model : Iteration  30, Sigma = 1.00, PSNR = 21.04 dB, SSIM = 0.7246.
+2021-12-09 15:02:01,524 : INFO : S0_gaptv.func.recon_model : [27.3801s] gap_model(array([[0.042... 0.73790308]]) with shape (256, 256), 
+array([[[1., ...dtype=float32) with shape (256, 256, 16), 
+<function ReModel.config_denoise.<locals>.<lambda> at 0x2b8bc0f559e0>, 
+<function Measurement.generate.<locals>.<lambda> at 0x2b8bc0f57c20>, 
+<function Measurement.generate.<locals>.<lambda> at 0x2b8bc0f557a0>, 
+init_v=None, 
+orig=array([[[0.00...dtype=float32) with shape (256, 256, 16), 
+sigmas=1, 
+lambda_=1, 
+ITERs=30, 
+ACC=True, 
+ASSESE=1) 
+-> array([[[-1.5...861408e-01]]]), [-7.100705041477148, 6.160976794980356, 9.872065682497489, 11.453464906216347, 12.111939513953745, 12.85381837758123, ...], [-0.02489195478825635, -0.17870329641183696, -0.0064694611680901765, 0.3317034567942323, 0.38422243483292334, 0.4599822215810516, ...]
+2021-12-09 15:02:01,817 : INFO : S0_gaptv.func.recon_model : Iteration  24, Sigma = 1.00, PSNR = 19.29 dB, SSIM = 0.6756.
+2021-12-09 15:02:01,934 : INFO : S0_gaptv.func.recon_model : Iteration  29, Sigma = 1.00, PSNR = 19.94 dB, SSIM = 0.6949.
+2021-12-09 15:02:02,163 : INFO : S0_gaptv.func.recon_model : Iteration  25, Sigma = 1.00, PSNR = 19.40 dB, SSIM = 0.6798.
+2021-12-09 15:02:02,547 : INFO : S0_gaptv.func.recon_model : Iteration  30, Sigma = 1.00, PSNR = 20.01 dB, SSIM = 0.6995.
+2021-12-09 15:02:02,564 : INFO : S0_gaptv.func.recon_model : [26.6599s] gap_model(array([[0.045... 0.71200058]]) with shape (256, 256), 
+array([[[1., ...dtype=float32) with shape (256, 256, 16), 
+<function ReModel.config_denoise.<locals>.<lambda> at 0x2b8bc0f559e0>, 
+<function Measurement.generate.<locals>.<lambda> at 0x2b8bc0f57c20>, 
+<function Measurement.generate.<locals>.<lambda> at 0x2b8bc0f557a0>, 
+init_v=None, 
+orig=array([[[0.00...dtype=float32) with shape (256, 256, 16), 
+sigmas=1, 
+lambda_=1, 
+ITERs=30, 
+ACC=True, 
+ASSESE=1) 
+-> array([[[ 0.0...0.10192056]]]), [-5.087992357474534, 6.66523976961745, 10.41748652249171, 11.839907475734694, 12.279591221732078, 12.883941441709794, ...], [-0.029821875400771254, -0.18118318320861165, -0.05476986165278811, 0.3307419910464412, 0.3785514160962453, 0.4496441424860316, ...]
+2021-12-09 15:02:02,801 : INFO : S0_gaptv.func.recon_model : Iteration  26, Sigma = 1.00, PSNR = 19.51 dB, SSIM = 0.6841.
+2021-12-09 15:02:03,085 : INFO : S0_gaptv.func.recon_model : Iteration  27, Sigma = 1.00, PSNR = 19.60 dB, SSIM = 0.6885.
+2021-12-09 15:02:03,371 : INFO : S0_gaptv.func.recon_model : Iteration  28, Sigma = 1.00, PSNR = 19.68 dB, SSIM = 0.6928.
+2021-12-09 15:02:03,657 : INFO : S0_gaptv.func.recon_model : Iteration  29, Sigma = 1.00, PSNR = 19.76 dB, SSIM = 0.6969.
+2021-12-09 15:02:03,940 : INFO : S0_gaptv.func.recon_model : Iteration  30, Sigma = 1.00, PSNR = 19.82 dB, SSIM = 0.7009.
+2021-12-09 15:02:03,956 : INFO : S0_gaptv.func.recon_model : [24.6913s] gap_model(array([[0.045... 0.59944447]]) with shape (256, 256), 
+array([[[1., ...dtype=float32) with shape (256, 256, 16), 
+<function ReModel.config_denoise.<locals>.<lambda> at 0x2b8bc0f559e0>, 
+<function Measurement.generate.<locals>.<lambda> at 0x2b8bc0f57c20>, 
+<function Measurement.generate.<locals>.<lambda> at 0x2b8bc0f557a0>, 
+init_v=None, 
+orig=array([[[0.00...dtype=float32) with shape (256, 256, 16), 
+sigmas=1, 
+lambda_=1, 
+ITERs=30, 
+ACC=True, 
+ASSESE=1) 
+-> array([[[ 5.9...270780e-01]]]), [-4.806407550206625, 6.6698687859410555, 10.411217695797601, 11.803971737662645, 12.218684948010573, 12.818825569059097, ...], [-0.025163315747319878, -0.18443999683065335, -0.06351613164983841, 0.3427757113188089, 0.3935962116472588, 0.4671500458309956, ...]
+2021-12-09 15:02:07,186 : INFO : S2_flow_predict.motion : Motion estimation with method: 'dain_flow2'

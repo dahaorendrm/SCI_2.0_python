@@ -5,8 +5,8 @@ from pathlib import Path
 import pytorch_lightning as pl
 import segmentation_models_pytorch as smp
 from . import Resblock
-from loss import *
-from utils import *
+from ..loss import *
+from ..utils import *
 
 class CHASTINET(pl.LightningModule):
     def __init__(self, hparams):
@@ -185,10 +185,10 @@ class CHASTINET(pl.LightningModule):
             ssim_re = calculate_ssim(preds, ref_y)
             psnr_n,ssim_n = outputevalarray(img_n,ref_y)
             psnr_p,ssim_p = outputevalarray(preds,ref_y)
-            np.savetxt(Path('result')/'eval'/(save_name+f'_psnr_{np.mean(psnr_re):.4f}.txt'), psnr_p, fmt='%.4f')
-            np.savetxt(Path('result')/'eval'/(save_name+f'_ssim_{np.mean(ssim_re):.6f}.txt'), ssim_p, fmt='%.6f')
-            np.savetxt(Path('result')/'eval'/(save_name+f'_psnr_n_{np.mean(psnr_re):.4f}.txt'), psnr_n, fmt='%.4f')
-            np.savetxt(Path('result')/'eval'/(save_name+f'_ssim_n_{np.mean(ssim_re):.6f}.txt'), ssim_n, fmt='%.6f')
+            np.savetxt(Path('/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/result')/'eval'/(save_name+f'_psnr_{np.mean(psnr_re):.4f}.txt'), psnr_p, fmt='%.4f')
+            np.savetxt(Path('/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/result')/'eval'/(save_name+f'_ssim_{np.mean(ssim_re):.6f}.txt'), ssim_p, fmt='%.6f')
+            np.savetxt(Path('/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/result')/'eval'/(save_name+f'_psnr_n_{np.mean(psnr_re):.4f}.txt'), psnr_n, fmt='%.4f')
+            np.savetxt(Path('/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/result')/'eval'/(save_name+f'_ssim_n_{np.mean(ssim_re):.6f}.txt'), ssim_n, fmt='%.6f')
             print(f"Name:{batch['id'][0]}, inputPSNR:{psnr_in:.4f}dB, outputPSNR:{psnr_re:.4f}dB, inputSSIM:{ssim_in:.6f}, outputSSIM:{ssim_re:.6f}.")
         # return (preds,psnr_val)
 

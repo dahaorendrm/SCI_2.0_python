@@ -16,9 +16,9 @@ import datetime
 from pathlib import Path
 
 MODEL='chasti_sst'
-MASK = scio.loadmat('lesti_mask.mat')['mask']
-MASK = np.reshape(MASK,(512,512,32))
-MASK = MASK[:482,...]
+MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
+#MASK = np.reshape(MASK,(512,512,32))
+#MASK = MASK[:482,...]
 def compressive_model(MODEL,input):
     '''
         <aodel> + gaptv
@@ -26,12 +26,12 @@ def compressive_model(MODEL,input):
     #global MODEL
     print(f'Current model is {MODEL}')
     if MODEL == 'cacti':
-        mask = scio.loadmat('cacti_mask.mat')['mask']
+        mask = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/cacti_mask.mat')['mask']
         input = rgb2gray(input)
         return np.mean(mask*input,2)
 
     if MODEL == 'cassi':
-        mask = scio.loadmat('cassi_mask.mat')['mask']
+        mask = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/cassi_mask.mat')['mask']
         input = rgb2gray(input)
         assert MASK.ndim is 2
         mask = MASK[:,:,np.newaxis]
@@ -39,7 +39,7 @@ def compressive_model(MODEL,input):
         temp = utils.shifter(temp,0)
         return np.mean(temp,2)
     if MODEL == 'lesti_sst':
-        BandsLed = scio.loadmat('BandsLed.mat')['BandsLed']
+        BandsLed = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/BandsLed.mat')['BandsLed']
         BandsLed = BandsLed[4:-2,:]
         data = (
         input,
@@ -74,7 +74,7 @@ def compressive_model(MODEL,input):
         return result__
 
     if MODEL == 'lesti_3d':
-        BandsLed = scio.loadmat('BandsLed.mat')['BandsLed']
+        BandsLed = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/BandsLed.mat')['BandsLed']
         BandsLed = BandsLed[4:-2,:]
         data = (
         input,
@@ -100,7 +100,7 @@ def compressive_model(MODEL,input):
         print(f'Return result with {len(result__)} elements!')
         return result__
     if MODEL == 'cassi':
-        mask = scio.loadmat('cassi_mask.mat')['mask']
+        mask = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/cassi_mask.mat')['mask']
         input = rgb2gray(input)
         assert MASK.ndim is 2
         mask = MASK[:,:,np.newaxis]

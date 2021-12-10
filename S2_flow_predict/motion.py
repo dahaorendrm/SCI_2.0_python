@@ -1,4 +1,3 @@
-import networks.PWCNet
 import torch
 from torch.autograd import Variable
 import torch.nn as nn
@@ -7,8 +6,10 @@ import pickle
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
-import networks as dain_net
-import utils
+
+from .networks import PWCNet
+from . import networks as dain_net
+from . import utils
 #from torchsummary import summary
 
 logger = utils.init_logger(__name__)
@@ -22,7 +23,7 @@ class Motion:
         elif method == 'dain_flow':
             self.model = dain_net.__dict__['DAIN_flow'](
                                                timestep=timestep,training=False)
-            SAVED_MODEL = './model_weights/best.pth'
+            SAVED_MODEL = '/lustre/arce/X_MA/SCI_2.0_python/S2_flow_predict/model_weights/best.pth'
             pretrained_dict = torch.load(SAVED_MODEL)
             model_dict = self.model.state_dict()
             # 1. filter out unnecessary keys
@@ -37,7 +38,7 @@ class Motion:
         elif method == 'dain_flow2':
             self.model = dain_net.__dict__['DAIN_flow2'](
                                                training=False)
-            SAVED_MODEL = './model_weights/best.pth'
+            SAVED_MODEL = '/lustre/arce/X_MA/SCI_2.0_python/S2_flow_predict/model_weights/best.pth'
             pretrained_dict = torch.load(SAVED_MODEL)
             model_dict = self.model.state_dict()
             # 1. filter out unnecessary keys
@@ -92,9 +93,9 @@ class Motion:
         #     pickle.dump(output,f)
         # with open("S2_result/dainflow2_results_ref.pickle",'wb') as f:
         #     pickle.dump(origs,f)
+        self.psnr = []
+        self.ssim = []
         if origs is not None:
-            self.psnr = []
-            self.ssim = []
             print('output_images shape'+repr(output.shape))
             print('orig shape'+ repr(origs.shape))
             for indr in range(output.shape[3]):

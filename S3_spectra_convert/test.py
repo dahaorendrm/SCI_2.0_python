@@ -1,13 +1,13 @@
 # import
 from pathlib import Path
 import numpy as np
-import utils
+from . import utils
 import torch
 import os
 
 from .ImgDataset import ImgDataset,TestDataset
 from .networks.SpecConvModel import SpecConvModel
-import .loss
+from . import loss
 import pytorch_lightning as pl
 # process data
 
@@ -37,7 +37,7 @@ def test(datapath,refpath):
         "out_channels":25
     }
     model = SpecConvModel(hparams=hparams)
-    model.load_state_dict(torch.load("model-outputs/gaptv_train_ssim/model.pt"))
+    model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S3_spectra_convert/model-outputs/gaptv_train_ssim/model.pt"))
     #trainer = Trainer()
     #trainer.test(model)
     model.test()

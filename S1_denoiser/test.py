@@ -1,13 +1,13 @@
 # import
 from pathlib import Path
 import numpy as np
-import .utils
+from . import utils
 import torch
 import os
 
 from .imgdataset import ImgDataset
 from .networks.chasti_network import CHASTINET
-import .loss
+from . import loss
 # process data
 
 def test(path):
@@ -32,7 +32,7 @@ def test(path):
     }
 
     model = CHASTINET(hparams=hparams)
-    model.load_state_dict(torch.load("model-outputs/model.pt"))
+    model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/model-outputs/model.pt"))
     #trainer = Trainer()
     #trainer.test(model)
     model.test()

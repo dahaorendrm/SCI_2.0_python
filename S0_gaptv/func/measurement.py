@@ -2,14 +2,13 @@ import numpy as np
 import cv2
 import scipy.io as scio
 import matplotlib.pyplot as plt
-from .func import utils
+from . import utils
 #import pickle
 import os
 import dill
-from .func.forward_model import *
+from .forward_model import *
 
 
-from func import utils
 logger = utils.init_logger(__name__)
 
 class Measurement:

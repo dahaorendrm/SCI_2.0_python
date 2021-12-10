@@ -1,12 +1,12 @@
 import math
 import torch
 import numpy as np
-from func import utils
+from .. import utils
 from bm3d import bm3d_deblurring, BM3DProfile, gaussian_kernel
-from func.denoiser.hsi.hsicnn import HSI_SDeCNN as hsinet
-from func.denoiser.ffdnet.models import FFDNet as ffdnet
-from func.denoiser.fastdvdnet.models import FastDVDnet as fastdvdnet
-from func.denoiser.fastdvdnet.fastdvdnet import fastdvdnet_seqdenoise
+from .hsi.hsicnn import HSI_SDeCNN as hsinet
+from .ffdnet.models import FFDNet as ffdnet
+from .fastdvdnet.models import FastDVDnet as fastdvdnet
+from .fastdvdnet.fastdvdnet import fastdvdnet_seqdenoise
 from skimage.restoration import denoise_tv_chambolle
 
 logger = utils.init_logger(__name__)

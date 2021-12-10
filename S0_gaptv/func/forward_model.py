@@ -4,7 +4,7 @@ import pickle
 import datetime
 
 
-from func import utils
+from . import utils
 logger = utils.init_logger(__name__)
 
 
