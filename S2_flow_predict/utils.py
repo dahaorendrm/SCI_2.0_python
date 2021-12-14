@@ -194,6 +194,8 @@ def calculate_psnr(img1, img2, maxv=1, border=0):
     # img1 and img2 have range [0, 1]
     #img1 = img1.squeeze()
     #img2 = img2.squeeze()
+    img1[img1<0] = 0
+    img2[img2<0] = 0
     if not img1.shape == img2.shape:
         raise ValueError('Input images must have the same dimensions.')
     # img1 = img1/np.amax(img1)
@@ -218,6 +220,9 @@ def calculate_ssim(img1, img2, max_v=1, border=0):
     the same outputs as MATLAB's
     img1, img2: [0, 255]
     '''
+    img1[img1<0] = 0
+    img2[img2<0] = 0
+
     #img1 = img1.squeeze()
     #img2 = img2.squeeze()
     if not img1.shape == img2.shape:

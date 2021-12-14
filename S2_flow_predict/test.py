@@ -27,6 +27,7 @@ def main():
     path = Path('../S0_gaptv/data/test')
     # dataPath = Path(path/'img_n')
     dataPath = Path('../S1_denoiser/result')
+    dataPath = Path('../S0_gaptv/data/test/img_n')
     data_list = os.listdir(dataPath)
     name = '0000'
 
