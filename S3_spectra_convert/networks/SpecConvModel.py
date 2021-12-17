@@ -32,6 +32,7 @@ class SpecConvModel(pl.LightningModule):
         self.gpu = self.hparams.get("gpu", False)
         self.in_channels = self.hparams.get("in_channels", 2)
         self.out_channels = self.hparams.get("out_channels", 1)
+        self.resultpath = Path(self.hparams.get("savepath", 'result/re'))
 
         # Where final model will be saved
         self.output_path = Path.cwd() / self.output_path
@@ -185,8 +186,8 @@ class SpecConvModel(pl.LightningModule):
             psnr_val = utils.calculate_psnr(preds,y)
             ssim_val = utils.calculate_ssim(preds,y) # %%% switch back the dimension
             psnr_re,ssim_re = utils.outputevalarray(preds,y)
-            np.savetxt(Path('result')/'eval'/(save_name+f'_psnr_{np.mean(psnr_re):.4f}.txt'), psnr_re, fmt='%.4f')
-            np.savetxt(Path('result')/'eval'/(save_name+f'_ssim_{np.mean(ssim_re):.6f}.txt'), ssim_re, fmt='%.6f')
+            np.savetxt(self.resultpath/'eval'/(save_name+f'_psnr_{np.mean(psnr_re):.4f}.txt'), psnr_re, fmt='%.4f')
+            np.savetxt(self.resultpath/'eval'/(save_name+f'_ssim_{np.mean(ssim_re):.6f}.txt'), ssim_re, fmt='%.6f')
             print(f"Data {batch['id'][0]}, psnr : {psnr_val:.4f}, SSIM : {ssim_val:.6f}.")
             self.psnr_val.append(psnr_val)
             # self.ssim_val.append(ssim_val)
@@ -195,7 +196,7 @@ class SpecConvModel(pl.LightningModule):
         if not os.path.exists('./result/re'):
             os.mkdir('result')
             os.mkdir('result/re')
-        tifffile.imwrite(f"result/re/{batch['id'][0]}",preds)
+        tifffile.imwrite(self.resultpath/f"{batch['id'][0]}",preds)
         utils.saveintemp(preds,save_name)
         utils.saveintemp(y,'orig'+save_name)
         #np.save(f'result/{batch["id"][0]}.npy',preds.cpu().numpy()) ####name needed
@@ -259,7 +260,7 @@ class SpecConvModel(pl.LightningModule):
         # Calculate IOU at end of epoch
         val_psnr = sum(self.psnr_val)/len(self.psnr_val)
         val_ssim = sum(self.ssim_val)/len(self.ssim_val)
-        
+
         # Reset metrics before next epoch
         self.psnr_val = []
         self.ssim_val = []

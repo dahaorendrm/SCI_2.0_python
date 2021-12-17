@@ -11,7 +11,7 @@ from . import loss
 import pytorch_lightning as pl
 # process data
 
-def test(datapath,refpath):
+def test(datapath='../S2_flow_predict/result/re',refpath='../S0_gaptv/data/test/gt',savepath='result/re'):
     # test_dataset = TestDataset('./data/test/feature','./data/test/label')
     test_dataset = ImgDataset(datapath, refpath, f_trans = False)
     # set-up model
@@ -34,7 +34,8 @@ def test(datapath,refpath):
         "log_path": "tensorboard_logs",
         "gpu": torch.cuda.is_available(),
         "in_channels":8,
-        "out_channels":25
+        "out_channels":25,
+        'savepath':savepath
     }
     model = SpecConvModel(hparams=hparams)
     model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S3_spectra_convert/model-outputs/gaptv_train_ssim/model.pt"))

@@ -8,7 +8,9 @@ from pathlib import Path
 import tifffile
 
 from S0_gaptv import run_gap_tv as S0run
-
+from S1_denoiser import test as S1run
+from S2_flow_predict import test as S2run
+from S3_spectra_convert import test as S3run
 
 # S0
 pool = multiprocessing.Pool()
@@ -30,7 +32,12 @@ if not os.path.exists('S0_gaptv/data/exp'):
     os.mkdir('S0_gaptv/data/exp/mea')
     os.mkdir('S0_gaptv/data/exp/img_n')
 for idx,(mea,re) in enumerate(return_crops_data):
-    tifffile.imwrite(mea,Path('S0_gaptv/data/exp/mea')/(datalist[idx]+'.tiff'))
-    tifffile.imwrite(re,Path('S0_gaptv/data/exp/img_n')/(datalist[idx]+'.tiff'))
+    tifffile.imwrite(Path('S0_gaptv/data/exp/mea')/(datalist[idx]+'.tiff'),mea)
+    tifffile.imwrite(Path('S0_gaptv/data/exp/img_n')/(datalist[idx]+'.tiff'),re)
 
 # S1
+S1run.test('S0_gaptv/data/exp','S1_denoiser/result/exp')
+# S2
+S2run.test('S0_gaptv/data/exp/img_n','S0_gaptv/data/exp/','S2_flow_predict/result/exp/')
+# S3
+S3run.test('S2_flow_predict/result/re','S1_denoiser/result/exp')

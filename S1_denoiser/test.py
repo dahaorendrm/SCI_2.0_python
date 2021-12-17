@@ -10,7 +10,7 @@ from .networks.chasti_network import CHASTINET
 from . import loss
 # process data
 
-def test(path):
+def test(path,savepath='result'):
     dataset = ImgDataset(path,f_trans=False)
     # set-up model
     hparams = {
@@ -28,7 +28,8 @@ def test(path):
         "gpu": torch.cuda.is_available(),
         "input_layers":4,
         "hidden_layers":64,
-        "num_blocks":4
+        "num_blocks":4,
+        "result_path":savepath
     }
 
     model = CHASTINET(hparams=hparams)
