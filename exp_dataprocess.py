@@ -20,28 +20,28 @@ def converter(path,idxrange,imgsize,cord,scale):
 if __name__=='__main__':
     if not os.path.exists('expdata'):
         os.mkdir('expdata')
-    path = Path('/home/xiao/data/expdata_SCI_2.0/20210930data')
+    path = Path('../data/expdata_SCI_2.0/20210930data')
     mask = converter(path,(1,24),1024,(3,1),0.25)
     mask = np.stack(mask,2)
     utils.saveintemp(mask,'expmask')
     scio.savemat('expdata/mask.mat',{'mask':mask})
     imgs = converter(path,(37,40),1024,(3,1),0.25)
     for idx,img in enumerate(imgs):
-        scio.savemat(f'expdata/color_checker{idx:04d}.mat',{'img':img})
+        scio.savemat(f'expdata/4D_color_checker{idx:04d}.mat',{'img':img})
     imgs = converter(path,(41,80),1024,(3,1),0.25)
     for idx,img in enumerate(imgs):
-        scio.savemat(f'expdata/color_checker_motion{idx:04d}.mat',{'img':img})
+        scio.savemat(f'expdata/4D_color_checker_motion{idx:04d}.mat',{'img':img})
     imgs = converter(path,(87,116),1024,(3,1),0.25)
     for idx,img in enumerate(imgs):
-        scio.savemat(f'expdata/rotor{idx:04d}.mat',{'img':img})
+        scio.savemat(f'expdata/4D_rotor{idx:04d}.mat',{'img':img})
     imgs = converter(path,(317,366),1024,(3,1),0.25)
     for idx,img in enumerate(imgs):
-        scio.savemat(f'expdata/Lego{idx:04d}.mat',{'img':img})
+        scio.savemat(f'expdata/4D_Lego{idx:04d}.mat',{'img':img})
     imgs = converter(path,(467,576),1024,(3,1),0.25)
     for idx,img in enumerate(imgs):
-        scio.savemat(f'expdata/Mango1_{idx:04d}.mat',{'img':img})
+        scio.savemat(f'expdata/4D_Mango1_{idx:04d}.mat',{'img':img})
     imgs = converter(path,(567,616),1024,(3,1),0.25)
     for idx,img in enumerate(imgs):
-        scio.savemat(f'expdata/Mango2_{idx:04d}.mat',{'img':img})
+        scio.savemat(f'expdata/4D_Mango2_{idx:04d}.mat',{'img':img})
 
 
