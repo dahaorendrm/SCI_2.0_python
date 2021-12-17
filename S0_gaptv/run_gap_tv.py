@@ -19,6 +19,25 @@ MODEL='chasti_sst'
 MASK = scio.loadmat('lesti_mask.mat')['mask']
 MASK = np.reshape(MASK,(512,512,32))
 MASK = MASK[:482,...]
+
+
+
+def compressive_model_exp(MODEL,numf=16,mea,mask):
+    mea = Measurement.import_exp_mea_modul(cls, MODEL, mea, mask, configs={'NUMF':numf, 'SCALE_DATA':1, 'CUT_BAND':None})
+    model = recon_model.ReModel('gap','tv_chambolle')
+    model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
+            'ITERs': 30, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
+            'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7}})
+    re = result.Result(model, mea, modul = mea.mask)
+    re = np.array(re)
+    re[re<0] = 0
+    re = re/np.amax(re)
+    mea = np.array(mea.mea)
+    # print('shape of re is '+str(mea.shape))
+    result__ = (mea,re)
+    return result__
+
+
 def compressive_model(MODEL,input):
     '''
         <aodel> + gaptv
@@ -199,7 +218,7 @@ def save_crops(path,index,fname,crops_mea,crops_img,crops_gt=None,crops_led=None
         if crops_led:
             os.mkdir(path+'/gt_led/') if not os.path.exists(path+'/gt_led') else None
             #qu.put(threading.Thread(target=save_tiff,args=[path+'/gt_led/'+name,crops_led[ind]]))
-            qu.put([path+'/gt_led/'+name,crops_led[ind]]) 
+            qu.put([path+'/gt_led/'+name,crops_led[ind]])
             #threads[-1].start()
         num_idx+=1
     for _ in range(200):
