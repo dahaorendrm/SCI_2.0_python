@@ -27,7 +27,12 @@ def process(data,ref=None):
 def test(datapath):
     path = Path('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/data/test')
     # dataPath = Path(path/'img_n')
+<<<<<<< HEAD
     dataPath = Path(datapath)
+=======
+    dataPath = Path('../S1_denoiser/result')
+    dataPath = Path('../S0_gaptv/data/test/img_n')
+>>>>>>> master
     data_list = os.listdir(dataPath)
     name = '0000'
 

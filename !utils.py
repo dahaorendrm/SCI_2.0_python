@@ -8,7 +8,7 @@ import time, os
 import reprlib
 import matplotlib.pyplot as plt
 import tifffile
-from pathlib import path
+from pathlib import Path
 from PIL import Image
 
 def saveintemp(data,name='test'):

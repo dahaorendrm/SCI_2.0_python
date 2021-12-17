@@ -26,3 +26,4 @@ temp
 *.egg
 *.o
 *.zip
+/expdata

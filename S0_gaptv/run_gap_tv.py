@@ -16,9 +16,34 @@ import datetime
 from pathlib import Path
 
 MODEL='chasti_sst'
+<<<<<<< HEAD
 MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
 #MASK = np.reshape(MASK,(512,512,32))
 #MASK = MASK[:482,...]
+=======
+MASK = scio.loadmat('lesti_mask.mat')['mask']
+MASK = np.reshape(MASK,(512,512,32))
+MASK = MASK[:482,...]
+
+
+
+def compressive_model_exp(MODEL,numf=16,mea,mask):
+    mea = Measurement.import_exp_mea_modul(cls, MODEL, mea, mask, configs={'NUMF':numf, 'SCALE_DATA':1, 'CUT_BAND':None})
+    model = recon_model.ReModel('gap','tv_chambolle')
+    model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
+            'ITERs': 30, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
+            'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7}})
+    re = result.Result(model, mea, modul = mea.mask)
+    re = np.array(re)
+    re[re<0] = 0
+    re = re/np.amax(re)
+    mea = np.array(mea.mea)
+    # print('shape of re is '+str(mea.shape))
+    result__ = (mea,re)
+    return result__
+
+
+>>>>>>> master
 def compressive_model(MODEL,input):
     '''
         <aodel> + gaptv
