@@ -10,8 +10,8 @@ from .networks.chasti_network import CHASTINET
 from . import loss
 # process data
 
-def test(path,savepath='result'):
-    dataset = ImgDataset(path,f_trans=False)
+def test(path,savepath='result',mask_path='../S0_gaptv/lesti_mask.mat'):
+    dataset = ImgDataset(path,mask_path,f_trans=False)
     # set-up model
     hparams = {
         "test_dataset": dataset,

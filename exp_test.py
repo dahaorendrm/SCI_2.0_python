@@ -41,7 +41,7 @@ if __name__=='__main__':
     # S0
     #S0run_test()
     # S1
-    S1run.test('S0_gaptv/data/exp','S1_denoiser/result/exp')
+    S1run.test('S0_gaptv/data/exp','S1_denoiser/result/exp','expdata/mask.mat')
     # S2
     #S2run.test('S0_gaptv/data/exp/img_n','S0_gaptv/data/exp/','S2_flow_predict/result/exp/')
     # S3

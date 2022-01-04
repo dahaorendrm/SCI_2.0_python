@@ -23,7 +23,7 @@ transformations = albumentations.Compose(
 
 class ImgDataset(torch.utils.data.Dataset):
 
-    def __init__(self, path, f_trans=True):
+    def __init__(self, path, mask_path='../S0_gaptv/lesti_mask.mat', f_trans=True):
         super(ImgDataset, self).__init__()
         #self.data = []
         self.f_trans= f_trans
@@ -32,7 +32,7 @@ class ImgDataset(torch.utils.data.Dataset):
             self.mea_path = path + '/mea'
             self.img_n_path = path + '/img_n'
             self.gt_led_path = path + '/gt_led'
-            self.mask = scio.loadmat('../S0_gaptv/lesti_mask.mat')['mask']
+            self.mask = scio.loadmat()['mask']
             self.data = os.listdir(self.mea_path)
         else:
             raise FileNotFoundError('path doesnt exist!')
