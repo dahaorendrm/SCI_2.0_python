@@ -61,17 +61,19 @@ def test(datapath='../S1_denoiser/result',path='../S0_gaptv/data/test',savepath=
         # np.save('S2_result/'+save_name+'ref.npy', orig_leds)
         print(f'shape of re is {re.shape}')
         utils.saveintemp(re,save_name)
-        utils.saveintemp(gt_orig,'orig'+save_name)
-        psnr_re,ssim_re = utils.outputevalarray(re,gt_orig)
-        print(f'The avg psnr of gt is {np.mean(psnr_re)}')
-        print(f'The avg ssim of gt is {np.mean(ssim_re)}')
+        if gt_orig is not None:
+            utils.saveintemp(gt_orig,'orig'+save_name)
+            psnr_re,ssim_re = utils.outputevalarray(re,gt_orig)
+            print(f'The avg psnr of gt is {np.mean(psnr_re)}')
+            print(f'The avg ssim of gt is {np.mean(ssim_re)}')
         ## Save
         if not os.path.exists(savepath/'re') or not os.path.exists(savepath/'eval'):
             os.mkdir(savepath)
             os.mkdir(savepath/'re')
             os.mkdir(savepath/'eval')
-        np.savetxt(savepath/'eval'/(save_name+f'_psnr_{np.mean(psnr_re):.4f}.txt'), psnr_re, fmt='%.4f')
-        np.savetxt(savepath/'eval'/(save_name+f'_ssim_{np.mean(ssim_re):.6f}.txt'), ssim_re, fmt='%.6f')
+        if gt_orig is not None:
+            np.savetxt(savepath/'eval'/(save_name+f'_psnr_{np.mean(psnr_re):.4f}.txt'), psnr_re, fmt='%.4f')
+            np.savetxt(savepath/'eval'/(save_name+f'_ssim_{np.mean(ssim_re):.6f}.txt'), ssim_re, fmt='%.6f')
 
 
         tifffile.imwrite(savepath/'re'/data_name,re)

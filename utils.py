@@ -10,6 +10,7 @@ import matplotlib.pyplot as plt
 import tifffile
 from pathlib import Path
 from PIL import Image
+import itertools
 
 def saveintemp(data,name='test'):
     if not os.path.exists('temp'):

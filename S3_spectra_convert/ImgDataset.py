@@ -42,6 +42,7 @@ class ImgDataset(torch.utils.data.Dataset):
         feature = (feature - min_norm) / (max_norm - min_norm)
 
         # Load label if available - training only
+        label = None
         if os.path.exists(self.label_path+'/'+self.data[idx]):
             label = tifffile.imread(self.label_path+'/'+self.data[idx])
             min_norm = np.nanmin(label)
@@ -57,10 +58,10 @@ class ImgDataset(torch.utils.data.Dataset):
         # Prepare sample dictionary
         if feature.ndim == 4:
             feature = np.transpose(feature, [2, 0, 1, 3])
-            label = np.transpose(label, [2, 0, 1, 3])
+            label = np.transpose(label, [2, 0, 1, 3]) if label is not None else False
         else:               
             feature = np.transpose(feature, [2, 0, 1])
-            label = np.transpose(label, [2, 0, 1])
+            label = np.transpose(label, [2, 0, 1]) if label is not None else False
         sample = {"id": self.data[idx], "feature":feature, "label":label}
         return sample
 

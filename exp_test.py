@@ -12,7 +12,6 @@ from S0_gaptv import run_gap_tv as S0run
 from S1_denoiser import test as S1run
 from S2_flow_predict import test as S2run
 from S3_spectra_convert import test as S3run
-
 # S0
 def S0run_test():
     pool = multiprocessing.Pool()
@@ -23,7 +22,7 @@ def S0run_test():
     dataset = []
     datalist = os.listdir(PATH)
     for idx,name in enumerate(datalist):
-        if idx > 10: # small test sets
+        if idx > 20: # small test sets
             break
         mea = scio.loadmat(PATH/name)['img']
         dataset.append((MODEL,mea,mask,numf))
@@ -41,8 +40,8 @@ if __name__=='__main__':
     # S0
     #S0run_test()
     # S1
-    S1run.test('S0_gaptv/data/exp','S1_denoiser/result/exp','expdata/mask.mat')
+    # S1run.test('S0_gaptv/data/exp','S1_denoiser/result/exp','expdata/mask.mat')
     # S2
     #S2run.test('S0_gaptv/data/exp/img_n','S0_gaptv/data/exp/','S2_flow_predict/result/exp/')
     # S3
-    #S3run.test('S2_flow_predict/result/re','S1_denoiser/result/exp')
+    S3run.test('S2_flow_predict/result/exp/re','S0_gaptv/data/exp/', 'S3_spectra_convert/result')

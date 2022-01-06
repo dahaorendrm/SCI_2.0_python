@@ -32,7 +32,7 @@ class ImgDataset(torch.utils.data.Dataset):
             self.mea_path = path + '/mea'
             self.img_n_path = path + '/img_n'
             self.gt_led_path = path + '/gt_led'
-            self.mask = scio.loadmat()['mask']
+            self.mask = scio.loadmat(mask_path)['mask']
             self.data = os.listdir(self.mea_path)
         else:
             raise FileNotFoundError('path doesnt exist!')
