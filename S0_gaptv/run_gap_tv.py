@@ -15,10 +15,9 @@ from collections import namedtuple
 import datetime
 from pathlib import Path
 
-MODEL='chasti_sst'
-MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
-MASK = np.reshape(MASK,(512,512,32))
-MASK = MASK[:482,...]
+
+# MODEL='chasti_sst'
+
 
 
 
@@ -42,7 +41,7 @@ def compressive_model(MODEL,input):
     '''
         <aodel> + gaptv
     '''
-    #global MODEL
+    global MASK
     print(f'Current model is {MODEL}')
     if MODEL == 'cacti':
         mask = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/cacti_mask.mat')['mask']
@@ -302,6 +301,8 @@ def train_data_generation():
     print(f"This code of {entries[ind_id]:s} run in {toc - tic:0.4f} seconds",flush=True)
 
 def test_data_generation():
+    global MASK
+    MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
     pool = multiprocessing.Pool()
     MODEL = 'chasti_sst'
     COMP_FRAME = 9
@@ -368,6 +369,10 @@ def test_data_generation():
 
 
 def S3train_data_generation():
+    global MASK
+    MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
+    MASK = np.reshape(MASK,(512,512,32))
+    MASK = MASK[:482,...]
     pool = multiprocessing.Pool(10)
     MODEL = 'lesti_3d'
     path = Path('../../data/ntire2020/spectral')
@@ -396,6 +401,66 @@ def S3train_data_generation():
         crops_mea.append(mea)
         crops_img.append(re)
     save_crops('data/trainS3',name_list,'ntire',crops_mea,crops_img, crops_gt=crops, crops_led=crops_led)
+
+def X2Cube(img,B=[4, 4],skip = [4, 4],bandNumber=16):
+    '''
+    This function came with the whispers datasets
+    '''
+    # Parameters
+    M, N = img.shape
+    col_extent = N - B[1] + 1
+    row_extent = M - B[0] + 1
+    # Get Starting block indices
+    start_idx = np.arange(B[0])[:, None] * N + np.arange(B[1])
+    # Generate Depth indeces
+    didx = M * N * np.arange(1)
+    start_idx = (didx[:, None] + start_idx.ravel()).reshape((-1, B[0], B[1]))
+    # Get offsetted indices across the height and width of input array
+    offset_idx = np.arange(row_extent)[:, None] * N + np.arange(col_extent)
+    # Get all actual indices & index into input array for final output
+    out = np.take(img, start_idx.ravel()[:, None] + offset_idx[::skip[0], ::skip[1]].ravel())
+    out = np.transpose(out)
+    DataCube = out.reshape(M//4, N//4,bandNumber )
+    return DataCube
+
+def S1train_data_generation():
+    global MASK
+    MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
+    MASK = np.reshape(MASK,(256,512,32))
+    COMP_FRAME = 32
+    pool = multiprocessing.Pool(10)
+    MODEL = 'chasti_sst'
+    path = Path('../../data/whispers/train')
+    datalist = os.listdir(path)
+    comp_input = []
+    crops = []
+    name_list = []
+    for name in datalist:
+        imglist = os.listdir(path/name/'HSI')
+        i = 0
+        oneset = []
+        imgidx = 0
+        while i < len(imglist):
+            img = skio.imread(path/name/'HSI'/f'{i:04d}.png')
+            img = X2Cube(img)
+            oneset.append(img)
+            if len(oneset)==COMP_FRAME:
+                imgs = np.stack(oneset,2)
+                crops.append(imgs)
+                comp_input.append((MODEL,imgs))
+                oneset = []
+                name_list.append(str(imgidx))
+                imgidx += 1
+                print(f'Input data max is {np.amax(imgs)}.')
+    crops_mea = []
+    crops_img = []
+    crops_led = []
+    return_crops_data = pool.starmap(compressive_model, comp_input) # contain (mea, gaptv_result)
+    for (mea,re) in return_crops_data:
+        crops_mea.append(mea)
+        crops_img.append(re)
+    save_crops('data/trainS1',name_list,'whispers',crops_mea,crops_img, crops_gt=crops)
+
 if __name__ == '__main__':
     print(f'Start time:{datetime.datetime.now()}')
     #train_data_generation()
