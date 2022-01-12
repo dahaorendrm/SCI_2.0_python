@@ -3,7 +3,7 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 
-#SBATCH --cpus-per-task=4
+#SBATCH --cpus-per-task=10
 
 #SBATCH --mem=60G
 # SBATCH --mem-per-cpu=10G
@@ -21,7 +21,7 @@
 # SBATCH --array=4-10
 
 # export OMP_NUM_THREADS=4
-vpkg_require xm_pytorch/SCI_2.0_t4
+vpkg_require xm_pytorch/20210806-LESTI_2.0_DAIN
 cd S0_gaptv
 python3 -u run_gap_tv.py
 cd ..

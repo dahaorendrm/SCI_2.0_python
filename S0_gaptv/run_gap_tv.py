@@ -10,7 +10,7 @@ import multiprocessing,threading,queue
 import PIL
 import itertools as itert
 import time
-from .func import utils,recon_model,result,measurement
+from func import utils,recon_model,result,measurement
 from collections import namedtuple
 import datetime
 from pathlib import Path
@@ -131,7 +131,7 @@ def compressive_model(MODEL,input):
         input,
         MASK #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
         )
-        mea = measurement.Measurement(model = 'chasti_sst', dim = 3, inputs=data)
+        mea = measurement.Measurement(model = 'chasti_sst', dim = 3, inputs=data, configs={'MAXV':1})
         model = recon_model.ReModel('gap','tv_chambolle')
         model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
                 'ITERs': 30, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
@@ -426,24 +426,30 @@ def X2Cube(img,B=[4, 4],skip = [4, 4],bandNumber=16):
 def S1train_data_generation():
     global MASK
     MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
-    MASK = np.reshape(MASK,(256,512,32))
+    MASK = np.reshape(MASK,(256,512,64))
     COMP_FRAME = 32
     pool = multiprocessing.Pool(10)
     MODEL = 'chasti_sst'
     path = Path('../../data/whispers/train')
     datalist = os.listdir(path)
-    comp_input = []
-    crops = []
-    name_list = []
     for name in datalist:
+        comp_input = []
+        crops = []
+        name_list = []
         imglist = os.listdir(path/name/'HSI')
-        i = 0
+        i = 1 
         oneset = []
         imgidx = 0
-        while i < len(imglist):
+        print(f'Start process data {name}.')
+        img = skio.imread(path/name/'HSI'/'0001.png')
+        if img.shape[0]!=1024:
+           print(f'Shape: {img.shape}. Data {name} shape is not right. Skipped')
+           continue
+        while i < len(imglist): # There's one txt file in the folder
             img = skio.imread(path/name/'HSI'/f'{i:04d}.png')
-            img = X2Cube(img)
+            img = X2Cube(img/511.)
             oneset.append(img)
+            i += 1
             if len(oneset)==COMP_FRAME:
                 imgs = np.stack(oneset,2)
                 crops.append(imgs)
@@ -451,19 +457,21 @@ def S1train_data_generation():
                 oneset = []
                 name_list.append(str(imgidx))
                 imgidx += 1
-                print(f'Input data max is {np.amax(imgs)}.')
-    crops_mea = []
-    crops_img = []
-    crops_led = []
-    return_crops_data = pool.starmap(compressive_model, comp_input) # contain (mea, gaptv_result)
-    for (mea,re) in return_crops_data:
-        crops_mea.append(mea)
-        crops_img.append(re)
-    save_crops('data/trainS1',name_list,'whispers',crops_mea,crops_img, crops_gt=crops)
+        print(f'Input data max is {np.amax(imgs)}.')
+        print(f'{name} data finished. There are {len(crops)} sets of data now.')
+        crops_mea = []
+        crops_img = []
+        crops_led = []
+        pool = multiprocessing.Pool(10)
+        return_crops_data = pool.starmap(compressive_model, comp_input) # contain (mea, gaptv_result)
+        for (mea,re) in return_crops_data:
+            crops_mea.append(mea)
+            crops_img.append(re)
+        save_crops('data/trainS1',name_list,'whispers',crops_mea,crops_img, crops_gt=crops)
 
 if __name__ == '__main__':
     print(f'Start time:{datetime.datetime.now()}')
     #train_data_generation()
     #test_data_generation()
-    S3train_data_generation()
+    S1train_data_generation()
     print(f'End time:{datetime.datetime.now()}')
