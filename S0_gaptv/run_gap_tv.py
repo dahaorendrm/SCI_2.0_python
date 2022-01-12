@@ -432,7 +432,10 @@ def S1train_data_generation():
     MODEL = 'chasti_sst'
     path = Path('../../data/whispers/train')
     datalist = os.listdir(path)
+    finished = ['automobile10','automobile6','automobile', 'bus2', 'car1', 'car2','car6','car8','pedestrian3','pedestrian4','rider3','rider4','taxi', 'automobile11', 'automobile13','automobile14', 'automobile2', 'automobile5', 'automobile8']
     for name in datalist:
+        if name in finished:
+            continue
         comp_input = []
         crops = []
         name_list = []
@@ -447,8 +450,8 @@ def S1train_data_generation():
            continue
         while i < len(imglist): # There's one txt file in the folder
             img = skio.imread(path/name/'HSI'/f'{i:04d}.png')
-            img = X2Cube(img/511.)
-            oneset.append(img)
+            img = X2Cube(img)
+            oneset.append(img/511.)
             i += 1
             if len(oneset)==COMP_FRAME:
                 imgs = np.stack(oneset,2)
@@ -467,7 +470,7 @@ def S1train_data_generation():
         for (mea,re) in return_crops_data:
             crops_mea.append(mea)
             crops_img.append(re)
-        save_crops('data/trainS1',name_list,'whispers',crops_mea,crops_img, crops_gt=crops)
+        save_crops('data/trainS1_2',name_list,name,crops_mea,crops_img, crops_gt=crops)
 
 if __name__ == '__main__':
     print(f'Start time:{datetime.datetime.now()}')
