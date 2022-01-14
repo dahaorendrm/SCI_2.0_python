@@ -432,10 +432,10 @@ def S1train_data_generation():
     MODEL = 'chasti_sst'
     path = Path('../../data/whispers/train')
     datalist = os.listdir(path)
-    finished = ['automobile10','automobile6','automobile', 'bus2', 'car1', 'car2','car6','car8','pedestrian3','pedestrian4','rider3','rider4','taxi', 'automobile11', 'automobile13','automobile14', 'automobile2', 'automobile5', 'automobile8']
+    #finished = ['automobile10','automobile6','automobile', 'bus2', 'car1', 'car2','car6','car8','pedestrian3','pedestrian4','rider3','rider4','taxi', 'automobile11', 'automobile13','automobile14', 'automobile2', 'automobile5', 'automobile8']
     for name in datalist:
-        if name in finished:
-            continue
+        #if name in finished:
+        #    continue
         comp_input = []
         crops = []
         name_list = []
@@ -445,16 +445,26 @@ def S1train_data_generation():
         imgidx = 0
         print(f'Start process data {name}.')
         img = skio.imread(path/name/'HSI'/'0001.png')
-        if img.shape[0]!=1024:
-           print(f'Shape: {img.shape}. Data {name} shape is not right. Skipped')
-           continue
-        while i < len(imglist): # There's one txt file in the folder
+        #if img.shape[0]==1024:
+        #   print(f'skip data set{name}!')
+           # print(f'Shape: {img.shape}. Data {name} shape is not right. Skipped')
+        #   continue
+        while i < len(imglist): # There's one txt file in the folder       
             img = skio.imread(path/name/'HSI'/f'{i:04d}.png')
+            print(f'1.max:{np.amax(img)}')
             img = X2Cube(img)
-            oneset.append(img/511.)
+            print(f'2.max:{np.amax(img)} sum {np.sum(img)}')
+            if img.shape[0]!=256:
+                img = skitrans.resize(img/511., (256,512))
+                oneset.append(img)
+            else:
+                oneset.append(img/511.)
+            print(f'3.max:{np.amax(img)} sum {np.sum(img)}')
+            #oneset.append(img/511.)
             i += 1
             if len(oneset)==COMP_FRAME:
-                imgs = np.stack(oneset,2)
+                imgs = np.stack(oneset,3)
+                print(f'4.max:{np.amax(imgs)}')
                 crops.append(imgs)
                 comp_input.append((MODEL,imgs))
                 oneset = []
@@ -465,13 +475,13 @@ def S1train_data_generation():
         crops_mea = []
         crops_img = []
         crops_led = []
-        pool = multiprocessing.Pool(10)
+        #pool = multiprocessing.Pool(10)
         return_crops_data = pool.starmap(compressive_model, comp_input) # contain (mea, gaptv_result)
         for (mea,re) in return_crops_data:
             crops_mea.append(mea)
             crops_img.append(re)
         save_crops('data/trainS1_2',name_list,name,crops_mea,crops_img, crops_gt=crops)
-
+        print(f'Finish saving for data {name}!')
 if __name__ == '__main__':
     print(f'Start time:{datetime.datetime.now()}')
     #train_data_generation()
