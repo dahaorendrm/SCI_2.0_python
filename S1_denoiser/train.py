@@ -11,8 +11,13 @@ import .loss
 
 #train_dataset = ImgDataset('../S0_gaptv/data/train/')
 #val_dataset = ImgDataset('../S0_gaptv/data/val/')
-dataset = ImgDataset('../S0_gaptv/data/train/')
-train_dataset,val_dataset = torch.utils.data.random_split(dataset, [2635, 650], generator=torch.Generator().manual_seed(8))
+dataset = ImgDataset('../S0_gaptv/data/trainS1_rgb/')
+train_dataset1,val_dataset1 = torch.utils.data.random_split(dataset, [2635, 650], generator=torch.Generator().manual_seed(8))
+dataset = ImgDataset('../S0_gaptv/data/trainS1_16b/', '../S0_gaptv/mask_256x512.mat', '16bands')
+train_dataset2,val_dataset2 = torch.utils.data.random_split(dataset, [2635, 650], generator=torch.Generator().manual_seed(8))
+
+train_dataset = torch.utils.data.ConcatDataset([train_dataset1, train_dataset2])
+val_dataset   = torch.utils.data.ConcatDataset([val_dataset1, val_dataset2])
 # set-up model
 hparams = {
 

@@ -6,9 +6,23 @@ import albumentations
 import tifffile
 import scipy.io as scio
 
-transformations = albumentations.Compose(
+transformations_rgb = albumentations.Compose(
     [
         #albumentations.RandomCrop(256,256),
+        albumentations.RandomRotate90(),
+        albumentations.HorizontalFlip(),
+        albumentations.VerticalFlip(),
+    ],
+    additional_targets={
+        'image1': 'image',
+        'image2': 'image',
+        'image3': 'image',
+        'image4': 'image'
+    }
+)
+transformations_16bands = albumentations.Compose(
+    [
+        albumentations.RandomSizedCrop([60,256],256,256),
         albumentations.RandomRotate90(),
         albumentations.HorizontalFlip(),
         albumentations.VerticalFlip(),
@@ -23,7 +37,7 @@ transformations = albumentations.Compose(
 
 class ImgDataset(torch.utils.data.Dataset):
 
-    def __init__(self, path, mask_path='../S0_gaptv/lesti_mask.mat', f_trans=True):
+    def __init__(self, path, mask_path='../S0_gaptv/lesti_mask.mat', f_trans='rgb'):
         super(ImgDataset, self).__init__()
         #self.data = []
         self.f_trans= f_trans
@@ -69,14 +83,23 @@ class ImgDataset(torch.utils.data.Dataset):
             gt = (gt - min_norm) / (max_norm - min_norm)
         else:
             gt = None
-        if self.f_trans:
-            transformed = transformations(image=mea,image1=img_n,
+        if self.f_trans=='rgb':
+            transformed = transformations_rgb(image=mea,image1=img_n,
                                 image2=mask,image3=gt,image4=oth_n)
             mea = transformed['image']
             img_n = transformed['image1']
             mask = transformed['image2']
             oth_n = transformed['image4']
             gt = transformed['image3']
+        if self.f_trans=='16bands':
+            transformed = transformations_16bands(image=mea,image1=img_n,
+                                image2=mask,image3=gt,image4=oth_n)
+            mea = transformed['image']
+            img_n = transformed['image1']
+            mask = transformed['image2']
+            oth_n = transformed['image4']
+            gt = transformed['image3']
+
         if gt is not None:
             sample = {'id':file_name.split('.')[0], 'mea':mea,
                 'img_n':img_n, 'mask':mask,'oth_n':oth_n,
