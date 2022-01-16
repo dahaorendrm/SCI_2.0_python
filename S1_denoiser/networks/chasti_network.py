@@ -5,8 +5,8 @@ from pathlib import Path
 import pytorch_lightning as pl
 import segmentation_models_pytorch as smp
 from . import Resblock
-from ..loss import *
-from ..utils import *
+from .loss import *
+from utils import *
 
 class CHASTINET(pl.LightningModule):
     def __init__(self, hparams):

@@ -9,8 +9,8 @@
 # SBATCH --mem-per-cpu=10G
 
 #SBATCH --job-name=chasti_S1_train
-#SBATCH --partition=_workgroup_
-#SBATCH --gres=gpu:v100:1
+#SBATCH --partition=gpu-t4
+#SBATCH --gpus=1
 # SBATCH --gres=gpu:t4:1  
 #SBATCH --time=1-10:00:00
 # SBATCH --output=ArraySCI%A-%a.out
@@ -19,7 +19,7 @@
 # SBATCH --array=4-10
 
 # export OMP_NUM_THREADS=4
-vpkg_require xm_pytorch/SCI_2.0_t4
+vpkg_require xm_pytorch/20210806-LESTI_2.0_DAIN
 cd S1_denoiser
 python3 -u train.py
 cd ..
