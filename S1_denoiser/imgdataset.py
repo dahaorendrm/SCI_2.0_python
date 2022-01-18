@@ -22,7 +22,7 @@ transformations_rgb = albumentations.Compose(
 )
 transformations_16bands = albumentations.Compose(
     [
-        albumentations.RandomSizedCrop([60,256],256,256),
+        albumentations.RandomCrop(256,256),
         albumentations.RandomRotate90(),
         albumentations.HorizontalFlip(),
         albumentations.VerticalFlip(),
@@ -102,8 +102,8 @@ class ImgDataset(torch.utils.data.Dataset):
 
         if gt is not None:
             sample = {'id':file_name.split('.')[0], 'mea':mea,
-                'img_n':img_n, 'mask':mask,'oth_n':oth_n,
-                    'label':gt}
+                'img_n':img_n, 'mask':mask,'oth_n':oth_n,'label':gt}
+            #print(f'size of mea:{mea.shape}, size of img_n {img_n.shape}, size of mask {mask.shape}, size of oth_n {oth_n.shape}, size of label {gt.shape}')
             return sample
         sample = {'id':file_name.split('.')[0], 'mea':mea,
             'img_n':img_n, 'mask':mask, 'oth_n':oth_n}
