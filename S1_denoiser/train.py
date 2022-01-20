@@ -37,7 +37,7 @@ hparams = {
     "output_path": "model-outputs",
     "log_path": "tensorboard_logs",
     "gpu": torch.cuda.is_available(),
-    "input_layers":4,
+    "input_layers":3,
     "hidden_layers":32,
     "num_blocks":4
 }

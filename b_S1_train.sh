@@ -5,7 +5,7 @@
 
 #SBATCH --cpus-per-task=2
 
-#SBATCH --mem=40G
+#SBATCH --mem=70G
 # SBATCH --mem-per-cpu=10G
 
 #SBATCH --job-name=chasti_S1_train

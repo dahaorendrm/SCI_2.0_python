@@ -78,7 +78,7 @@ class CHASTINET(pl.LightningModule):
             if self.gpu:
                 img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
             # print(f'shape of input is {torch.stack((mea,img_n,mask),1).size()}')
-            pred = self.model(torch.stack((mea,img_n,mask,oth_n),1))
+            pred = self.model(torch.stack((mea,img_n,oth_n),1))
             preds.append(torch.squeeze(pred,1))
         preds = torch.stack(preds,3)
         criterion = XEDiceLoss()
@@ -110,7 +110,7 @@ class CHASTINET(pl.LightningModule):
             oth_n = batch['oth_n'][...,i].float()
             if self.gpu:
                 img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
-            pred = self.model(torch.stack((mea,img_n,mask,oth_n),1))
+            pred = self.model(torch.stack((mea,img_n,oth_n),1))
             preds.append(torch.squeeze(pred,1))
         preds = torch.stack(preds,3)
         # saveintemp(preds.cpu().numpy(),batch['id'][0])
