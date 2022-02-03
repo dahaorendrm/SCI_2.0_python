@@ -432,7 +432,7 @@ def S1train_data_generation():
     MODEL = 'chasti_sst'
     path = Path('../../data/whispers/test')
     datalist = os.listdir(path)
-    finished = ['coke','hand','trucker']
+    finished = [] 
     for name in datalist:
         if name in finished:
             continue

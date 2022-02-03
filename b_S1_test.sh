@@ -5,14 +5,14 @@
 
 #SBATCH --cpus-per-task=2
 
-#SBATCH --mem=40G
+#SBATCH --mem=60G
 # SBATCH --mem-per-cpu=10G
 
 #SBATCH --job-name=chasti_S1_test
 # SBATCH --partition=_workgroup_
 # SBATCH --partition=standard
-#SBATCH --partition=devel
-#SBATCH --gres=gpu
+#SBATCH --partition=gpu-t4
+#SBATCH --gpus=1
 
 #SBATCH --time=0-1:00:00
 # SBATCH --output=ArraySCI%A-%a.out
@@ -21,9 +21,9 @@
 # SBATCH --array=4-10
 
 # export OMP_NUM_THREADS=4
-vpkg_require xm_pytorch/SCI_2.0_t4
+vpkg_require xm_pytorch/20210806-LESTI_2.0_DAIN
 cd S1_denoiser
 python3 -u test.py
 cd ..
-mkdir -p S2_flow_predict/data/test
-cp -r S1_denoiser/result/*.npz S2_flow_predict/data/test
+#mkdir -p S2_flow_predict/data/test
+#cp -r S1_denoiser/result/*.npz S2_flow_predict/data/test
