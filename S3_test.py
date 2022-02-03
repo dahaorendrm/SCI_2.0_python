@@ -1,17 +1,16 @@
 # import
 from pathlib import Path
 import numpy as np
-from . import utils
 import torch
 import os
-
-from .ImgDataset import ImgDataset,TestDataset
-from .networks.SpecConvModel import SpecConvModel
-from . import loss
 import pytorch_lightning as pl
+
+from S3_spectra_convert.ImgDataset import ImgDataset,TestDataset
+from S3_spectra_convert.networks.SpecConvModel import SpecConvModel
+from S3_spectra_convert import loss,utils
 # process data
 
-def test(datapath='../S2_flow_predict/result/re',refpath='../S0_gaptv/data/test/gt',savepath='result/re'):
+def test(datapath='./S2_flow_predict/result/re',refpath='./S0_gaptv/data/test/gt',savepath='S1_denoiser/result/re'):
     # test_dataset = TestDataset('./data/test/feature','./data/test/label')
     test_dataset = ImgDataset(datapath, refpath, f_trans = False)
     # set-up model
@@ -44,4 +43,4 @@ def test(datapath='../S2_flow_predict/result/re',refpath='../S0_gaptv/data/test/
     model.test()
 
 if __name__=='__main__':
-    test('../S2_flow_predict/result/re_withS1','../S0_gaptv/data/test/gt')
+    test('./S2_flow_predict/result/re_withS1','./S0_gaptv/data/test/gt')

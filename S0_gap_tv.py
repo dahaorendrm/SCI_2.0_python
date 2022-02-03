@@ -10,7 +10,7 @@ import multiprocessing,threading,queue
 import PIL
 import itertools as itert
 import time
-from func import utils,recon_model,result,measurement
+from S0_gaptv.func import utils,recon_model,result,measurement
 from collections import namedtuple
 import datetime
 from pathlib import Path
@@ -432,7 +432,7 @@ def S1train_data_generation():
     MODEL = 'chasti_sst'
     path = Path('../../data/whispers/test')
     datalist = os.listdir(path)
-    finished = [] 
+    finished = []
     for name in datalist:
         if name in finished:
             continue
@@ -440,7 +440,7 @@ def S1train_data_generation():
         crops = []
         name_list = []
         imglist = os.listdir(path/name/'HSI')
-        i = 1 
+        i = 1
         oneset = []
         imgidx = 0
         print(f'Start process data {name}.')
@@ -449,7 +449,7 @@ def S1train_data_generation():
         #   print(f'skip data set{name}!')
            # print(f'Shape: {img.shape}. Data {name} shape is not right. Skipped')
         #   continue
-        while i < len(imglist): # There's one txt file in the folder       
+        while i < len(imglist): # There's one txt file in the folder
             img = skio.imread(path/name/'HSI'/f'{i:04d}.png')
             #print(f'1.max:{np.amax(img)}')
             img = X2Cube(img)

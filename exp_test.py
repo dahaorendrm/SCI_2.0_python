@@ -8,10 +8,10 @@ from pathlib import Path
 import tifffile
 import multiprocessing
 
-from S0_gaptv import run_gap_tv as S0run
-from S1_denoiser import test as S1run
-from S2_flow_predict import test as S2run
-from S3_spectra_convert import test as S3run
+import S0_gap_tv as S0run
+import S1_test as S1run
+import S2_test as S2run
+import S3_test as S3run
 # S0
 def S0run_test():
     pool = multiprocessing.Pool()

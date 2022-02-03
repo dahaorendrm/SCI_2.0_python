@@ -5,8 +5,8 @@ import numpy as np
 import torch
 import os
 
-from imgdataset import ImgDataset
-from networks.chasti_network import CHASTINET
+from S1_denoiser.imgdataset import ImgDataset
+from S1_denoiser.networks.chasti_network import CHASTINET
 # process data
 
 def test(path,savepath='result',mask_path='../S0_gaptv/lesti_mask.mat'):

@@ -1,5 +1,6 @@
-from .motion import Motion
-from . import utils
+from S2_flow_predict.motion import Motion
+from S2_flow_predict import utils
+
 import pickle
 import numpy as np
 import os
@@ -24,7 +25,7 @@ def process(data,ref=None):
     re_ledimg_4d,v_psnr,v_ssim = flow.get_motions(data, ref)
     return re_ledimg_4d
 
-def test(datapath='../S1_denoiser/result',path='../S0_gaptv/data/test',savepath='/result'):
+def test(datapath='./S1_denoiser/result',path='./S0_gaptv/data/test',savepath='./S2_flow_predict/result'):
     savepath = Path(savepath)
     path = Path(path)
     # dataPath = Path(path/'img_n')
@@ -81,4 +82,4 @@ def test(datapath='../S1_denoiser/result',path='../S0_gaptv/data/test',savepath=
 
 
 if __name__ == '__main__':
-    test('../S1_denoiser/result')
+    test('./S1_denoiser/result')

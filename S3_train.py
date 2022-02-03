@@ -1,17 +1,17 @@
 # import
 from pathlib import Path
 import numpy as np
-import utils
 import torch
 import os
 
-from .ImgDataset import ImgDataset
-from .networks.SpecConvModel import SpecConvModel
-import .loss
+from S3_spectra_convert.ImgDataset import ImgDataset
+from S3_spectra_convert.networks.SpecConvModel import SpecConvModel
+import S3_spectra_convert.loss
+from S3_spectra_convert import utils
 # process data
 
 #dataset = ImgDataset('./data/train/feature', './data/train/label')
-dataset = ImgDataset('../S0_gaptv/data/trainS3/img_n', '../S0_gaptv/data/trainS3/gt')
+dataset = ImgDataset('./S0_gaptv/data/trainS3/img_n', './S0_gaptv/data/trainS3/gt')
 train_dataset,val_dataset = torch.utils.data.random_split(dataset, [370, 90], generator=torch.Generator().manual_seed(8))
 
 # set-up model
@@ -30,8 +30,8 @@ hparams = {
     "num_workers": 4,
     "val_sanity_checks": 0,
     "fast_dev_run": False,
-    "output_path": "model-outputs",
-    "log_path": "tensorboard_logs",
+    "output_path": "./S3_spectra_convert/model-outputs",
+    "log_path": "./S3_spectra_convert/tensorboard_logs",
     "gpu": torch.cuda.is_available(),
     "in_channels":8,
     "out_channels":25
@@ -44,8 +44,8 @@ model.fit()
 # results
 print(f'Best IOU score is : {model.trainer_params["callbacks"][0].best_model_score}')
 # save the weights to submitssion file
-if not os.path.exists('model-outputs'):
-    os.mkdir('model-outputs')
-weight_path = "model-outputs/model.pt"
+if not os.path.exists('./S3_spectra_convert/model-outputs'):
+    os.mkdir('./S3_spectra_convert/model-outputs')
+weight_path = "./S3_spectra_convert/model-outputs/model.pt"
 model = SpecConvModel(hparams=hparams).load_from_checkpoint(model.trainer_params["callbacks"][0].best_model_path)
 torch.save(model.state_dict(), weight_path)
