@@ -78,7 +78,7 @@ class CHASTINET(pl.LightningModule):
             if self.gpu:
                 img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
             # print(f'shape of input is {torch.stack((mea,img_n,mask),1).size()}')
-            pred = self.model(torch.stack((mea,img_n,mask,oth_n),1))
+            pred = self.model(torch.stack((mea,mask,img_n,oth_n),1))
             preds.append(torch.squeeze(pred,1))
         preds = torch.stack(preds,3)
         criterion = XEDiceLoss()
@@ -110,7 +110,7 @@ class CHASTINET(pl.LightningModule):
             oth_n = batch['oth_n'][...,i].float()
             if self.gpu:
                 img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
-            pred = self.model(torch.stack((mea,img_n,mask,oth_n),1))
+            pred = self.model(torch.stack((mea,mask,img_n,oth_n),1))
             preds.append(torch.squeeze(pred,1))
         preds = torch.stack(preds,3)
         # saveintemp(preds.cpu().numpy(),batch['id'][0])
@@ -169,13 +169,13 @@ class CHASTINET(pl.LightningModule):
             oth_n = batch['oth_n'][...,i].float()
             if self.gpu:
                 img_n, mask = img_n.cuda(non_blocking=True), mask.cuda(non_blocking=True)
-            pred = self.model(torch.stack((mea,img_n,mask,oth_n),1))
+            pred = self.model(torch.stack((mea,mask,img_n,oth_n),1))
             preds.append(torch.squeeze(pred,1))
         preds = torch.stack(preds,3)
         saveintemp(preds.cpu().numpy(),batch['id'][0])
         saveintemp(batch['img_n'].cpu().numpy(),'img_n_'+batch['id'][0])
         preds = preds.cpu().numpy()
-        preds = np.squeeze(np.moveaxis(preds,0,-1))
+        preds = np.squeeze(np.moveaxis(preds,0,-1)) # *0.71
         tifffile.imwrite(self.resultpath/f"{batch['id'][0]}.tiff",preds)
         psnr_val = None
         if y is not None:
@@ -193,8 +193,8 @@ class CHASTINET(pl.LightningModule):
             psnr_p,ssim_p = outputevalarray(preds,ref_y)
             np.savetxt(self.resultpath/'eval'/(save_name+f'_psnr_{np.mean(psnr_re):.4f}.txt'), psnr_p, fmt='%.4f')
             np.savetxt(self.resultpath/'eval'/(save_name+f'_ssim_{np.mean(ssim_re):.6f}.txt'), ssim_p, fmt='%.6f')
-            np.savetxt(self.resultpath/'eval'/(save_name+f'_psnr_n_{np.mean(psnr_re):.4f}.txt'), psnr_n, fmt='%.4f')
-            np.savetxt(self.resultpath/'eval'/(save_name+f'_ssim_n_{np.mean(ssim_re):.6f}.txt'), ssim_n, fmt='%.6f')
+            np.savetxt(self.resultpath/'eval'/(save_name+f'_psnr_n_{np.mean(psnr_in):.4f}.txt'), psnr_n, fmt='%.4f')
+            np.savetxt(self.resultpath/'eval'/(save_name+f'_ssim_n_{np.mean(ssim_in):.6f}.txt'), ssim_n, fmt='%.6f')
             print(f"Name:{batch['id'][0]}, inputPSNR:{psnr_in:.4f}dB, outputPSNR:{psnr_re:.4f}dB, inputSSIM:{ssim_in:.6f}, outputSSIM:{ssim_re:.6f}.")
         # return (preds,psnr_val)
 
@@ -263,8 +263,24 @@ class CHASTINET(pl.LightningModule):
 
     def _prepare_model(self):
         resnet = Resblock.__dict__['MultipleBasicBlock_4'](self.input_layers,self.hidden_layers,self.num_blocks)
-        #torch.nn.init.xavier_uniform_(resnet.weight.data)
+        ####torch.nn.init.xavier_uniform_(resnet.weight.data)
         return resnet
+        #cnn_denoise = torch.nn.Sequential(
+        #torch.nn.Conv2d(self.input_layers, self.input_layers, kernel_size=5, stride=1,
+        #             padding='same'),
+        #torch.nn.ReLU()
+        #)
+        #torch.nn.init.normal_(cnn_denoise[0].weight.data, mean=0.0, std=1.0)
+        #unet_model = smp.Unet(
+        #    encoder_name='resnet34',
+        #    encoder_weights='imagenet',
+        #    in_channels=self.input_layers,
+        #    classes=1,
+        #)
+        #s_stacked = torch.nn.Sequential(cnn_denoise, unet_model, torch.nn.Sigmoid())
+        #if self.gpu:
+        #    s_stacked.cuda()
+        #return s_stacked
 
     def _get_trainer_params(self):
         # Define callback behavior

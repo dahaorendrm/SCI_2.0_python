@@ -7,7 +7,7 @@ __all__ = ['MultipleBasicBlock','MultipleBasicBlock_4']
 def conv3x3(in_planes, out_planes, dilation = 1, stride=1):
     "3x3 convolution with padding"
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
-                     padding=int(dilation*(3-1)/2), dilation=dilation, bias=False)
+                     padding=int(dilation*(3-1)/2), dilation=dilation, bias=True)
 class BasicBlock(nn.Module):
     expansion = 1
 
@@ -44,7 +44,7 @@ class BasicBlock(nn.Module):
             residual = self.downsample(x)
 
         out += residual
-        out = self.relu(out)
+        #out = self.relu(out)
 
         return out
 class MultipleBasicBlock(nn.Module):

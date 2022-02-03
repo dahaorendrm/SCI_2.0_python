@@ -430,12 +430,12 @@ def S1train_data_generation():
     COMP_FRAME = 32
     pool = multiprocessing.Pool(10)
     MODEL = 'chasti_sst'
-    path = Path('../../data/whispers/train')
+    path = Path('../../data/whispers/test')
     datalist = os.listdir(path)
-    #finished = ['automobile10','automobile6','automobile', 'bus2', 'car1', 'car2','car6','car8','pedestrian3','pedestrian4','rider3','rider4','taxi', 'automobile11', 'automobile13','automobile14', 'automobile2', 'automobile5', 'automobile8']
+    finished = [] 
     for name in datalist:
-        #if name in finished:
-        #    continue
+        if name in finished:
+            continue
         comp_input = []
         crops = []
         name_list = []
@@ -451,20 +451,21 @@ def S1train_data_generation():
         #   continue
         while i < len(imglist): # There's one txt file in the folder       
             img = skio.imread(path/name/'HSI'/f'{i:04d}.png')
-            print(f'1.max:{np.amax(img)}')
+            #print(f'1.max:{np.amax(img)}')
             img = X2Cube(img)
-            print(f'2.max:{np.amax(img)} sum {np.sum(img)}')
+            #print(f'2.max:{np.amax(img)} sum {np.sum(img)}')
             if img.shape[0]!=256:
                 img = skitrans.resize(img/511., (256,512))
                 oneset.append(img)
             else:
                 oneset.append(img/511.)
-            print(f'3.max:{np.amax(img)} sum {np.sum(img)}')
+            #print(f'3.max:{np.amax(img)} sum {np.sum(img)}')
             #oneset.append(img/511.)
             i += 1
             if len(oneset)==COMP_FRAME:
                 imgs = np.stack(oneset,3)
-                print(f'4.max:{np.amax(imgs)}')
+                print(f'imgs.shape is {imgs.shape}.')
+                #print(f'4.max:{np.amax(imgs)}')
                 crops.append(imgs)
                 comp_input.append((MODEL,imgs))
                 oneset = []
