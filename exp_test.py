@@ -8,7 +8,7 @@ from pathlib import Path
 import tifffile
 import multiprocessing
 
-import S0_gap_tv as S0run
+import S0_run as S0run
 import S1_test as S1run
 import S2_test as S2run
 import S3_test as S3run
@@ -21,10 +21,13 @@ def S0run_test():
     numf = mask.shape[2]
     dataset = []
     datalist = os.listdir(PATH)
+    dataout = []
     for idx,name in enumerate(datalist):
-        if idx > 20: # small test sets
-            break
+        if not 'Lego0019' in name: # small test sets
+            print(name)
+            continue
         mea = scio.loadmat(PATH/name)['img']
+        dataout.append(name)
         dataset.append((MODEL,mea,mask,numf))
     #S0run.compressive_model_exp(MODEL,mea,mask,numf=16)
     return_crops_data = pool.starmap(S0run.compressive_model_exp, dataset)
@@ -33,15 +36,15 @@ def S0run_test():
         os.mkdir('S0_gaptv/data/exp/mea')
         os.mkdir('S0_gaptv/data/exp/img_n')
     for idx,(mea,re) in enumerate(return_crops_data):
-        tifffile.imwrite(Path('S0_gaptv/data/exp/mea')/(datalist[idx][:-4]+'.tiff'),mea)
-        tifffile.imwrite(Path('S0_gaptv/data/exp/img_n')/(datalist[idx][:-4]+'.tiff'),re)
+        tifffile.imwrite(Path('S0_gaptv/data/exp/mea')/(dataout[idx][:-4]+'.tiff'),mea)
+        tifffile.imwrite(Path('S0_gaptv/data/exp/img_n')/(dataout[idx][:-4]+'.tiff'),re)
 
 if __name__=='__main__':
     # S0
     #S0run_test()
     # S1
-    # S1run.test('S0_gaptv/data/exp','S1_denoiser/result/exp','expdata/mask.mat')
+    #S1run.test('S0_gaptv/data/exp','S1_denoiser/result/exp','expdata/mask.mat')
     # S2
-    #S2run.test('S0_gaptv/data/exp/img_n','S0_gaptv/data/exp/','S2_flow_predict/result/exp/')
+    #S2run.test('/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/result/exp','S0_gaptv/data/exp/','S2_flow_predict/result/exp_w_s1/')
     # S3
-    S3run.test('S2_flow_predict/result/exp/re','S0_gaptv/data/exp/', 'S3_spectra_convert/result')
+    S3run.test('S2_flow_predict/result/exp_wo_s1/re','S0_gaptv/data/exp/', 'S3_spectra_convert/result/exp_wos1')

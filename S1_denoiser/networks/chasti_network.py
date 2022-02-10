@@ -154,14 +154,15 @@ class CHASTINET(pl.LightningModule):
         save_name = batch['id'][0]
         self.model.eval()
         torch.set_grad_enabled(False)
-        if batch['label'] is not None:
+        if batch['label']:
             y = batch['label'].float()
             y = self.selectFrames(y)
         else:
-            y=None
+            y=False
         mea = batch['mea'].float()
         if self.gpu:
-            mea, y = mea.cuda(non_blocking=True), y.cuda(non_blocking=True)
+            mea = mea.cuda(non_blocking=True)
+            y = y.cuda(non_blocking=True) if y else False
         preds = []
         for i in range(batch['img_n'].shape[3]):
             img_n = batch['img_n'][...,i].float()
@@ -172,13 +173,13 @@ class CHASTINET(pl.LightningModule):
             pred = self.model(torch.stack((mea,mask,img_n,oth_n),1))
             preds.append(torch.squeeze(pred,1))
         preds = torch.stack(preds,3)
-        saveintemp(preds.cpu().numpy(),batch['id'][0])
-        saveintemp(batch['img_n'].cpu().numpy(),'img_n_'+batch['id'][0])
+        #saveintemp(preds.cpu().numpy(),batch['id'][0])
+        #saveintemp(batch['img_n'].cpu().numpy(),'img_n_'+batch['id'][0])
         preds = preds.cpu().numpy()
         preds = np.squeeze(np.moveaxis(preds,0,-1)) # *0.71
         tifffile.imwrite(self.resultpath/f"{batch['id'][0]}.tiff",preds)
         psnr_val = None
-        if y is not None:
+        if y:
             saveintemp(y.cpu().numpy(),'ref_'+batch['id'][0])
             ref_y = y.cpu().numpy()
             ref_y = np.squeeze(np.moveaxis(ref_y,0,-1))

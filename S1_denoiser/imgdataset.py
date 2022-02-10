@@ -106,7 +106,7 @@ class ImgDataset(torch.utils.data.Dataset):
             #print(f'size of mea:{mea.shape}, size of img_n {img_n.shape}, size of mask {mask.shape}, size of oth_n {oth_n.shape}, size of label {gt.shape}')
             return sample
         sample = {'id':file_name.split('.')[0], 'mea':mea,
-            'img_n':img_n, 'mask':mask, 'oth_n':oth_n}
+            'img_n':img_n, 'mask':mask, 'oth_n':oth_n, 'label':False}
         return sample
 
     def __len__(self):

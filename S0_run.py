@@ -25,8 +25,8 @@ def compressive_model_exp(MODEL,mea,mask,numf):
     mea = measurement.Measurement.import_exp_mea_modul(MODEL, mea, mask, configs={'NUMF':numf, 'SCALE_DATA':1, 'CUT_BAND':None})
     model = recon_model.ReModel('gap','tv_chambolle')
     model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
-            'ITERs': 80, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
-            'P_DENOISE':{'TV_WEIGHT': 0.4, 'TV_ITER': 7}})
+            'ITERs': 70, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
+            'P_DENOISE':{'TV_WEIGHT': 0.4, 'TV_ITER': 5}})
     re = result.Result(model, mea, modul = mea.modul)
     re = np.array(re)
     re[re<0] = 0

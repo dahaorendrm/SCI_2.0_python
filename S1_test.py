@@ -32,7 +32,7 @@ def test(path,savepath='result',mask_path='../S0_gaptv/lesti_mask.mat'):
     }
 
     model = CHASTINET(hparams=hparams)
-    model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/model-outputs/model_2.pt"))
+    model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/model-outputs/2022_with_bias_rgb+spectra_21.6/model_2.pt"))
     #trainer = Trainer()
     #trainer.test(model)
     model.test()
