@@ -302,7 +302,7 @@ class CHASTINET(pl.LightningModule):
         # Specify where TensorBoard logs will be saved
         self.log_path = Path.cwd() / self.hparams.get("log_path", "tensorboard-logs")
         self.log_path.mkdir(exist_ok=True)
-        logger = pl.loggers.TensorBoardLogger(self.log_path)
+        logger = pl.loggers.TensorBoardLogger(self.log_path, name="model-chasti")
 
         trainer_params = {
             "callbacks": [checkpoint_callback, early_stop_callback, lrmonitor_callback],

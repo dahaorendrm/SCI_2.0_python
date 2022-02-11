@@ -154,7 +154,7 @@ class SpecConvModel(pl.LightningModule):
         y = batch["label"].float() if batch["label"] else False
             #y = y[:,CUT_BAND[0]:-CUT_BAND[1],...]
         if self.gpu:
-            x = x.cuda(non_blocking=True) 
+            x = x.cuda(non_blocking=True)
             y = y.cuda(non_blocking=True) if y else False
 
         # Forward pass & softmax
@@ -310,7 +310,7 @@ class SpecConvModel(pl.LightningModule):
         # Specify where TensorBoard logs will be saved
         self.log_path = Path.cwd() / self.hparams.get("log_path", "tensorboard-logs")
         self.log_path.mkdir(exist_ok=True)
-        logger = pl.loggers.TensorBoardLogger(self.log_path, name="benchmark-model")
+        logger = pl.loggers.TensorBoardLogger(self.log_path, name="model-specconv")
 
         trainer_params = {
             "callbacks": [checkpoint_callback, early_stop_callback],

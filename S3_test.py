@@ -29,7 +29,7 @@ def test(datapath='./S2_flow_predict/result/re',refpath='./S0_gaptv/data/test/gt
         "num_workers": 16,
         "val_sanity_checks": 0,
         "fast_dev_run": False,
-        "output_path": "model-outputs",
+        "output_path": "./S3_spectra_convert/model-outputs",
         "log_path": "tensorboard_logs",
         "gpu": torch.cuda.is_available(),
         "in_channels":8,

@@ -38,7 +38,7 @@ hparams = {
     "val_sanity_checks": 0,
     "fast_dev_run": False,
     "output_path": "./S1_denoiser/model-outputs",
-    "log_path": "./S1_denoiser/tensorboard_logs",
+    "log_path": "./tensorboard_logs",
     "gpu": torch.cuda.is_available(),
     "input_layers":4,
     "hidden_layers":32,
