@@ -11,26 +11,54 @@ import tifffile
 from pathlib import Path
 from PIL import Image
 import itertools
+from colour_system import cs_srgb_diy as ColorS
 
-def saveintemp(data,name='test'):
+def saveintemp(data,name='test',rgb=False,specrange=(400,700)):
     if not os.path.exists('temp'):
         os.makedirs('temp')
     if data.ndim == 3:
-        for idx in range(data.shape[2]):
-            # print(idx)
-            im1 = data[:,:,idx]
-            im1 = np.round(im1 * 255.0)
-            im1 = Image.fromarray(im1)
-            im1 = im1.convert("L")
-            im1 = im1.save(f"temp/{name}_{idx}.jpg")
+        if not rgb:
+            for idx in range(data.shape[2]):
+                # print(idx)
+                im1 = data[:,:,idx]
+                im1 = np.round(im1 * 255.0)
+                im1 = Image.fromarray(im1)
+                im1 = im1.convert("L")
+                im1 = im1.save(f"temp/{name}_{idx}.jpg")
+        else:
+            img = np.zeros(*data.shape[0:2],3)
+            for idxi in range(data.shape[0]):
+                for idxj in range(data.shape[1]):
+                    img[idxi,idxj,:] = ColorS.spec_to_rgb(data[indi,indj,:],specrange)
+            img = np.round(img * 255.0)
+            img = Image.fromarray(img)
+            img = img.convert("RGB")
+            img = img.save(f"temp/{name}.jpg")
+
     elif data.ndim == 4:
-        for idx in itertools.product(list(range(data.shape[2])),list(range(data.shape[3]))):
-            # print(idx)
-            im1 = data[:,:,idx[0],idx[1]]
-            im1 = np.round(im1 * 255.0)
-            im1 = Image.fromarray(im1)
-            im1 = im1.convert("L")
-            im1 = im1.save(f"temp/{name}_{idx}.jpg")
+        if not rgb:
+            for idx in itertools.product(list(range(data.shape[2])),list(range(data.shape[3]))):
+                # print(idx)
+                im1 = data[:,:,idx[0],idx[1]]
+                im1 = np.round(im1 * 255.0)
+                im1 = Image.fromarray(im1)
+                im1 = im1.convert("L")
+                im1 = im1.save(f"temp/{name}_{idx}.jpg")
+        else:
+            data_rgb = np.zeros((*data.shape[0:2],3,data.shape[3]))
+            for idxf in range(data.shape[3]):
+                for idxi in range(data.shape[0]):
+                    for idxj in range(data.shape[1]):
+                        data_rgb[indx,indy,:,idxf] = ColorS.spec_to_rgb(data[indi,indj,:,idxf],specrange)
+            data = data_rgb
+            for idx in range(data.shape[3])):
+                # print(idx)
+                im1 = data[...,idx]
+                im1 = np.round(im1 * 255.0)
+                im1 = Image.fromarray(im1)
+                im1 = im1.convert("RGB")
+                im1 = im1.save(f"temp/{name}_{idx}.jpg")
+
 
 def loadTiffFile(path,name):
     p = Path(path)
