@@ -17,7 +17,7 @@ class ColourSystem:
     """
 
     # The CIE colour matching function for 380 - 780 nm in 5 nm intervals
-    cmf = np.loadtxt('data/cie-cmf.txt', usecols=(0,1,2,3))
+    cmf = np.loadtxt('./other/cie-cmf.txt', usecols=(0,1,2,3))
 
     def __init__(self, red, green, blue, white):
         """Initialise the ColourSystem object.
@@ -27,7 +27,7 @@ class ColourSystem:
         defining the colour system.
 
         """
-
+        self.cmf = ColourSystem.cmf
         # Chromaticities
         self.red, self.green, self.blue = red, green, blue
         self.white = white
@@ -56,9 +56,9 @@ class ColourSystem:
             # We're not in the RGB gamut: approximate by desaturating
             w = - np.min(rgb)
             rgb += w
-        if not np.all(rgb==0):
+        #if not np.all(rgb==0):
             # Normalize the rgb vector
-            rgb /= np.max(rgb)
+            #rgb /= np.max(rgb)
 
         if out_fmt == 'html':
             return self.rgb_to_hex(rgb)
@@ -78,9 +78,11 @@ class ColourSystem:
 
         """
         if self.cmf.shape[0] != spec.shape[0]:
-            irange = (np.where(self.cmf[:,0]==range[0])[0][0], np.where(self.cmf[:,0]==range[1])[0][0])
+            print('sth')
+            irange = (np.where(self.cmf[:,0]==range[0])[0][0], np.where(self.cmf[:,0]==range[1])[0][0]+1)
             self.cmf = self.cmf[slice(*irange),1:]
-            self.cmf = signal.resample(self.cmf,spec.shape[0])
+            if self.cmf.shape[0] != spec.shape[0]:
+                self.cmf = signal.resample(self.cmf,spec.shape[0])
         XYZ = np.mean(spec[:, np.newaxis] * self.cmf, axis=0)
         #den = np.sum(XYZ)
         #if den == 0.:
@@ -92,6 +94,7 @@ class ColourSystem:
         """Convert a spectrum to an rgb value."""
 
         xyz = self.spec_to_xyz(spec,spec_range)
+        #return xyz
         return self.xyz_to_rgb(xyz, out_fmt)
 
 illuminant_D65 = xyz_from_xy(0.3127, 0.3291)
