@@ -19,7 +19,7 @@ from pathlib import Path
 # MODEL='chasti_sst'
 
 
-
+MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
 
 def compressive_model_exp(MODEL,mea,mask,numf):
     mea = measurement.Measurement.import_exp_mea_modul(MODEL, mea, mask, configs={'NUMF':numf, 'SCALE_DATA':1, 'CUT_BAND':None})
@@ -37,11 +37,10 @@ def compressive_model_exp(MODEL,mea,mask,numf):
     return result__
 
 
-def compressive_model(MODEL,input):
+def compressive_model(MODEL,input,mask=None):
     '''
         <aodel> + gaptv
     '''
-    global MASK
     print(f'Current model is {MODEL}')
     if MODEL == 'cacti':
         mask = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/cacti_mask.mat')['mask']
@@ -51,8 +50,8 @@ def compressive_model(MODEL,input):
     if MODEL == 'cassi':
         mask = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/cassi_mask.mat')['mask']
         input = rgb2gray(input)
-        assert MASK.ndim is 2
-        mask = MASK[:,:,np.newaxis]
+        assert mask.ndim is 2
+        mask = mask[:,:,np.newaxis]
         temp = mask*input
         temp = utils.shifter(temp,0)
         return np.mean(temp,2)
@@ -61,7 +60,7 @@ def compressive_model(MODEL,input):
         BandsLed = BandsLed[4:-2,:]
         data = (
         input,
-        MASK, #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
+        mask, #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
         BandsLed
         )
         #print(f'test:shape of input is {input.shape}')
@@ -96,7 +95,7 @@ def compressive_model(MODEL,input):
         BandsLed = BandsLed[4:-2,:]
         data = (
         input,
-        MASK, #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
+        mask, #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
         BandsLed
         )
         #print(f'test:shape of input is {input.shape}')
@@ -120,8 +119,8 @@ def compressive_model(MODEL,input):
     if MODEL == 'cassi':
         mask = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/cassi_mask.mat')['mask']
         input = rgb2gray(input)
-        assert MASK.ndim is 2
-        mask = MASK[:,:,np.newaxis]
+        assert mask.ndim is 2
+        mask = mask[:,:,np.newaxis]
         temp = mask*input
         temp = utils.shifter(temp,0)
         return np.mean(temp,2)
@@ -129,7 +128,7 @@ def compressive_model(MODEL,input):
     if MODEL == 'chasti_sst':
         data = (
         input,
-        MASK #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
+        mask #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
         )
         mea = measurement.Measurement(model = 'chasti_sst', dim = 3, inputs=data, configs={'MAXV':1})
         model = recon_model.ReModel('gap','tv_chambolle')
@@ -270,7 +269,7 @@ def entry_process(path,COMP_FRAME):
         # li_crops_mirror_mea = pool.map(compressive_model, li_crops_mirror)
         # proc1 = multiprocessing.Process(target=procf1,args(li_crops,))
         print(f'Start multiprocessing with {len(li_crops)} datasets...')
-        comp_input = [(MODEL,crop) for crop in li_crops]
+        comp_input = [(MODEL,crop,MASK) for crop in li_crops]
         return_crops_data = pool.starmap(compressive_model, comp_input) # contain (mea, gaptv_result)
         crops_mea = []
         crops_img = []
@@ -302,7 +301,7 @@ def train_data_generation():
 
 def test_data_generation():
     global MASK
-    MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
+    mask = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
     pool = multiprocessing.Pool()
     MODEL = 'chasti_sst'
     COMP_FRAME = 9
@@ -316,7 +315,7 @@ def test_data_generation():
     crops = []
     for ind in range(0,27,COMP_FRAME):
         crops.append(imgs_down[:,:,:,ind:ind+COMP_FRAME])
-    comp_input = [(MODEL,crop) for crop in crops]
+    comp_input = [(MODEL,crop,mask) for crop in crops]
     return_crops_data = pool.starmap(compressive_model, comp_input) # contain (mea, gaptv_result)
     crops_mea = []
     crops_img = []
@@ -334,7 +333,7 @@ def test_data_generation():
     for ind in range(0,40-COMP_FRAME+1,COMP_FRAME-4):
         #print(f'Test: index of the data range is {ind} to {ind+COMP_FRAME}')
         crops.append(imgs[:,:,4:-2,ind:ind+COMP_FRAME])
-    comp_input = [(MODEL,crop) for crop in crops]
+    comp_input = [(MODEL,crop,mask) for crop in crops]
     return_crops_data = pool.starmap(compressive_model, comp_input) # contain (original led project, mea, gaptv_result)
     crops_mea = []
     crops_img = []
@@ -356,7 +355,7 @@ def test_data_generation():
     for ind in range(0,40-COMP_FRAME+1,COMP_FRAME-4):
         #print(f'Test: index of the data range is {ind} to {ind+COMP_FRAME}')
         crops.append(imgs[:,:,4:-2,ind:ind+COMP_FRAME])
-    comp_input = [(MODEL,crop) for crop in crops]
+    comp_input = [(MODEL,crop,mask) for crop in crops]
     return_crops_data = pool.starmap(compressive_model, comp_input) # contain (original led project, mea, gaptv_result)
     crops_mea = []
     crops_img = []
@@ -384,7 +383,7 @@ def S3train_data_generation():
         name_list.append(name[8:12])
         imgs = scio.loadmat(path/name)['cube']
         imgs = imgs[...,4:-2]
-        comp_input.append((MODEL,imgs))
+        comp_input.append((MODEL,imgs,MASK))
         crops.append(imgs)
     print(f'Input data max is {np.amax(imgs)}.')
     crops_mea = []
@@ -467,7 +466,7 @@ def S1train_data_generation():
                 print(f'imgs.shape is {imgs.shape}.')
                 #print(f'4.max:{np.amax(imgs)}')
                 crops.append(imgs)
-                comp_input.append((MODEL,imgs))
+                comp_input.append((MODEL,imgs,MASK))
                 oneset = []
                 name_list.append(str(imgidx))
                 imgidx += 1

@@ -14,9 +14,8 @@ import S2_test as S2run
 import S3_test as S3run
 # S0
 def S0run_lego():# total 40 frames
-    global MASK
     pool = multiprocessing.Pool()
-    MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
+    mask = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
     MODEL = 'lesti_sst'
     imgs = scio.loadmat('S0_gaptv/4D_Lego.mat')['img']
     imgs_reverse = np.flip(imgs,3)
@@ -28,7 +27,7 @@ def S0run_lego():# total 40 frames
         #print(f'Test: index of the data range is {ind} to {ind+COMP_FRAME}')
         COMP_FRAME = COMP_GROUPS * 8
         crops.append(imgs[:,:,4:-2,0:COMP_FRAME])
-    comp_input = [(MODEL,crop) for crop in crops]
+    comp_input = [(MODEL,crop,mask) for crop in crops]
     return_crops_data = pool.starmap(S0run.compressive_model, comp_input) # contain (original led project, mea, gaptv_result)
     if not os.path.exists('S0_gaptv/data/sim'):
         os.mkdir('S0_gaptv/data/sim')
@@ -57,7 +56,7 @@ def S0run_block(): # total 30 frames
         #print(f'Test: index of the data range is {ind} to {ind+COMP_FRAME}')
         COMP_FRAME = COMP_GROUPS * 8
         crops.append(imgs[:,:,4:-2,0:COMP_FRAME])
-    comp_input = [(MODEL,crop) for crop in crops]
+    comp_input = [(MODEL,crop,mask) for crop in crops]
     return_crops_data = pool.starmap(S0run.compressive_model, comp_input) # contain (original led project, mea, gaptv_result)
     if not os.path.exists('S0_gaptv/data/sim'):
         os.mkdir('S0_gaptv/data/sim')
