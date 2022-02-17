@@ -197,7 +197,7 @@ class SpecConvModel(pl.LightningModule):
             os.mkdir(self.resultpath)
             #os.mkdir(self.resultpath/'re')
         tifffile.imwrite(self.resultpath/f"{batch['id'][0]}",preds)
-        utils.saveintemp(preds,save_name)
+        utils.saveintemp(preds,save_name,True,(440,680))
         #utils.saveintemp(y,'orig'+save_name)
         #np.save(f'result/{batch["id"][0]}.npy',preds.cpu().numpy()) ####name needed
         # Log batch IOU
