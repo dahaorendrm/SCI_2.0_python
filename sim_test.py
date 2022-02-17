@@ -15,11 +15,12 @@ import S3_test as S3run
 # S0
 def S0run_lego():# total 40 frames
     global MASK
+    pool = multiprocessing.Pool()
     MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
     MODEL = 'lesti_sst'
-    imgs = scio.loadmat('4D_Lego.mat')['img']
-    imgs_reverse = np.transpose(imgs,3)
-    imgs = np.cat([imgs,imgs_reverse],3)
+    imgs = scio.loadmat('S0_gaptv/4D_Lego.mat')['img']
+    imgs_reverse = np.flip(imgs,3)
+    imgs = np.concatenate([imgs,imgs_reverse],3)
     print(f'Input LEGO data max is {np.amax(imgs)}.')
     #print(f'shape of imgs is {imgs.shape}')
     crops = []
@@ -43,11 +44,12 @@ def S0run_lego():# total 40 frames
 
 def S0run_block(): # total 30 frames
     global MASK
+    pool = multiprocessing.Pool()
     MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
     MODEL = 'lesti_sst'
-    imgs = scio.loadmat('blocks.mat')['img']
-    imgs_reverse = np.transpose(imgs,3)
-    imgs = np.cat([imgs,imgs_reverse],3)
+    imgs = scio.loadmat('S0_gaptv/blocks.mat')['img']
+    imgs_reverse = np.flip(imgs,3)
+    imgs = np.concatenate([imgs,imgs_reverse],3)
     print(f'Input LEGO data max is {np.amax(imgs)}.')
     #print(f'shape of imgs is {imgs.shape}')
     crops = []
