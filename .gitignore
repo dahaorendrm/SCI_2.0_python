@@ -4,6 +4,7 @@
 **/__pycache__
 temp
 **/temp
+**/checkpoints
 **/result
 **/_result
 **/model-outputs

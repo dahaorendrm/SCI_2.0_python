@@ -43,8 +43,10 @@ if __name__=='__main__':
     # S0
     #S0run_test()
     # S1
-    #S1run.test('S0_gaptv/data/exp','S1_denoiser/result/exp','expdata/mask.mat')
+    S1run.test('S0_gaptv/data/exp','S1_denoiser/result/exp','expdata/mask.mat')
     # S2
-    #S2run.test('/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/result/exp','S0_gaptv/data/exp/','S2_flow_predict/result/exp_w_s1/')
+    S2run.test('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/data/exp/img_n','S0_gaptv/data/exp/','S2_flow_predict/result/exp_wo_s1/')
+    S2run.test('/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/result/exp','S0_gaptv/data/exp/','S2_flow_predict/result/exp_w_s1/')
     # S3
+    S3run.test('S2_flow_predict/result/exp_w_s1/re','S0_gaptv/data/exp/', 'S3_spectra_convert/result/exp_ws1')
     S3run.test('S2_flow_predict/result/exp_wo_s1/re','S0_gaptv/data/exp/', 'S3_spectra_convert/result/exp_wos1')
