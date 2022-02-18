@@ -34,8 +34,9 @@ def S0run_lego():# total 40 frames
         os.mkdir('S0_gaptv/data/sim/mea')
         os.mkdir('S0_gaptv/data/sim/img_n')
         os.mkdir('S0_gaptv/data/sim/gt')
-        os.mkdir('S0_gaptv/data/sim/gt_leds')
+        os.mkdir('S0_gaptv/data/sim/gt_led')
     for idx,(re,mea,orig_leds) in enumerate(return_crops_data):
+        print(str(re.shape[2]))
         tifffile.imwrite(Path('S0_gaptv/data/sim/mea')/('4D_Lego_CF'+str(re.shape[2])+'.tiff'),mea)
         tifffile.imwrite(Path('S0_gaptv/data/sim/img_n')/('4D_Lego_CF'+str(re.shape[2])+'.tiff'),re)
         tifffile.imwrite(Path('S0_gaptv/data/sim/gt_led')/('4D_Lego_CF'+str(re.shape[2])+'.tiff'),orig_leds)
@@ -64,6 +65,7 @@ def S0run_block(): # total 30 frames
         os.mkdir('S0_gaptv/data/sim/gt')
         os.mkdir('S0_gaptv/data/sim/gt_led')
     for idx,(re,mea,orig_leds) in enumerate(return_crops_data):
+        print(str(re.shape[2]))
         tifffile.imwrite(Path('S0_gaptv/data/sim/mea')/('4D_Blocks_CF'+str(re.shape[2])+'.tiff'),mea)
         tifffile.imwrite(Path('S0_gaptv/data/sim/img_n')/('4D_Blocks_CF'+str(re.shape[2])+'.tiff'),re)
         tifffile.imwrite(Path('S0_gaptv/data/sim/gt_led')/('4D_Blocks_CF'+str(re.shape[2])+'.tiff'),orig_leds)
