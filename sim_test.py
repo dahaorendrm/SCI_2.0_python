@@ -35,16 +35,15 @@ def S0run_lego():# total 40 frames
         os.mkdir('S0_gaptv/data/sim/img_n')
         os.mkdir('S0_gaptv/data/sim/gt')
         os.mkdir('S0_gaptv/data/sim/gt_leds')
-    for idx,(mea,re,orig_leds) in enumerate(return_crops_data):
+    for idx,(re,mea,orig_leds) in enumerate(return_crops_data):
         tifffile.imwrite(Path('S0_gaptv/data/sim/mea')/('4D_Lego_CF'+str(re.shape[2])+'.tiff'),mea)
         tifffile.imwrite(Path('S0_gaptv/data/sim/img_n')/('4D_Lego_CF'+str(re.shape[2])+'.tiff'),re)
         tifffile.imwrite(Path('S0_gaptv/data/sim/gt_led')/('4D_Lego_CF'+str(re.shape[2])+'.tiff'),orig_leds)
         tifffile.imwrite(Path('S0_gaptv/data/sim/gt')/('4D_Lego_CF'+str(re.shape[2])+'.tiff'),crops[idx])
 
 def S0run_block(): # total 30 frames
-    global MASK
     pool = multiprocessing.Pool()
-    MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
+    mask = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
     MODEL = 'lesti_sst'
     imgs = scio.loadmat('S0_gaptv/blocks.mat')['img']
     imgs_reverse = np.flip(imgs,3)
@@ -63,8 +62,8 @@ def S0run_block(): # total 30 frames
         os.mkdir('S0_gaptv/data/sim/mea')
         os.mkdir('S0_gaptv/data/sim/img_n')
         os.mkdir('S0_gaptv/data/sim/gt')
-        os.mkdir('S0_gaptv/data/sim/gt_leds')
-    for idx,(mea,re,orig_leds) in enumerate(return_crops_data):
+        os.mkdir('S0_gaptv/data/sim/gt_led')
+    for idx,(re,mea,orig_leds) in enumerate(return_crops_data):
         tifffile.imwrite(Path('S0_gaptv/data/sim/mea')/('4D_Blocks_CF'+str(re.shape[2])+'.tiff'),mea)
         tifffile.imwrite(Path('S0_gaptv/data/sim/img_n')/('4D_Blocks_CF'+str(re.shape[2])+'.tiff'),re)
         tifffile.imwrite(Path('S0_gaptv/data/sim/gt_led')/('4D_Blocks_CF'+str(re.shape[2])+'.tiff'),orig_leds)

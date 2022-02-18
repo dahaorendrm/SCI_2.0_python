@@ -37,7 +37,7 @@ transformations_16bands = albumentations.Compose(
 
 class ImgDataset(torch.utils.data.Dataset):
 
-    def __init__(self, path, mask_path='../S0_gaptv/lesti_mask.mat', f_trans='rgb'):
+    def __init__(self, path, mask_path='./S0_gaptv/lesti_mask.mat', f_trans='rgb'):
         super(ImgDataset, self).__init__()
         #self.data = []
         self.f_trans= f_trans
