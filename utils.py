@@ -59,6 +59,37 @@ def saveintemp(data,name='test',rgb=False,specrange=(400,700)):
                 im1 = Image.fromarray(im1.astype('int8'),mode='RGB')
                 im1 = im1.save(f"temp/{name}_{idx}.jpg")
 
+def outputevalarray(data,ref):
+    v_psnr = []
+    v_ssim = []
+    if data.shape != ref.shape:
+        raise RuntimeError('data shape not match')
+    if data.ndim == 3:
+        for indr in range(data.shape[2]):
+            psnr_ = calculate_psnr(
+                       ref[:,:,indr],data[:,:,indr])
+            ssim_ = calculate_ssim(
+                       ref[:,:,indr],data[:,:,indr])
+            v_psnr.append(psnr_)
+            v_ssim.append(ssim_)
+        return np.array(v_psnr),np.array(v_ssim)
+    if data.ndim == 4:
+        for indr in range(data.shape[3]):
+            temp_psnr = []
+            temp_ssim = []
+            for indc in range(data.shape[2]):
+                psnr_ = calculate_psnr(
+                           ref[:,:,indc,indr],data[:,:,indc,indr])
+                ssim_ = calculate_ssim(
+                           ref[:,:,indc,indr],data[:,:,indc,indr])
+                temp_ssim.append(ssim_)
+                temp_psnr.append(psnr_)
+            v_psnr.append(temp_psnr)
+            v_ssim.append(temp_ssim)
+        return np.array(v_psnr),np.array(v_ssim)
+    else:
+        raise RuntimeError('Unknown size')
+
 
 def loadTiffFile(path,name):
     p = Path(path)

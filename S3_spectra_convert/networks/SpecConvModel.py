@@ -9,7 +9,7 @@ import numpy as np
 import tifffile
 import os
 from ..loss import *
-from .. import utils
+import utils
 import cv2
 
 class SpecConvModel(pl.LightningModule):

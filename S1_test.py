@@ -9,7 +9,7 @@ from S1_denoiser.imgdataset import ImgDataset
 from S1_denoiser.networks.chasti_network import CHASTINET
 # process data
 
-def test(path,savepath='result',mask_path='../S0_gaptv/lesti_mask.mat'):
+def test(path,savepath='result',mask_path='./S0_gaptv/lesti_mask.mat'):
     dataset = ImgDataset(path,mask_path,f_trans=False)
     # set-up model
     hparams = {

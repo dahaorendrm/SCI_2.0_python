@@ -35,8 +35,7 @@ def S0run_lego():# total 40 frames
         os.mkdir('S0_gaptv/data/sim/img_n')
         os.mkdir('S0_gaptv/data/sim/gt')
         os.mkdir('S0_gaptv/data/sim/gt_led')
-    for idx,(re,mea,orig_leds) in enumerate(return_crops_data):
-        print(str(re.shape[2]))
+    for idx,(orig_leds,mea,re) in enumerate(return_crops_data):
         tifffile.imwrite(Path('S0_gaptv/data/sim/mea')/('4D_Lego_CF'+str(re.shape[2])+'.tiff'),mea)
         tifffile.imwrite(Path('S0_gaptv/data/sim/img_n')/('4D_Lego_CF'+str(re.shape[2])+'.tiff'),re)
         tifffile.imwrite(Path('S0_gaptv/data/sim/gt_led')/('4D_Lego_CF'+str(re.shape[2])+'.tiff'),orig_leds)
@@ -64,8 +63,7 @@ def S0run_block(): # total 30 frames
         os.mkdir('S0_gaptv/data/sim/img_n')
         os.mkdir('S0_gaptv/data/sim/gt')
         os.mkdir('S0_gaptv/data/sim/gt_led')
-    for idx,(re,mea,orig_leds) in enumerate(return_crops_data):
-        print(str(re.shape[2]))
+    for idx,(orig_leds,mea,re) in enumerate(return_crops_data):
         tifffile.imwrite(Path('S0_gaptv/data/sim/mea')/('4D_Blocks_CF'+str(re.shape[2])+'.tiff'),mea)
         tifffile.imwrite(Path('S0_gaptv/data/sim/img_n')/('4D_Blocks_CF'+str(re.shape[2])+'.tiff'),re)
         tifffile.imwrite(Path('S0_gaptv/data/sim/gt_led')/('4D_Blocks_CF'+str(re.shape[2])+'.tiff'),orig_leds)
@@ -76,13 +74,22 @@ def S0run_block(): # total 30 frames
 if __name__=='__main__':
     # S0
     #S0run_test()
-    S0run_lego()
-    S0run_block()
+    #S0run_lego()
+    #S0run_block()
+    #Error()
     # S1
-    S1run.test('S0_gaptv/data/sim','S1_denoiser/result/sim')
+    if not os.path.exists('S1_denoiser/result/sim'):
+        os.mkdir('S1_denoiser/result/sim')
+    if not os.path.exists('S1_denoiser/result/sim/eval'):
+        os.mkdir('S1_denoiser/result/sim/eval')
+    #S1run.test('S0_gaptv/data/sim','S1_denoiser/result/sim')
     # S2
-    S2run.test('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/data/sim/img_n','S0_gaptv/data/sim/','S2_flow_predict/result/sim_wo_s1/')
-    S2run.test('/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/result/sim','S0_gaptv/data/sim/','S2_flow_predict/result/sim_w_s1/')
+    if not os.path.exists('S2_flow_predict/result/sim_wo_s1'):
+        os.mkdir('S2_flow_predict/result/sim_wo_s1')
+    #S2run.test('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/data/sim/img_n','S0_gaptv/data/sim/','S2_flow_predict/result/sim_wo_s1/')
+    if not os.path.exists('S2_flow_predict/result/sim_w_s1'):
+        os.mkdir('S2_flow_predict/result/sim_w_s1')
+    #S2run.test('/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/result/sim','S0_gaptv/data/sim/','S2_flow_predict/result/sim_w_s1/')
     # S3
     S3run.test('S2_flow_predict/result/sim_w_s1/re','S0_gaptv/data/sim/', 'S3_spectra_convert/result/sim_ws1')
     S3run.test('S2_flow_predict/result/sim_wo_s1/re','S0_gaptv/data/sim/', 'S3_spectra_convert/result/sim_wos1')

@@ -69,7 +69,7 @@ def test(datapath='./S1_denoiser/result',path='./S0_gaptv/data/test',savepath='.
             print(f'The avg ssim of gt is {np.mean(ssim_re)}')
         ## Save
         if not os.path.exists(savepath/'re') or not os.path.exists(savepath/'eval'):
-            os.mkdir(savepath)
+            #os.mkdir(savepath)
             os.mkdir(savepath/'re')
             os.mkdir(savepath/'eval')
         if gt_orig is not None:
