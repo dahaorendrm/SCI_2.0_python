@@ -21,6 +21,7 @@ class BasicBlock(nn.Module):
         self.bn2 = nn.BatchNorm2d(planes)
         self.downsample = downsample
         self.stride = stride
+        self.do = nn.Dropout2d(p=0.2)
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -32,6 +33,7 @@ class BasicBlock(nn.Module):
                 m.bias.data.zero_()
 
     def forward(self, x):
+        x = self.do(x)
         residual = x
 
         out = self.conv1(x)
@@ -41,6 +43,76 @@ class BasicBlock(nn.Module):
         out = self.conv2(out)
         out = self.bn2(out)
 
+        if self.downsample is not None:
+            residual = self.downsample(x)
+
+        out += residual
+        #out = self.relu(out)
+
+        return out
+
+class BeginBlock(nn.Module):
+    expansion = 1
+
+    def __init__(self, inplanes, planes, dilation = 1, stride=1, downsample=None):
+        super(BasicBlock, self).__init__()
+
+        self.conv = conv3x3(inplanes, planes,dilation, stride)
+        self.bn = nn.BatchNorm2d(planes)
+        self.relu = nn.LeakyReLU(inplace=True)
+        self.do = nn.Dropout2d(p=0.2)
+
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+                #m.weight.data.normal_(0, math.sqrt(2. / n))
+                torch.nn.init.xavier_uniform_(m.weight.data)
+            elif isinstance(m, nn.BatchNorm2d):
+                m.weight.data.fill_(1)
+                m.bias.data.zero_()
+
+    def forward(self, x):
+        x = self.do(x)
+        out = self.conv(x)
+        out = self.bn(out)
+        out = self.relu(out)
+
+
+        return out
+
+class EndBlock(nn.Module):
+    expansion = 1
+
+    def __init__(self, inplanes, planes, dilation = 1, stride=1, downsample=None):
+        super(BasicBlock, self).__init__()
+        self.conv1 = conv3x3(inplanes, planes,dilation, stride)
+        self.bn1 = nn.BatchNorm2d(planes)
+        self.relu = nn.LeakyReLU(inplace=True)
+        self.conv2 = conv3x3(planes, planes)
+        self.bn2 = nn.BatchNorm2d(planes)
+        self.downsample = downsample
+        self.stride = stride
+        self.endlayer = nn.Conv2d(intermediate_feature, 1 , (3, 3), 1, (1, 1)),nn.Sigmoid()
+
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+                #m.weight.data.normal_(0, math.sqrt(2. / n))
+                torch.nn.init.xavier_uniform_(m.weight.data)
+            elif isinstance(m, nn.BatchNorm2d):
+                m.weight.data.fill_(1)
+                m.bias.data.zero_()
+
+    def forward(self, x):
+        residual = x[:,:,:,1]
+
+        out = self.conv1(x)
+        out = self.bn1(out)
+        out = self.relu(out)
+
+        out = self.conv2(out)
+        out = self.bn2(out)
+        out = self.endlayer(out)
         if self.downsample is not None:
             residual = self.downsample(x)
 
@@ -59,20 +131,17 @@ class MultipleBasicBlock(nn.Module):
         self.num_block = num_blocks
         self.intermediate_feature = intermediate_feature
 
-        self.block1= nn.Sequential(*[
-            nn.Conv2d(input_feature, intermediate_feature,
-                      kernel_size=3, stride=1, padding=1, bias=True),
-            nn.LeakyReLU(inplace=True)
-        ])
 
         # for i in range(1, num_blocks):
+        self.beginblock = BeginBlock(input_feature, intermediate_feature, dilation = 1)
         self.block2 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=2 else None
         self.block3 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=3 else None
         self.block4 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=4 else None
         self.block5 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=5 else None
         #self.block6 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=6 else None
         #self.block7 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=7 else None
-        self.block8 = nn.Sequential(*[nn.Conv2d(intermediate_feature, 1 , (3, 3), 1, (1, 1)),nn.Sigmoid()])
+        #self.block8 = nn.Sequential(*[nn.Conv2d(intermediate_feature, 1 , (3, 3), 1, (1, 1)),nn.Sigmoid()])
+        self.endblock = EndBlock(intermediate_feature, intermediate_feature, dilation = 1)
         #self.BN2     = nn.BatchNorm2d(intermediate_feature)
         #self.BN3     = nn.BatchNorm2d(intermediate_feature)
         #self.BN4     = nn.BatchNorm2d(intermediate_feature)
@@ -101,7 +170,8 @@ class MultipleBasicBlock(nn.Module):
         #x = self.block6(x) if self.num_block>=6 else x
         #x = self.BN6(x)     if self.num_block>6  else x
         #x = self.block7(x) if self.num_block>=7 else x
-        x = self.block8(x)
+        #x = self.block8(x)
+        x = self.endblock(x)
         return x
 
 def MultipleBasicBlock_4(input_feature,intermediate_feature = 64, num_blocks=4):

@@ -23,35 +23,35 @@ def train(train_dataset1,val_dataset1,train_dataset2,val_dataset2):
         "lr": 1e-3,
         "min_epochs": 4,
         "max_epochs": 1000,
-        "patience": 6,
-        "batch_size": 8,
-        "num_workers": 2,
+        "patience": 4,
+        "batch_size": 12,
+        "num_workers": 4,
         "val_sanity_checks": 0,
         "fast_dev_run": False,
         "output_path": "./S1_denoiser/model-outputs",
         "log_path": "./tensorboard_logs",
         "gpu": torch.cuda.is_available(),
         "input_layers":6,
-        "hidden_layers":32,
+        "hidden_layers":16,
         "num_blocks":4
     }
 
     model = CHASTINET(hparams=hparams)
-    # run model
-    model.fit()
-    # results
-    print(f'Best IOU score is : {model.trainer_params["callbacks"][0].best_model_score}')
-    # save the weights to submitssion file
-    if not os.path.exists('./S1_denoiser/model-outputs'):
-        os.mkdir('./S1_denoiser/model-outputs')
-    weight_path = "./S1_denoiser/model-outputs/model_1.pt"
+    # # run model
+    # model.fit()
+    # # results
+    # print(f'Best IOU score is : {model.trainer_params["callbacks"][0].best_model_score}')
+    # # save the weights to submitssion file
+    # if not os.path.exists('./S1_denoiser/model-outputs'):
+    #     os.mkdir('./S1_denoiser/model-outputs')
+    # weight_path = "./S1_denoiser/model-outputs/model_1.pt"
 
     hparams["train_dataset"] = train_dataset2
     hparams["val_dataset"] = val_dataset2
-    hparams["lr"] = 1e-5
+    #hparams["lr"] = 1e-5
 
-    model = CHASTINET(hparams=hparams).load_from_checkpoint(model.trainer_params["callbacks"][0].best_model_path)
-    torch.save(model.state_dict(), weight_path)
+    # model = CHASTINET(hparams=hparams).load_from_checkpoint(model.trainer_params["callbacks"][0].best_model_path)
+    # torch.save(model.state_dict(), weight_path)
 
 
     model.fit()
@@ -75,15 +75,15 @@ def test(path,savepath='result',mask_path='./S0_gaptv/lesti_mask.mat', dataset=F
         "min_epochs": 4,
         "max_epochs": 1000,
         "patience": 10,
-        "batch_size": 4,
-        "num_workers": 2,
+        "batch_size": 8,
+        "num_workers": 4,
         "val_sanity_checks": 0,
         "fast_dev_run": False,
         "output_path": "./S1_denoiser/model-outputs",
         "log_path": "./tensorboard_logs",
         "gpu": torch.cuda.is_available(),
         "input_layers":6,
-        "hidden_layers":32,
+        "hidden_layers":16,
         "num_blocks":4,
         "result_path":savepath
     }
@@ -97,9 +97,9 @@ def test(path,savepath='result',mask_path='./S0_gaptv/lesti_mask.mat', dataset=F
 
 if __name__ == '__main__':
     dataset = ImgDataset('./S0_gaptv/data/trainS1_16b/', './S0_gaptv/mask_256x512.mat', '16bands')
-    train_dataset2,val_dataset2,test_dataset = torch.utils.data.random_split(dataset, [547, 100, 100], generator=torch.Generator().manual_seed(8))
-
+    train_dataset2,val_dataset2,test_dataset = torch.utils.data.random_split(dataset, [587, 100, 60], generator=torch.Generator().manual_seed(8))
+    train(None,None,train_dataset2,val_dataset2)
+    
     test_dataset.f_trans = False
     test('S0_gaptv/data/test/','S1_denoiser/result/test_sim_newmodel',dataset=test_dataset)
     test('S0_gaptv/data/test/','S1_denoiser/result/test_sim_newmodel')
-    
