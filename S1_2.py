@@ -89,19 +89,17 @@ def test(path,savepath='result',mask_path='./S0_gaptv/lesti_mask.mat', dataset=F
     }
 
     model = CHASTINET(hparams=hparams)
-    model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/model-outputs/2022_with_bias_rgb+spectra_21.6/model_2.pt"))
+    model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/model-outputs/2022new/model_2.pt"))
     #trainer = Trainer()
     #trainer.test(model)
     model.test()
 
 
 if __name__ == '__main__':
-    dataset = ImgDataset('./S0_gaptv/data/trainS1_rgb/')
-    train_dataset1,val_dataset1 = torch.utils.data.random_split(dataset, [2635, 650], generator=torch.Generator().manual_seed(8))
-
     dataset = ImgDataset('./S0_gaptv/data/trainS1_16b/', './S0_gaptv/mask_256x512.mat', '16bands')
-    train_dataset2,val_dataset2,test_dataset = torch.utils.data.random_split(dataset, [647, 60, 40], generator=torch.Generator().manual_seed(8))
+    train_dataset2,val_dataset2,test_dataset = torch.utils.data.random_split(dataset, [547, 100, 100], generator=torch.Generator().manual_seed(8))
 
-    train(train_dataset1,val_dataset1,train_dataset2,val_dataset2)
     test_dataset.f_trans = False
-    test('../S0_gaptv/data/test/',dataset=test_dataset)
+    test('S0_gaptv/data/test/','S1_denoiser/result/test_sim_newmodel',dataset=test_dataset)
+    test('S0_gaptv/data/test/','S1_denoiser/result/test_sim_newmodel')
+    
