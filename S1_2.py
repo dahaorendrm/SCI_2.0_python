@@ -24,7 +24,7 @@ def train(train_dataset1,val_dataset1,train_dataset2,val_dataset2):
         "min_epochs": 4,
         "max_epochs": 1000,
         "patience": 4,
-        "batch_size": 30,
+        "batch_size": 20,
         "num_workers": 4,
         "val_sanity_checks": 0,
         "fast_dev_run": False,

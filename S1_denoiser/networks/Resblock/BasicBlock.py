@@ -59,7 +59,7 @@ class BeginBlock(nn.Module):
 
         self.conv1 = nn.Conv2d(inplanes, planes,
                       kernel_size=9, stride=stride, padding=4, bias=True)
-        self.conv2 = nn.Conv2d(inplanes, planes/2,
+        self.conv2 = nn.Conv2d(planes, planes/2,
                       kernel_size=5, stride=stride, padding=2, bias=True)
         self.bn = nn.BatchNorm2d(planes/2)
         self.relu1 = nn.ReLU(inplace=True)
@@ -76,10 +76,10 @@ class BeginBlock(nn.Module):
                 m.bias.data.zero_()
 
     def forward(self, x):
-        x = self.do(x)
-        out = self.conv1(x)
+        out = self.do(x)
+        out = self.conv1(out)
         out = self.relu1(out)
-        out = self.conv2(x)
+        out = self.conv2(out)
         out = self.bn(out)
         out = self.relu2(out)
         return out
