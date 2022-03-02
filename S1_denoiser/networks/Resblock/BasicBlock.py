@@ -55,9 +55,10 @@ class BeginBlock(nn.Module):
     expansion = 1
 
     def __init__(self, inplanes, planes, dilation = 1, stride=1, downsample=None):
-        super(BasicBlock, self).__init__()
+        super(BeginBlock, self).__init__()
 
-        self.conv = conv3x3(inplanes, planes,dilation, stride)
+        self.conv = nn.Conv2d(inplanes, planes,
+                      kernel_size=9, stride=stride, padding=4, bias=True)
         self.bn = nn.BatchNorm2d(planes)
         self.relu = nn.LeakyReLU(inplace=True)
         self.do = nn.Dropout2d(p=0.2)
@@ -84,7 +85,7 @@ class EndBlock(nn.Module):
     expansion = 1
 
     def __init__(self, inplanes, planes, dilation = 1, stride=1, downsample=None):
-        super(BasicBlock, self).__init__()
+        super(EndBlock, self).__init__()
         self.conv1 = conv3x3(inplanes, planes,dilation, stride)
         self.bn1 = nn.BatchNorm2d(planes)
         self.relu = nn.LeakyReLU(inplace=True)
@@ -92,7 +93,8 @@ class EndBlock(nn.Module):
         self.bn2 = nn.BatchNorm2d(planes)
         self.downsample = downsample
         self.stride = stride
-        self.endlayer = nn.Conv2d(intermediate_feature, 1 , (3, 3), 1, (1, 1)),nn.Sigmoid()
+        self.endlayer = nn.Conv2d(inplanes, out_channels=1 , kernel_size=5, strid=1, padding=2)
+        self.sigmoid = nn.Sigmoid()
 
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -104,7 +106,7 @@ class EndBlock(nn.Module):
                 m.bias.data.zero_()
 
     def forward(self, x):
-        residual = x[:,:,:,1]
+        residual = x[:,1,...]
 
         out = self.conv1(x)
         out = self.bn1(out)
@@ -113,6 +115,7 @@ class EndBlock(nn.Module):
         out = self.conv2(out)
         out = self.bn2(out)
         out = self.endlayer(out)
+        out = self.sigmoid(out)
         if self.downsample is not None:
             residual = self.downsample(x)
 
@@ -141,7 +144,7 @@ class MultipleBasicBlock(nn.Module):
         #self.block6 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=6 else None
         #self.block7 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=7 else None
         #self.block8 = nn.Sequential(*[nn.Conv2d(intermediate_feature, 1 , (3, 3), 1, (1, 1)),nn.Sigmoid()])
-        self.endblock = EndBlock(intermediate_feature, intermediate_feature, dilation = 1)
+        self.endlayer = nn.Sequential(*[nn.Conv2d(intermediate_feature, 1 , 5, 1, 2),nn.Sigmoid()])
         #self.BN2     = nn.BatchNorm2d(intermediate_feature)
         #self.BN3     = nn.BatchNorm2d(intermediate_feature)
         #self.BN4     = nn.BatchNorm2d(intermediate_feature)
@@ -158,7 +161,7 @@ class MultipleBasicBlock(nn.Module):
                 m.bias.data.zero_()
 
     def forward(self, x):
-        x = self.block1(x)
+        x = self.beginblock(x)
         x = self.block2(x) if self.num_block>=2 else x
         #x = self.BN2(x)     if self.num_block>2  else x
         x = self.block3(x) if self.num_block>=3 else x
@@ -171,7 +174,7 @@ class MultipleBasicBlock(nn.Module):
         #x = self.BN6(x)     if self.num_block>6  else x
         #x = self.block7(x) if self.num_block>=7 else x
         #x = self.block8(x)
-        x = self.endblock(x)
+        x = self.endlayer(x)
         return x
 
 def MultipleBasicBlock_4(input_feature,intermediate_feature = 64, num_blocks=4):

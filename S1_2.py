@@ -36,7 +36,7 @@ def train(train_dataset1,val_dataset1,train_dataset2,val_dataset2):
         "num_blocks":4
     }
 
-    model = CHASTINET(hparams=hparams)
+    # model = CHASTINET(hparams=hparams)
     # # run model
     # model.fit()
     # # results
@@ -49,7 +49,7 @@ def train(train_dataset1,val_dataset1,train_dataset2,val_dataset2):
     hparams["train_dataset"] = train_dataset2
     hparams["val_dataset"] = val_dataset2
     #hparams["lr"] = 1e-5
-
+    model = CHASTINET(hparams=hparams)
     # model = CHASTINET(hparams=hparams).load_from_checkpoint(model.trainer_params["callbacks"][0].best_model_path)
     # torch.save(model.state_dict(), weight_path)
 
