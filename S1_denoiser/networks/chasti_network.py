@@ -244,8 +244,8 @@ class CHASTINET(pl.LightningModule):
 
         # Define scheduler
         scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
-            optimizer, mode="max", factor=0.1, patience=self.patience,
-            threshold = 0.3,verbose = True
+            optimizer, mode="max", factor=0.5, patience=self.patience,
+            threshold = 0.01,verbose = True
         )
         scheduler = {
             "scheduler": scheduler,

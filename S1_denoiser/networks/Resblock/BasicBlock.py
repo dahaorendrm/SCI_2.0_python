@@ -16,7 +16,7 @@ class BasicBlock(nn.Module):
         super(BasicBlock, self).__init__()
         self.conv1 = conv3x3(inplanes, planes,dilation, stride)
         self.bn1 = nn.BatchNorm2d(planes)
-        self.relu = nn.LeakyReLU(inplace=True)
+        self.relu = nn.ReLU(inplace=True)
         self.conv2 = conv3x3(planes, planes)
         self.bn2 = nn.BatchNorm2d(planes)
         self.downsample = downsample
@@ -57,10 +57,13 @@ class BeginBlock(nn.Module):
     def __init__(self, inplanes, planes, dilation = 1, stride=1, downsample=None):
         super(BeginBlock, self).__init__()
 
-        self.conv = nn.Conv2d(inplanes, planes,
+        self.conv1 = nn.Conv2d(inplanes, planes,
                       kernel_size=9, stride=stride, padding=4, bias=True)
-        self.bn = nn.BatchNorm2d(planes)
-        self.relu = nn.LeakyReLU(inplace=True)
+        self.conv2 = nn.Conv2d(inplanes, planes/2,
+                      kernel_size=5, stride=stride, padding=2, bias=True)
+        self.bn = nn.BatchNorm2d(planes/2)
+        self.relu1 = nn.ReLU(inplace=True)
+        self.relu2 = nn.ReLU(inplace=True)
         self.do = nn.Dropout2d(p=0.2)
 
         for m in self.modules():
@@ -74,11 +77,11 @@ class BeginBlock(nn.Module):
 
     def forward(self, x):
         x = self.do(x)
-        out = self.conv(x)
+        out = self.conv1(x)
+        out = self.relu1(out)
+        out = self.conv2(x)
         out = self.bn(out)
-        out = self.relu(out)
-
-
+        out = self.relu2(out)
         return out
 
 class EndBlock(nn.Module):
@@ -88,7 +91,7 @@ class EndBlock(nn.Module):
         super(EndBlock, self).__init__()
         self.conv1 = conv3x3(inplanes, planes,dilation, stride)
         self.bn1 = nn.BatchNorm2d(planes)
-        self.relu = nn.LeakyReLU(inplace=True)
+        self.relu = nn.ReLU(inplace=True)
         self.conv2 = conv3x3(planes, planes)
         self.bn2 = nn.BatchNorm2d(planes)
         self.downsample = downsample
@@ -106,20 +109,11 @@ class EndBlock(nn.Module):
                 m.bias.data.zero_()
 
     def forward(self, x):
-        residual = x[:,1,...]
 
-        out = self.conv1(x)
-        out = self.bn1(out)
-        out = self.relu(out)
-
-        out = self.conv2(out)
-        out = self.bn2(out)
         out = self.endlayer(out)
         out = self.sigmoid(out)
-        if self.downsample is not None:
-            residual = self.downsample(x)
 
-        out += residual
+        #out += residual
         #out = self.relu(out)
 
         return out
@@ -136,7 +130,7 @@ class MultipleBasicBlock(nn.Module):
 
 
         # for i in range(1, num_blocks):
-        self.beginblock = BeginBlock(input_feature, intermediate_feature, dilation = 1)
+        self.beginblock = BeginBlock(input_feature, intermediate_feature*2, dilation = 1)
         self.block2 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=2 else None
         self.block3 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=3 else None
         self.block4 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=4 else None

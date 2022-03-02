@@ -24,16 +24,16 @@ def train(train_dataset1,val_dataset1,train_dataset2,val_dataset2):
         "min_epochs": 4,
         "max_epochs": 1000,
         "patience": 4,
-        "batch_size": 12,
+        "batch_size": 30,
         "num_workers": 4,
         "val_sanity_checks": 0,
         "fast_dev_run": False,
-        "output_path": "./S1_denoiser/model-outputs",
+        "output_path": "./S1_denoiser/model-outputs/2022_new",
         "log_path": "./tensorboard_logs",
         "gpu": torch.cuda.is_available(),
         "input_layers":6,
-        "hidden_layers":16,
-        "num_blocks":4
+        "hidden_layers":32,
+        "num_blocks":5
     }
 
     # model = CHASTINET(hparams=hparams)
@@ -58,9 +58,9 @@ def train(train_dataset1,val_dataset1,train_dataset2,val_dataset2):
     # results
     print(f'Best IOU score is : {model.trainer_params["callbacks"][0].best_model_score}')
     # save the weights to submitssion file
-    if not os.path.exists('./S1_denoiser/model-outputs'):
-       os.mkdir('./S1_denoiser/model-outputs')
-    weight_path = "./S1_denoiser/model-outputs/model_2.pt"
+    if not os.path.exists('./S1_denoiser/model-outputs/2022_new'):
+       os.mkdir('./S1_denoiser/model-outputs/2022_new')
+    weight_path = "./S1_denoiser/model-outputs/2022_new/model_2.pt"
     model = CHASTINET(hparams=hparams).load_from_checkpoint(model.trainer_params["callbacks"][0].best_model_path)
     torch.save(model.state_dict(), weight_path)
 
@@ -83,8 +83,8 @@ def test(path,savepath='result',mask_path='./S0_gaptv/lesti_mask.mat', dataset=F
         "log_path": "./tensorboard_logs",
         "gpu": torch.cuda.is_available(),
         "input_layers":6,
-        "hidden_layers":16,
-        "num_blocks":4,
+        "hidden_layers":32,
+        "num_blocks":5,
         "result_path":savepath
     }
 
@@ -98,8 +98,10 @@ def test(path,savepath='result',mask_path='./S0_gaptv/lesti_mask.mat', dataset=F
 if __name__ == '__main__':
     dataset = ImgDataset('./S0_gaptv/data/trainS1_16b/', './S0_gaptv/mask_256x512.mat', '16bands')
     train_dataset2,val_dataset2,test_dataset = torch.utils.data.random_split(dataset, [587, 100, 60], generator=torch.Generator().manual_seed(8))
-    #train(None,None,train_dataset2,val_dataset2)
-    
+    train(None,None,train_dataset2,val_dataset2)
+
     test_dataset.f_trans = False
-    test('S0_gaptv/data/test/','S1_denoiser/result/test_sim_newmodel',dataset=val_dataset2)
+    val_dataset2.f_trans = False
+    test('S0_gaptv/data/test/','S1_denoiser/result/test_sim_newmodel',dataset=val_dataset2[:50])
+    test('S0_gaptv/data/test/','S1_denoiser/result/test_sim_newmodel',dataset=test_dataset)
     test('S0_gaptv/data/test/','S1_denoiser/result/test_sim_newmodel')
