@@ -75,7 +75,7 @@ def test(path,savepath='result',mask_path='./S0_gaptv/lesti_mask.mat', dataset=F
         "min_epochs": 4,
         "max_epochs": 1000,
         "patience": 10,
-        "batch_size": 8,
+        "batch_size": 16,
         "num_workers": 4,
         "val_sanity_checks": 0,
         "fast_dev_run": False,
@@ -98,8 +98,8 @@ def test(path,savepath='result',mask_path='./S0_gaptv/lesti_mask.mat', dataset=F
 if __name__ == '__main__':
     dataset = ImgDataset('./S0_gaptv/data/trainS1_16b/', './S0_gaptv/mask_256x512.mat', '16bands')
     train_dataset2,val_dataset2,test_dataset = torch.utils.data.random_split(dataset, [587, 100, 60], generator=torch.Generator().manual_seed(8))
-    train(None,None,train_dataset2,val_dataset2)
+    #train(None,None,train_dataset2,val_dataset2)
     
     test_dataset.f_trans = False
-    test('S0_gaptv/data/test/','S1_denoiser/result/test_sim_newmodel',dataset=test_dataset)
+    test('S0_gaptv/data/test/','S1_denoiser/result/test_sim_newmodel',dataset=val_dataset2)
     test('S0_gaptv/data/test/','S1_denoiser/result/test_sim_newmodel')
