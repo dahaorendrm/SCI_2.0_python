@@ -24,7 +24,7 @@ def train(train_dataset1,val_dataset1,train_dataset2,val_dataset2):
         "min_epochs": 4,
         "max_epochs": 1000,
         "patience": 4,
-        "batch_size": 20,
+        "batch_size": 8,
         "num_workers": 4,
         "val_sanity_checks": 0,
         "fast_dev_run": False,
@@ -32,8 +32,8 @@ def train(train_dataset1,val_dataset1,train_dataset2,val_dataset2):
         "log_path": "./tensorboard_logs",
         "gpu": torch.cuda.is_available(),
         "input_layers":6,
-        "hidden_layers":32,
-        "num_blocks":5
+        "hidden_layers":16,
+        "num_blocks":4
     }
 
     # model = CHASTINET(hparams=hparams)
@@ -83,8 +83,8 @@ def test(path,savepath='result',mask_path='./S0_gaptv/lesti_mask.mat', dataset=F
         "log_path": "./tensorboard_logs",
         "gpu": torch.cuda.is_available(),
         "input_layers":6,
-        "hidden_layers":32,
-        "num_blocks":5,
+        "hidden_layers":16,
+        "num_blocks":4,
         "result_path":savepath
     }
 
