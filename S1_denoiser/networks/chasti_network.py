@@ -67,10 +67,13 @@ class CHASTINET(pl.LightningModule):
         self.model.train()
         torch.set_grad_enabled(True)
         y = batch['label'].float()
+        y = self.selectFrames(y)
         mea = batch['mea'].float()
         if self.gpu:
             mea, y = mea.cuda(non_blocking=True), y.cuda(non_blocking=True)
         preds = []
+        loss_li = []
+        criterion = XEDiceLoss()
         for i in range(batch['img_n'].shape[3]):
             img_pre = batch['img_n'][...,i-1].float() if i>0 else batch['img_n'][...,i].float()
             img_cur = batch['img_n'][...,i].float()
@@ -82,11 +85,12 @@ class CHASTINET(pl.LightningModule):
                 mask = mask.cuda(non_blocking=True)
             # print(f'shape of input is {torch.stack((mea,img_n,mask),1).size()}')
             pred = self.model(torch.stack((img_pre, img_cur, img_lat, mea,mask,oth_n),1))
-            preds.append(torch.squeeze(pred,1))
-        preds = torch.stack(preds,3)
-        criterion = XEDiceLoss()
+            loss_li.append(criterion(preds, y[...,i]))
+            #preds.append(torch.squeeze(pred,1))
+        #preds = torch.stack(preds,3)
+
         # print(f'shape of preds is {preds.size()}, shape of y is {y.size()}')
-        loss = criterion(preds, self.selectFrames(y))
+        loss = nn.mean(loss_li)
         self.log(
             "loss",
             loss,
