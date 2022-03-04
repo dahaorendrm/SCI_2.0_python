@@ -64,9 +64,9 @@ class MultipleBasicBlock(nn.Module):
         self.intermediate_feature = intermediate_feature
 
         self.cvlayer1 = nn.Sequential(*[nn.Conv2d(input_feature, intermediate_feature*2,
-                      kernel_size=9, stride=1, padding=4, bias=True),nn.ReLU()])
+                      kernel_size=9, stride=1, padding=4, bias=True),nn.ReLU(inplace=True)])
         self.cvlayer2 = nn.Sequential(*[nn.Conv2d(intermediate_feature*2, intermediate_feature,
-                      kernel_size=5, stride=1, padding=2, bias=True),nn.ReLU()])
+                      kernel_size=5, stride=1, padding=2, bias=True),nn.ReLU(inplace=True)])
         self.block1 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=1 else None
         self.block2 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=2 else None
         self.block3 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=3 else None
