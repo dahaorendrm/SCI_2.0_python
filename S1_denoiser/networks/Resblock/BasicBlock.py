@@ -76,18 +76,17 @@ class CascadeBlock(nn.Module):
                 m.bias.data.zero_()
 
     def forward(self, x):
-        x_copy = x[:,0,:]
         out = self.conv1(x)
         #out = self.bn1(out)
         out = self.ReLU1(out)
         out = self.conv2(out)
         out = self.ReLU2(out)
-        residual = self.conv3(out)
+        out = self.conv3(out)
 
         #out = self.bn2(out)
         #if self.downsample is not None:
         #    residual = self.downsample(x)
-        return x[:,0,:]+residual
+        return x[:,0:1,:]+out
 
 
 class MultipleCascadeBlock(nn.Module):
@@ -130,17 +129,17 @@ class MultipleCascadeBlock(nn.Module):
         step1 = self.BN1(step1)
         step1 = self.block1(step1)
 
-        step2 = torch.cat((step1,x[:,4,...]),1)
+        step2 = torch.cat((step1,x[:,4:5,...]),1)
         step2 = self.do2(step2)
         step2 = self.BN2(step2)
         step2 = self.block2(step2)
 
-        step3 = torch.cat((step2,x[:,3,...]),1)
+        step3 = torch.cat((step2,x[:,3:4,...]),1)
         step3 = self.do3(step3)
         step3 = self.BN3(step3)
         step3 = self.block3(step3)
 
-        step4 = torch.cat((step3,x[:,5,...]),1)
+        step4 = torch.cat((step3,x[:,5:6,...]),1)
         step4 = self.do4(step4)
         step4 = self.BN4(step4)
         step4 = self.block4(step4)
