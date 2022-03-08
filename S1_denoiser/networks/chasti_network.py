@@ -276,7 +276,7 @@ class CHASTINET(pl.LightningModule):
     ## Convenience Methods ##
 
     def _prepare_model(self):
-        resnet = Resblock.__dict__['MultipleCascadeBlock']()
+        resnet = Resblock.__dict__['MultipleCascadeBlock_func']()
         #resnet = Resblock.__dict__['MultipleBasicBlock_4'](self.input_layers,self.hidden_layers,self.num_blocks)
         ####torch.nn.init.xavier_uniform_(resnet.weight.data)
         return resnet

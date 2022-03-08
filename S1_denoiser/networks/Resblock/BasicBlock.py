@@ -3,8 +3,8 @@ import math
 import torch.utils.model_zoo as model_zoo
 import torch.nn.init as weight_init
 import torch
-__all__ = ['MultipleBasicBlock','MultipleBasicBlock_4','BasicBlock','MultipleCascadeBlock']
-def conv3x3(in_planes, out_planes, dilation = 1, stride=1):
+__all__ = ['MultipleBasicBlock','MultipleBasicBlock_4','BasicBlock','MultipleCascadeBlock','MultipleCascadeBlock_func']
+def conv3x3(in_planes, out_planes, dilation=1, stride=1):
     "3x3 convolution with padding"
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
                      padding=int(dilation*(3-1)/2), dilation=dilation, bias=True)
@@ -224,6 +224,10 @@ class MultipleBasicBlock(nn.Module):
         x = self.BNend(x)
         x = self.endlayer(x)
         return x
+
+def MultipleCascadeBlock_func(intermediate_feature = 64):
+    model = MultipleCascadeBlock(intermediate_feature)
+    return model
 
 def MultipleBasicBlock_4(input_feature,intermediate_feature = 64, num_blocks=4):
     model = MultipleBasicBlock(input_feature,
