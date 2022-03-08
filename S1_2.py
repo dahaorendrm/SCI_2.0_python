@@ -46,10 +46,11 @@ def train(train_dataset1,val_dataset1,train_dataset2,val_dataset2):
     #     os.mkdir('./S1_denoiser/model-outputs')
     # weight_path = "./S1_denoiser/model-outputs/model_1.pt"
 
-    hparams["train_dataset"] = train_dataset2
-    hparams["val_dataset"] = val_dataset2
+    #hparams["train_dataset"] = train_dataset2
+    #hparams["val_dataset"] = val_dataset2
     #hparams["lr"] = 1e-5
     model = CHASTINET(hparams=hparams)
+    model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/model-outputs/2022_new/model_2.pt"))
     # model = CHASTINET(hparams=hparams).load_from_checkpoint(model.trainer_params["callbacks"][0].best_model_path)
     # torch.save(model.state_dict(), weight_path)
 
@@ -60,7 +61,7 @@ def train(train_dataset1,val_dataset1,train_dataset2,val_dataset2):
     # save the weights to submitssion file
     if not os.path.exists('./S1_denoiser/model-outputs/2022_new'):
        os.mkdir('./S1_denoiser/model-outputs/2022_new')
-    weight_path = "./S1_denoiser/model-outputs/2022_new/model_2.pt"
+    weight_path = "./S1_denoiser/model-outputs/2022_new/model_1.pt"
     model = CHASTINET(hparams=hparams).load_from_checkpoint(model.trainer_params["callbacks"][0].best_model_path)
     torch.save(model.state_dict(), weight_path)
 
@@ -89,16 +90,18 @@ def test(path,savepath='result',mask_path='./S0_gaptv/lesti_mask.mat', dataset=F
     }
 
     model = CHASTINET(hparams=hparams)
-    model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/model-outputs/2022new/model_2.pt"))
+    model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/model-outputs/2022_new/model_1.pt"))
     #trainer = Trainer()
     #trainer.test(model)
     model.test()
 
 
 if __name__ == '__main__':
+    dataset = ImgDataset('./S0_gaptv/data/trainS1_rgb/')
+    train_dataset1,val_dataset1 = torch.utils.data.random_split(dataset, [2635, 650], generator=torch.Generator().manual_seed(8))
     dataset = ImgDataset('./S0_gaptv/data/trainS1_16b/', './S0_gaptv/mask_256x512.mat', '16bands')
     train_dataset2,val_dataset2,test_dataset = torch.utils.data.random_split(dataset, [587, 100, 60], generator=torch.Generator().manual_seed(8))
-    #train(None,None,train_dataset2,val_dataset2)
+    train(train_dataset1,val_dataset1,None,None)
 
     test_dataset.f_trans = False
     val_dataset2.f_trans = False

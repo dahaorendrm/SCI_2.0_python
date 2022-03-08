@@ -190,10 +190,10 @@ class CHASTINET(pl.LightningModule):
         #saveintemp(batch['img_n'].cpu().numpy(),'img_n_'+batch['id'][0])
         preds = preds.cpu().numpy()
         preds = np.squeeze(np.moveaxis(preds,0,-1)) # *0.71
-        tifffile.imwrite(self.resultpath/f"{batch['id'][0]}.tiff",preds)
+        #tifffile.imwrite(self.resultpath/f"{batch['id'][0]}.tiff",preds)
         psnr_val = None
         if not y is False:
-            saveintemp(y.cpu().numpy(),'ref_'+batch['id'][0])
+            #saveintemp(y.cpu().numpy(),'ref_'+batch['id'][0])
             ref_y = y.cpu().numpy()
             ref_y = np.squeeze(np.moveaxis(ref_y,0,-1))
             img_n = batch['img_n'].cpu().numpy()

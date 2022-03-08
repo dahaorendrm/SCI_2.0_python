@@ -13,18 +13,18 @@ from PIL import Image
 import itertools
 from colour_system import cs_srgb as ColorS
 
-def selectFrames(self, gt):
+def selectFrames( gt):
     '''
     create reference label from gt to only keep desired frames
     '''
-    new_size = gt.shape
-    new_size.pop(3)
+    new_size = list(gt.shape)
+    new_size.pop(2)
     new_gt = np.zeros(new_size)
     ch_idx = 0
-    for f_idx in range(gt.size()[4]):
-        new_gt[:,:,:,f_idx] = gt[:,:,:,ch_idx,f_idx]
+    for f_idx in range(gt.shape[3]):
+        new_gt[:,:,f_idx] = gt[:,:,ch_idx,f_idx]
         ch_idx+=1
-        if ch_idx==gt.size()[3]:
+        if ch_idx==gt.shape[2]:
             ch_idx = 0
     return new_gt
 
