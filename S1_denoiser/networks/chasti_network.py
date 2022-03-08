@@ -70,7 +70,7 @@ class CHASTINET(pl.LightningModule):
         y = self.selectFrames(y)
         mea = batch['mea'].float()
         if self.gpu:
-            mea, y = mea.cuda(non_blocking=True), y.cuda(non_blocking=True)
+            y = y.cuda(non_blocking=True)
         preds = []
         loss_li = []
         criterion = XEDiceLoss()
@@ -80,12 +80,10 @@ class CHASTINET(pl.LightningModule):
             img_lat = batch['img_n'][...,i+1].float() if i<batch['img_n'].shape[3]-1 else batch['img_n'][...,i].float()
             oth_n = batch['oth_n'][...,i].float()
             mask = batch['mask'][...,i].float()
+            input = torch.stack((img_cur, img_pre, img_lat, mea,mask,oth_n),1)
             if self.gpu:
-                img_pre, img_cur, img_lat = img_pre.cuda(non_blocking=True), img_cur.cuda(non_blocking=True), img_lat.cuda(non_blocking=True)
-                mask = mask.cuda(non_blocking=True)
-                oth_n = oth_n.cuda(non_blocking=True)
-            # print(f'shape of input is {torch.stack((mea,img_n,mask),1).size()}')
-            pred = self.model(torch.stack((img_cur, img_pre, img_lat, mea,mask,oth_n),1))
+                input= input.cuda(non_blocking=True)
+            pred = self.model(input)
             loss_li.append(criterion(pred, y[...,i].unsqueeze(1)))
             #preds.append(torch.squeeze(pred,1))
         #preds = torch.stack(preds,3)
@@ -110,7 +108,7 @@ class CHASTINET(pl.LightningModule):
         y = self.selectFrames(y)
         mea = batch['mea'].float()
         if self.gpu:
-            mea, y = mea.cuda(non_blocking=True), y.cuda(non_blocking=True)
+            y = y.cuda(non_blocking=True)
         preds = []
         for i in range(batch['img_n'].shape[3]):
             img_pre = batch['img_n'][...,i-1].float() if i>0 else batch['img_n'][...,i].float()
@@ -118,11 +116,10 @@ class CHASTINET(pl.LightningModule):
             img_lat = batch['img_n'][...,i+1].float() if i<batch['img_n'].shape[3]-1 else batch['img_n'][...,i].float()
             oth_n = batch['oth_n'][...,i].float()
             mask = batch['mask'][...,i].float()
+            input = torch.stack((img_cur, img_pre, img_lat, mea,mask,oth_n),1)
             if self.gpu:
-                img_pre, img_cur, img_lat = img_pre.cuda(non_blocking=True), img_cur.cuda(non_blocking=True), img_lat.cuda(non_blocking=True)
-                mask = mask.cuda(non_blocking=True)
-                oth_n = oth_n.cuda(non_blocking=True)
-            pred = self.model(torch.stack((img_cur, img_pre, img_lat, mea,mask,oth_n),1))
+                input= input.cuda(non_blocking=True)
+            pred = self.model(input)
             preds.append(torch.squeeze(pred,1))
         preds = torch.stack(preds,3)
         # saveintemp(preds.cpu().numpy(),batch['id'][0])
@@ -173,7 +170,6 @@ class CHASTINET(pl.LightningModule):
             y=False
         mea = batch['mea'].float()
         if self.gpu:
-            mea = mea.cuda(non_blocking=True)
             y = y.cuda(non_blocking=True) if not y is False else False
         preds = []
         for i in range(batch['img_n'].shape[3]):
@@ -182,11 +178,10 @@ class CHASTINET(pl.LightningModule):
             img_lat = batch['img_n'][...,i+1].float() if i<batch['img_n'].shape[3]-1 else batch['img_n'][...,i].float()
             oth_n = batch['oth_n'][...,i].float()
             mask = batch['mask'][...,i].float()
+            input = torch.stack((img_cur, img_pre, img_lat, mea,mask,oth_n),1)
             if self.gpu:
-                img_pre, img_cur, img_lat = img_pre.cuda(non_blocking=True), img_cur.cuda(non_blocking=True), img_lat.cuda(non_blocking=True)
-                mask = mask.cuda(non_blocking=True)
-                oth_n = oth_n.cuda(non_blocking=True)
-            pred = self.model(torch.stack((img_cur, img_pre, img_lat, mea,mask,oth_n),1))
+                input= input.cuda(non_blocking=True)
+            pred = self.model(input)
             preds.append(torch.squeeze(pred,1))
         preds = torch.stack(preds,3)
         #saveintemp(preds.cpu().numpy(),batch['id'][0])
