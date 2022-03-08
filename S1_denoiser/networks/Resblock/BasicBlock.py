@@ -3,7 +3,7 @@ import math
 import torch.utils.model_zoo as model_zoo
 import torch.nn.init as weight_init
 import torch
-__all__ = ['MultipleBasicBlock','MultipleBasicBlock_4']
+__all__ = ['MultipleBasicBlock','MultipleBasicBlock_4','BasicBlock','MultipleCascadeBlock']
 def conv3x3(in_planes, out_planes, dilation = 1, stride=1):
     "3x3 convolution with padding"
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
@@ -16,7 +16,7 @@ class BasicBlock(nn.Module):
         super(BasicBlock, self).__init__()
         self.conv1 = conv3x3(inplanes, planes,dilation, stride)
         #self.bn1 = nn.BatchNorm2d(planes)
-        self.relu = nn.ReLU(inplace=True)
+        self.ReLU = nn.LeakyReLU(inplace=True)
         self.conv2 = conv3x3(planes, planes)
         #self.bn2 = nn.BatchNorm2d(planes)
         #self.downsample = downsample
@@ -39,7 +39,7 @@ class BasicBlock(nn.Module):
 
         out = self.conv1(x)
         #out = self.bn1(out)
-        out = self.relu(out)
+        out = self.ReLU(out)
 
         out = self.conv2(out)
         #out = self.bn2(out)
@@ -48,9 +48,109 @@ class BasicBlock(nn.Module):
         #    residual = self.downsample(x)
 
         out += residual
-        #out = self.relu(out)
+        #out = self.LeakyReLU(out)
 
         return out
+
+class CascadeBlock(nn.Module):
+    expansion = 1
+    def __init__(self, inplanes, features, dilation = 1, stride=1, downsample=None):
+        super(CascadeBlock, self).__init__()
+        self.conv1 = conv3x3(inplanes, features,dilation, stride)
+        #self.bn1 = nn.BatchNorm2d(features)
+        self.ReLU1 = nn.LeakyReLU(inplace=True)
+        self.conv2 = conv3x3(features, features/2)
+        self.ReLU2 = nn.LeakyReLU(inplace=True)
+        self.conv3 = conv3x3(features/2, 1)
+        #self.bn2 = nn.BatchNorm2d(features)
+        #self.downsample = downsample
+        self.stride = stride
+        #self.do = nn.Dropout2d(p=0.2)
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+                #m.weight.data.normal_(0, math.sqrt(2. / n))
+                torch.nn.init.xavier_uniform_(m.weight.data)
+            elif isinstance(m, nn.BatchNorm2d):
+                m.weight.data.fill_(1)
+                m.bias.data.zero_()
+
+    def forward(self, x):
+        x_copy = x[:,0,:]
+        out = self.conv1(x)
+        #out = self.bn1(out)
+        out = self.ReLU1(out)
+        out = self.conv2(out)
+        out = self.ReLU2(out)
+        residual = self.conv3(out)
+
+        #out = self.bn2(out)
+        #if self.downsample is not None:
+        #    residual = self.downsample(x)
+        return x[:,0,:]+residual
+
+
+class MultipleCascadeBlock(nn.Module):
+    def __init__(self,intermediate_feature = 64, dense = True):
+        super(MultipleCascadeBlock, self).__init__()
+        self.dense = dense
+        self.intermediate_feature = intermediate_feature
+
+        self.block1 = CascadeBlock(3,intermediate_feature*2)
+        self.block2 = CascadeBlock(2,intermediate_feature)
+        self.block3 = CascadeBlock(2,intermediate_feature)
+        self.block4 = CascadeBlock(2,intermediate_feature)
+        self.block5 = BasicBlock(1,64)
+
+        self.BN1 = nn.BatchNorm2d(3)
+        self.BN2 = nn.BatchNorm2d(2)
+        self.BN3 = nn.BatchNorm2d(2)
+        self.BN4 = nn.BatchNorm2d(2)
+        self.BN5 = nn.BatchNorm2d(1)
+        self.do1 = nn.Dropout2d(p=0.2,inplace=True)
+        self.do2 = nn.Dropout2d(p=0.2,inplace=True)
+        self.do3 = nn.Dropout2d(p=0.2,inplace=True)
+        self.do4 = nn.Dropout2d(p=0.2,inplace=True)
+        self.do5 = nn.Dropout2d(p=0.2,inplace=True)
+        #self.BN7     = nn.BatchNorm2d(intermediate_feature)
+        #self.BNend     = nn.BatchNorm2d(intermediate_feature)
+        #self.endlayer = nn.Sequential(*[nn.Conv2d(intermediate_feature, 1 , 5, 1, 2),nn.Sigmoid()])
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+                m.weight.data.normal_(0, math.sqrt(2. / n))
+            elif isinstance(m, nn.BatchNorm2d):
+                m.weight.data.fill_(1)
+                m.bias.data.zero_()
+
+    def forward(self, x):
+
+        step1 = x[:,:3,...]
+        step1 = self.do1(step1)
+        step1 = self.BN1(step1)
+        step1 = self.block1(step1)
+
+        step2 = torch.stack((step1,x[:,4,...]))
+        step2 = self.do2(step2)
+        step2 = self.BN2(step2)
+        step2 = self.block2(step2)
+
+        step3 = torch.stack((step2,x[:,3,...]))
+        step3 = self.do3(step3)
+        step3 = self.BN3(step3)
+        step3 = self.block3(step3)
+
+        step4 = torch.stack((step3,x[:,5,...]))
+        step4 = self.do4(step4)
+        step4 = self.BN4(step4)
+        step4 = self.block4(step4)
+
+        step5 = step4
+        step5 = self.do5(step5)
+        step5 = self.BN5(step5)
+        step5 = self.block5(step5)
+
+        return step5
 
 
 class MultipleBasicBlock(nn.Module):
@@ -64,9 +164,9 @@ class MultipleBasicBlock(nn.Module):
         self.intermediate_feature = intermediate_feature
 
         self.cvlayer1 = nn.Sequential(*[nn.Conv2d(input_feature, intermediate_feature*2,
-                      kernel_size=9, stride=1, padding=4, bias=True),nn.ReLU(inplace=True)])
+                      kernel_size=9, stride=1, padding=4, bias=True),nn.LeakyReLU(inplace=True)])
         self.cvlayer2 = nn.Sequential(*[nn.Conv2d(intermediate_feature*2, intermediate_feature,
-                      kernel_size=5, stride=1, padding=2, bias=True),nn.ReLU(inplace=True)])
+                      kernel_size=5, stride=1, padding=2, bias=True),nn.LeakyReLU(inplace=True)])
         self.block1 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=1 else None
         self.block2 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=2 else None
         self.block3 = block(intermediate_feature, intermediate_feature, dilation = 1) if num_blocks>=3 else None

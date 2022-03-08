@@ -84,7 +84,7 @@ class CHASTINET(pl.LightningModule):
                 img_pre, img_cur, img_lat = img_pre.cuda(non_blocking=True), img_cur.cuda(non_blocking=True), img_lat.cuda(non_blocking=True)
                 mask = mask.cuda(non_blocking=True)
             # print(f'shape of input is {torch.stack((mea,img_n,mask),1).size()}')
-            pred = self.model(torch.stack((img_pre, img_cur, img_lat, mea,mask,oth_n),1))
+            pred = self.model(torch.stack((img_cur, img_pre, img_lat, mea,mask,oth_n),1))
             loss_li.append(criterion(pred, y[...,i].unsqueeze(1)))
             #preds.append(torch.squeeze(pred,1))
         #preds = torch.stack(preds,3)
@@ -120,7 +120,7 @@ class CHASTINET(pl.LightningModule):
             if self.gpu:
                 img_pre, img_cur, img_lat = img_pre.cuda(non_blocking=True), img_cur.cuda(non_blocking=True), img_lat.cuda(non_blocking=True)
                 mask = mask.cuda(non_blocking=True)
-            pred = self.model(torch.stack((img_pre, img_cur, img_lat, mea,mask,oth_n),1))
+            pred = self.model(torch.stack((img_cur, img_pre, img_lat, mea,mask,oth_n),1))
             preds.append(torch.squeeze(pred,1))
         preds = torch.stack(preds,3)
         # saveintemp(preds.cpu().numpy(),batch['id'][0])
@@ -183,7 +183,7 @@ class CHASTINET(pl.LightningModule):
             if self.gpu:
                 img_pre, img_cur, img_lat = img_pre.cuda(non_blocking=True), img_cur.cuda(non_blocking=True), img_lat.cuda(non_blocking=True)
                 mask = mask.cuda(non_blocking=True)
-            pred = self.model(torch.stack((img_pre, img_cur, img_lat, mea,mask,oth_n),1))
+            pred = self.model(torch.stack((img_cur, img_pre, img_lat, mea,mask,oth_n),1))
             preds.append(torch.squeeze(pred,1))
         preds = torch.stack(preds,3)
         #saveintemp(preds.cpu().numpy(),batch['id'][0])
@@ -276,7 +276,8 @@ class CHASTINET(pl.LightningModule):
     ## Convenience Methods ##
 
     def _prepare_model(self):
-        resnet = Resblock.__dict__['MultipleBasicBlock_4'](self.input_layers,self.hidden_layers,self.num_blocks)
+        resnet = Resblock.__dict__['MultipleCascadeBlock']()
+        #resnet = Resblock.__dict__['MultipleBasicBlock_4'](self.input_layers,self.hidden_layers,self.num_blocks)
         ####torch.nn.init.xavier_uniform_(resnet.weight.data)
         return resnet
         #cnn_denoise = torch.nn.Sequential(
