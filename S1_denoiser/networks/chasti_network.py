@@ -129,6 +129,8 @@ class CHASTINET(pl.LightningModule):
         y = y.cpu().numpy()
         preds = np.squeeze(np.moveaxis(preds,0,-1))
         y = np.squeeze(np.moveaxis(y,0,-1))
+        #print(preds.shape)
+        #print(y.shape)
         psnr_val = calculate_psnr(preds, y)
         ssim_val = calculate_ssim(preds, y)
         self.psnr_val.append(psnr_val)

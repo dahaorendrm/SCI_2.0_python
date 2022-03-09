@@ -24,7 +24,7 @@ def train(train_dataset1,val_dataset1,train_dataset2,val_dataset2):
         "min_epochs": 60,
         "max_epochs": 1000,
         "patience": 4,
-        "batch_size": 10,
+        "batch_size": 6,
         "num_workers": 4,
         "val_sanity_checks": 0,
         "fast_dev_run": False,
@@ -32,7 +32,7 @@ def train(train_dataset1,val_dataset1,train_dataset2,val_dataset2):
         "log_path": "./tensorboard_logs",
         "gpu": torch.cuda.is_available(),
         "input_layers":6,
-        "hidden_layers":16,
+        "hidden_layers":128,
         "num_blocks":4
     }
 

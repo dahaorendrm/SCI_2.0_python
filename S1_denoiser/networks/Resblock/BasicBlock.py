@@ -7,7 +7,7 @@ __all__ = ['MultipleBasicBlock','MultipleBasicBlock_4','BasicBlock','MultipleCas
 def conv3x3(in_planes, out_planes, dilation=1, stride=1):
     "3x3 convolution with padding"
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
-                     padding=int(dilation*(3-1)/2), dilation=dilation, bias=True)
+                     padding=int(dilation*(3-1)/2), dilation=dilation, bias=False)
 
 class BasicBlock(nn.Module):
     expansion = 1
@@ -59,9 +59,9 @@ class CascadeBlock(nn.Module):
         self.conv1 = conv3x3(inplanes, features,dilation, stride)
         #self.bn1 = nn.BatchNorm2d(features)
         self.ReLU1 = nn.LeakyReLU(inplace=True)
-        self.conv2 = conv3x3(features, features/2)
+        self.conv2 = conv3x3(features, int(features/2))
         self.ReLU2 = nn.LeakyReLU(inplace=True)
-        self.conv3 = conv3x3(features/2, 1)
+        self.conv3 = conv3x3(int(features/2), 1)
         #self.bn2 = nn.BatchNorm2d(features)
         #self.downsample = downsample
         self.stride = stride
@@ -99,7 +99,7 @@ class MultipleCascadeBlock(nn.Module):
         self.block2 = CascadeBlock(2,intermediate_feature)
         self.block3 = CascadeBlock(2,intermediate_feature)
         self.block4 = CascadeBlock(2,intermediate_feature)
-        self.block5 = BasicBlock(1,64)
+        self.block5 = CascadeBlock(1,64)
 
         self.BN1 = nn.BatchNorm2d(3)
         self.BN2 = nn.BatchNorm2d(2)
