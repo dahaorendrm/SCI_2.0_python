@@ -106,11 +106,11 @@ class MultipleCascadeBlock(nn.Module):
         self.BN3 = nn.BatchNorm2d(2)
         self.BN4 = nn.BatchNorm2d(2)
         self.BN5 = nn.BatchNorm2d(1)
-        self.do1 = nn.Dropout2d(p=0.2,inplace=True)
-        self.do2 = nn.Dropout2d(p=0.2,inplace=True)
-        self.do3 = nn.Dropout2d(p=0.2,inplace=True)
-        self.do4 = nn.Dropout2d(p=0.2,inplace=True)
-        self.do5 = nn.Dropout2d(p=0.2,inplace=True)
+        # self.do1 = nn.Dropout2d(p=0.2,inplace=True)
+        # self.do2 = nn.Dropout2d(p=0.2,inplace=True)
+        # self.do3 = nn.Dropout2d(p=0.2,inplace=True)
+        # self.do4 = nn.Dropout2d(p=0.2,inplace=True)
+        # self.do5 = nn.Dropout2d(p=0.2,inplace=True)
         #self.BN7     = nn.BatchNorm2d(intermediate_feature)
         #self.BNend     = nn.BatchNorm2d(intermediate_feature)
         #self.endlayer = nn.Sequential(*[nn.Conv2d(intermediate_feature, 1 , 5, 1, 2),nn.Sigmoid()])
@@ -125,27 +125,27 @@ class MultipleCascadeBlock(nn.Module):
     def forward(self, x):
 
         step1 = x[:,:3,...]
-        step1 = self.do1(step1)
+        # step1 = self.do1(step1)
         step1 = self.BN1(step1)
         step1 = self.block1(step1)
 
         step2 = torch.cat((step1,x[:,4:5,...]),1)
-        step2 = self.do2(step2)
+        # step2 = self.do2(step2)
         step2 = self.BN2(step2)
         step2 = self.block2(step2)
 
         step3 = torch.cat((step2,x[:,3:4,...]),1)
-        step3 = self.do3(step3)
+        # step3 = self.do3(step3)
         step3 = self.BN3(step3)
         step3 = self.block3(step3)
 
         step4 = torch.cat((step3,x[:,5:6,...]),1)
-        step4 = self.do4(step4)
+        # step4 = self.do4(step4)
         step4 = self.BN4(step4)
         step4 = self.block4(step4)
 
         step5 = step4
-        step5 = self.do5(step5)
+        # step5 = self.do5(step5)
         step5 = self.BN5(step5)
         step5 = self.block5(step5)
 
