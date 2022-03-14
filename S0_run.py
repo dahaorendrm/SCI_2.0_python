@@ -66,7 +66,7 @@ def compressive_model(MODEL,input,mask=None):
         #print(f'test:shape of input is {input.shape}')
         mea = measurement.Measurement(model = 'lesti_sst', dim = 4, inputs=data, configs={'NUMF':input.shape[3], 'SCALE_DATA':1, 'CUT_BAND':None})
         model = recon_model.ReModel('gap','tv_chambolle')
-        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
+        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': False,
                 'ITERs': 30, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
                 'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7}})
         orig = np.empty_like(mea.mask)
@@ -101,7 +101,7 @@ def compressive_model(MODEL,input,mask=None):
         #print(f'test:shape of input is {input.shape}')
         mea = measurement.Measurement(model = 'lesti', dim = 3, inputs=data, configs={'SCALE_DATA':1, 'CUT_BAND':None, 'MAXV':1})
         model = recon_model.ReModel('gap','tv_chambolle')
-        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
+        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': False,
                 'ITERs': 30, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
                 'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7}})
         re = result.Result(model, mea, modul = mea.mask, orig = mea.orig_leds)
@@ -132,7 +132,7 @@ def compressive_model(MODEL,input,mask=None):
         )
         mea = measurement.Measurement(model = 'chasti_sst', dim = 3, inputs=data, configs={'MAXV':1})
         model = recon_model.ReModel('gap','tv_chambolle')
-        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
+        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': False,
                 'ITERs': 30, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
                 'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7}})
         re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
@@ -429,10 +429,12 @@ def S1train_data_generation():
     COMP_FRAME = 32
     pool = multiprocessing.Pool(10)
     MODEL = 'chasti_sst'
-    path = Path('../../data/whispers/test')
+    path = Path('../data/whispers/test')
     datalist = os.listdir(path)
     finished = []
-    for name in datalist:
+    for idx,name in enumerate(datalist):
+        if idx>50:
+            break
         if name in finished:
             continue
         comp_input = []
@@ -480,7 +482,7 @@ def S1train_data_generation():
         for (mea,re) in return_crops_data:
             crops_mea.append(mea)
             crops_img.append(re)
-        save_crops('data/trainS1_2',name_list,name,crops_mea,crops_img, crops_gt=crops)
+        save_crops('data/trainS1_nacc',name_list,name,crops_mea,crops_img, crops_gt=crops)
         print(f'Finish saving for data {name}!')
 if __name__ == '__main__':
     print(f'Start time:{datetime.datetime.now()}')

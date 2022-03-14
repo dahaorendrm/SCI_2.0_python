@@ -28,7 +28,7 @@ def train(train_dataset1,val_dataset1,train_dataset2,val_dataset2):
         "num_workers": 4,
         "val_sanity_checks": 0,
         "fast_dev_run": False,
-        "output_path": "./S1_denoiser/model-outputs/2022_new",
+        "output_path": "./S1_denoiser/model-outputs/2022_new_video_ndo",
         "log_path": "./tensorboard_logs",
         "gpu": torch.cuda.is_available(),
         "input_layers":6,
@@ -46,8 +46,8 @@ def train(train_dataset1,val_dataset1,train_dataset2,val_dataset2):
     #     os.mkdir('./S1_denoiser/model-outputs')
     # weight_path = "./S1_denoiser/model-outputs/model_1.pt"
 
-    hparams["train_dataset"] = train_dataset2
-    hparams["val_dataset"] = val_dataset2
+    #hparams["train_dataset"] = train_dataset2
+    #hparams["val_dataset"] = val_dataset2
     #hparams["lr"] = 1e-5
     model = CHASTINET(hparams=hparams)
     #model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/model-outputs/2022_new/model_2.pt"))
@@ -59,9 +59,9 @@ def train(train_dataset1,val_dataset1,train_dataset2,val_dataset2):
     # results
     print(f'Best IOU score is : {model.trainer_params["callbacks"][0].best_model_score}')
     # save the weights to submitssion file
-    if not os.path.exists('./S1_denoiser/model-outputs/2022_new_video'):
-       os.mkdir('./S1_denoiser/model-outputs/2022_new_video')
-    weight_path = "./S1_denoiser/model-outputs/2022_new_video/model_2.pt"
+    if not os.path.exists('./S1_denoiser/model-outputs/2022_new_video_ndo'):
+       os.mkdir('./S1_denoiser/model-outputs/2022_new_video_ndo')
+    weight_path = "./S1_denoiser/model-outputs/2022_new_video_ndo/model_1.pt"
     model = CHASTINET(hparams=hparams).load_from_checkpoint(model.trainer_params["callbacks"][0].best_model_path)
     torch.save(model.state_dict(), weight_path)
 
@@ -90,7 +90,7 @@ def test(path,savepath='result',mask_path='./S0_gaptv/lesti_mask.mat', dataset=F
     }
 
     model = CHASTINET(hparams=hparams)
-    model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/model-outputs/2022_new_video/model_2.pt"))
+    model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/model-outputs/2022_new_video_ndo/model_1.pt"))
     #trainer = Trainer()
     #trainer.test(model)
     model.test()
