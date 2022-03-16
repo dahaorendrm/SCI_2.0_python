@@ -433,8 +433,6 @@ def S1train_data_generation():
     datalist = os.listdir(path)
     finished = []
     for idx,name in enumerate(datalist):
-        if idx>50:
-            break
         if name in finished:
             continue
         comp_input = []
