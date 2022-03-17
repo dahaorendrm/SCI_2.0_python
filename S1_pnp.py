@@ -4,8 +4,8 @@ import numpy as np
 import torch
 import os
 
-from S1_denoiser.imgdataset import ImgDataset
-from S1_denoiser.networks.chasti_network import CHASTINET
+from S1_pnp.imgdataset import ImgDataset
+from S1_pnp.networks.SpViDeCNN_network import SpViDeCNN
 # process data
 
 #train_dataset = ImgDataset('../S0_gaptv/data/train/')
@@ -24,7 +24,7 @@ def train(train_dataset,val_dataset):
         "min_epochs": 60,
         "max_epochs": 1000,
         "patience": 4,
-        "batch_size": 6,
+        "batch_size": 10,
         "num_workers": 4,
         "val_sanity_checks": 1,
         "fast_dev_run": False,
@@ -81,8 +81,11 @@ if __name__ == '__main__':
     dataset = ImgDataset('./S1_pnp/train_data')
     train_num = round(0.7*len(dataset))
     valid_num = round(0.15*len(dataset))
+    print(len(dataset))
+    if not len(dataset):
+        Error
     train_dataset,val_dataset,test_dataset = torch.utils.data.random_split(dataset, [train_num, valid_num,len(dataset)-train_num-valid_num], generator=torch.Generator().manual_seed(8))
-    train(train_dataset,val_dataset)
+    #train(train_dataset,val_dataset)
 
-    test_dataset.test()
+    test_dataset.dataset.test()
     test(test_dataset)

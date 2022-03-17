@@ -4,6 +4,7 @@ from pathlib import Path
 
 import pytorch_lightning as pl
 import segmentation_models_pytorch as smp
+from . import Resblock
 from .loss import *
 from utils import *
 
@@ -77,6 +78,7 @@ class SpViDeCNN(pl.LightningModule):
             img_n = img_n.cuda(non_blocking=True)
             img = img.cuda(non_blocking=True)
             sigma = sigma.cuda()
+        sigma = sigma.unsqueeze(1).unsqueeze(1).unsqueeze(1)
         sigma = sigma.repeat(1, 1, img_n.size()[-2], img_n.size()[-1])
         input = torch.cat([img_n,sigma],1)
         pred = self.model(input)
@@ -105,8 +107,10 @@ class SpViDeCNN(pl.LightningModule):
             img_n = img_n.cuda(non_blocking=True)
             img = img.cuda(non_blocking=True)
             sigma = sigma.cuda()
+        sigma = sigma.unsqueeze(1).unsqueeze(1).unsqueeze(1)
         sigma = sigma.repeat(1, 1, img_n.size()[-2], img_n.size()[-1])
         input = torch.cat([img_n,sigma],1)
+        print(input.size())
         pred = self.model(input)
         #loss = criterion(pred, img)
 
@@ -118,7 +122,7 @@ class SpViDeCNN(pl.LightningModule):
         pred = np.squeeze(np.moveaxis(pred,0,-1))
 
         val_psnr_input = calculate_psnr(img, img_n)
-        val_ssim_input = calculate_psnr(img, img_n)
+        val_ssim_input = calculate_ssim(img, img_n)
         val_psnr = calculate_psnr(img, pred)
         val_ssim = calculate_ssim(img, pred)
         val_psnr_incr = val_psnr - val_psnr_input
@@ -160,26 +164,28 @@ class SpViDeCNN(pl.LightningModule):
             img_n = img_n.cuda(non_blocking=True)
 
             sigma = sigma.cuda()
+        sigma = sigma.unsqueeze(1).unsqueeze(1).unsqueeze(1)
         sigma = sigma.repeat(1, 1, img_n.size()[-2], img_n.size()[-1])
         input = torch.cat([img_n,sigma],1)
         pred = self.model(input)
         img_n = img_n.cpu().numpy()
-        img_n = np.squeeze(np.moveaxis(img_n,0,-1))
+        img_n = np.squeeze(np.moveaxis(img_n,(0,1),(-1,-2)))
         pred = pred.cpu().numpy()
-        pred = np.squeeze(np.moveaxis(pred,0,-1))
+        pred = np.squeeze(np.moveaxis(pred,(0,1),(-1,-2)))
         if not img is False:
             img = torch.moveaxis(img,-1,1)
             img = img.cuda(non_blocking=True)
             #loss = criterion(pred, img)
             img = img.cpu().numpy()
-            img = np.squeeze(np.moveaxis(img,0,-1))
+            img = np.squeeze(np.moveaxis(img,(0,1),(-1,-2)))
             val_psnr_input = calculate_psnr(img, img_n)
-            val_ssim_input = calculate_psnr(img, img_n)
+            val_ssim_input = calculate_ssim(img, img_n)
             val_psnr = calculate_psnr(img, pred)
             val_ssim = calculate_ssim(img, pred)
+        tifffile.imwrite(self.resultpath/f"{batch['id'][0]}_in.tiff",img_n)
         tifffile.imwrite(self.resultpath/f"{batch['id'][0]}.tiff",pred)
-        print(f"Name:{save_name},
-        inputPSNR:{val_psnr_input:.4f}dB, outputPSNR:{val_psnr:.4f}dB,
+        print(f"Name:{save_name}, \
+        inputPSNR:{val_psnr_input:.4f}dB, outputPSNR:{val_psnr:.4f}dB,\
         inputSSIM:{val_ssim_input:.6f}, outputSSIM:{val_ssim:.6f}.")
 
 
@@ -253,10 +259,34 @@ class SpViDeCNN(pl.LightningModule):
     ## Convenience Methods ##
 
     def _prepare_model(self):
-        inpblock = Resblock.__dict__['BasicBlock'](inplanes=9, planes=128)
-        midblock = Resblock.__dict__['BasicBlock'](inplanes=128, planes=128)
-        endblock = Resblock.__dict__['BasicBlock'](inplanes=128, planes=8)
-        s_stacked = torch.nn.Sequential(inpblock, midblock, endblock)
+        
+        inpblock = torch.nn.Sequential(*[
+            torch.nn.Conv2d(9, 128,
+                      kernel_size=3, stride=1, padding=1, bias=True),
+            torch.nn.LeakyReLU(inplace=True)
+        ])
+        for m in inpblock.modules():
+            if isinstance(m, torch.nn.Conv2d):
+                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+                m.weight.data.normal_(0, math.sqrt(2. / n))
+            elif isinstance(m, torch.nn.BatchNorm2d):
+                m.weight.data.fill_(1)
+                m.bias.data.zero_()            
+        midblock1 = Resblock.__dict__['BasicBlock'](inplanes=128, planes=128)
+        midblock2 = Resblock.__dict__['BasicBlock'](inplanes=128, planes=128)
+        endblock = torch.nn.Sequential(*[
+            torch.nn.Conv2d(128, 8,
+                      kernel_size=1, stride=1, padding=0, bias=True),
+            torch.nn.LeakyReLU(inplace=True)
+        ])
+        for m in endblock.modules():
+            if isinstance(m, torch.nn.Conv2d):
+                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+                m.weight.data.normal_(0, math.sqrt(2. / n))
+            elif isinstance(m, torch.nn.BatchNorm2d):
+                m.weight.data.fill_(1)
+                m.bias.data.zero_()
+        s_stacked = torch.nn.Sequential(inpblock, midblock1, midblock2, endblock)
         return s_stacked
 
 
@@ -279,7 +309,7 @@ class SpViDeCNN(pl.LightningModule):
         # Specify where TensorBoard logs will be saved
         self.log_path = Path.cwd() / self.hparams.get("log_path", "tensorboard-logs")
         self.log_path.mkdir(exist_ok=True)
-        logger = pl.loggers.TensorBoardLogger(self.log_path, name="model-chasti")
+        logger = pl.loggers.TensorBoardLogger(self.log_path, name="model-SpViDeCNN")
 
         trainer_params = {
             "callbacks": [checkpoint_callback, early_stop_callback, lrmonitor_callback],

@@ -5,6 +5,8 @@ import os
 import albumentations
 import tifffile
 import scipy.io as scio
+from skimage import io as skio
+from skimage import transform as skitrans
 import scipy
 from pathlib import Path
 import utils
@@ -61,20 +63,19 @@ def X2Cube(img,B=[4, 4],skip = [4, 4],bandNumber=16):
 
 class ImgDataset(torch.utils.data.Dataset):
 
-    def __init__(self, path='./S1_pnp/train_data', raw_data_path=Path('../data/whispers/test'), f_trans='rgb'):
+    def __init__(self, path='./S1_pnp/train_data', raw_data_path=Path('../data/whispers/train')):
         super(ImgDataset, self).__init__()
         #self.data = []
         path = Path(path)
         self.path = path
-        self.f_trans= f_trans
         if os.path.exists(path):
             self.data = os.listdir(path)
         else:
             os.mkdir(path)
             self.prepare_rawdata(raw_data_path,path)
             self.data = os.listdir(path)
-        rng_level = np.random.default_rng(12)
-        rng_distr = np.random.default_rng(14)
+        self.rng_level = np.random.default_rng(12)
+        self.rng_distr = np.random.default_rng(14)
         self.sigma_min, self.sigma_max = 0, 25
         self.sigma_test=self.sigma_max
 
@@ -82,21 +83,23 @@ class ImgDataset(torch.utils.data.Dataset):
         for dataname in os.listdir(raw_data_path):
             dataset = []
             imglist = os.listdir(raw_data_path/dataname/'HSI')
-            idx = 0
+            idx = 1
             temp = []
             while idx < len(imglist):
-                img = skio.imread(raw_data_path/dataname/'HSI'/f'{i:04d}.png')
+                img = skio.imread(raw_data_path/dataname/'HSI'/f'{idx:04d}.png')
                 img = X2Cube(img)
+                if img.shape[0]!=256:
+                    img = skitrans.resize(img, (256,512))
                 temp.append(img/511.)
-                i += 1
+                idx += 1
                 if len(temp) == 8:
                     img = np.stack(temp,3)
 
-                    print(f'imgs.shape is {imgs.shape}.')
-                    data1 = img[...,::2]
+                    print(f'img.shape is {img.shape}.')
+                    data1 = img[...,::2,:]
                     data1 = utils.selectFrames(data1)
                     dataset.append(data1)
-                    data2 = img[...,1::2]
+                    data2 = img[...,1::2,:]
                     data2 = utils.selectFrames(data2)
                     dataset.append(data2)
                     temp = []
@@ -106,7 +109,7 @@ class ImgDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, index):
         file_name = self.data[index]
-        img = tifffile.imread(self.path + '/' + file_name)
+        img = tifffile.imread(self.path/file_name)
         temp = []
         for idx in range(img.shape[2]):
             img[...,idx] = scipy.signal.medfilt2d(img[...,idx], kernel_size=3)
@@ -114,13 +117,14 @@ class ImgDataset(torch.utils.data.Dataset):
         max_norm = np.amax(img)
         img = (img - min_norm) / (max_norm - min_norm)
         img_n = np.copy(img)
-        noise_level = rng_level.uniform(self.sigma_min, self.sigma_max)
-        img_n += rng_distr.normal(0, noise_level / 255.0, img_n.shape)
+        noise_level = self.rng_level.uniform(self.sigma_min, self.sigma_max)
+        img_n += self.rng_distr.normal(0, noise_level / 255.0, img_n.shape)
         transformed = transformations_16bands(image=img,image1=img_n)
         img = transformed['image']
         img_n = transformed['image1']
         sample = {'id':file_name.split('.')[0], 'img_n':img_n, 'img':img, 'sigma':noise_level}
-        return img
+        return sample
+
     def test(self):
         self.sigma_min = self.sigma_max
     def __len__(self):
