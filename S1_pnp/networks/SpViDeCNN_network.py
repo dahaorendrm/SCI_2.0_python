@@ -81,7 +81,7 @@ class SpViDeCNN(pl.LightningModule):
         sigma = sigma.unsqueeze(1).unsqueeze(1).unsqueeze(1)
         sigma = sigma.repeat(1, 1, img_n.size()[-2], img_n.size()[-1])
         input = torch.cat([img_n,sigma],1)
-        pred = self.model(input)
+        pred = self.model(input[:,:8,...])
         loss = criterion(pred, img)
         self.log(
             "loss",
@@ -111,7 +111,7 @@ class SpViDeCNN(pl.LightningModule):
         sigma = sigma.repeat(1, 1, img_n.size()[-2], img_n.size()[-1])
         input = torch.cat([img_n,sigma],1)
         print(input.size())
-        pred = self.model(input)
+        pred = self.model(input[:,:8,...])
         #loss = criterion(pred, img)
 
         img = img.cpu().numpy()
@@ -167,7 +167,7 @@ class SpViDeCNN(pl.LightningModule):
         sigma = sigma.unsqueeze(1).unsqueeze(1).unsqueeze(1)
         sigma = sigma.repeat(1, 1, img_n.size()[-2], img_n.size()[-1])
         input = torch.cat([img_n,sigma],1)
-        pred = self.model(input)
+        pred = self.model(input[:,:8,...])
         img_n = img_n.cpu().numpy()
         img_n = np.squeeze(np.moveaxis(img_n,(0,1),(-1,-2)))
         pred = pred.cpu().numpy()
@@ -259,35 +259,9 @@ class SpViDeCNN(pl.LightningModule):
     ## Convenience Methods ##
 
     def _prepare_model(self):
-        
-        inpblock = torch.nn.Sequential(*[
-            torch.nn.Conv2d(9, 128,
-                      kernel_size=3, stride=1, padding=1, bias=True),
-            torch.nn.LeakyReLU(inplace=True)
-        ])
-        for m in inpblock.modules():
-            if isinstance(m, torch.nn.Conv2d):
-                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-                m.weight.data.normal_(0, math.sqrt(2. / n))
-            elif isinstance(m, torch.nn.BatchNorm2d):
-                m.weight.data.fill_(1)
-                m.bias.data.zero_()            
-        midblock1 = Resblock.__dict__['BasicBlock'](inplanes=128, planes=128)
-        midblock2 = Resblock.__dict__['BasicBlock'](inplanes=128, planes=128)
-        endblock = torch.nn.Sequential(*[
-            torch.nn.Conv2d(128, 8,
-                      kernel_size=1, stride=1, padding=0, bias=True),
-            torch.nn.LeakyReLU(inplace=True)
-        ])
-        for m in endblock.modules():
-            if isinstance(m, torch.nn.Conv2d):
-                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
-                m.weight.data.normal_(0, math.sqrt(2. / n))
-            elif isinstance(m, torch.nn.BatchNorm2d):
-                m.weight.data.fill_(1)
-                m.bias.data.zero_()
-        s_stacked = torch.nn.Sequential(inpblock, midblock1, midblock2, endblock)
-        return s_stacked
+        Resblock.__dict__['MultipleBasicBlock2'](inplanes=8, intermediate_feature=128)
+
+        return Resblock
 
 
     def _get_trainer_params(self):

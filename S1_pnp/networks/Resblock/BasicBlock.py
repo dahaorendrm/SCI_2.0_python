@@ -3,7 +3,7 @@ import math
 import torch.utils.model_zoo as model_zoo
 import torch.nn.init as weight_init
 import torch
-__all__ = ['MultipleBasicBlock','MultipleBasicBlock_4','BasicBlock','MultipleCascadeBlock','MultipleCascadeBlock_func']
+__all__ = ['MultipleBasicBlock','MultipleBasicBlock_4','BasicBlock','MultipleCascadeBlock','MultipleCascadeBlock_func','MultipleBasicBlock2']
 def conv3x3(in_planes, out_planes, dilation=1, stride=1):
     "3x3 convolution with padding"
     return nn.Conv2d(in_planes, out_planes, kernel_size=3, stride=stride,
@@ -34,22 +34,57 @@ class BasicBlock(nn.Module):
 
     def forward(self, x):
         #x = self.do(x)
-
         residual = x
-
         out = self.conv1(x)
         #out = self.bn1(out)
         out = self.ReLU(out)
-
         out = self.conv2(out)
         #out = self.bn2(out)
-
         #if self.downsample is not None:
         #    residual = self.downsample(x)
-
         out += residual
         #out = self.LeakyReLU(out)
+        return out
 
+class BasicBlock2(nn.Module):
+    expansion = 1
+
+    def __init__(self, inplanes, planes, dilation = 1, stride=1, downsample=None):
+        super(BasicBlock2, self).__init__()
+        self.conv1 = conv3x3(inplanes, planes,dilation, stride)
+        self.bn1 = nn.BatchNorm2d(planes)
+        self.ReLU1 = nn.LeakyReLU(inplace=True)
+        self.conv2 = conv3x3(planes, round(planes/2))
+        self.ReLU2 = nn.LeakyReLU(inplace=True)
+        self.conv3 = conv3x3(round(planes/2),inplanes)
+        self.bn2 = nn.BatchNorm2d(planes)
+        #self.downsample = downsample
+        self.stride = stride
+        #self.do = nn.Dropout2d(p=0.2)
+
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+                #m.weight.data.normal_(0, math.sqrt(2. / n))
+                torch.nn.init.xavier_uniform_(m.weight.data)
+            elif isinstance(m, nn.BatchNorm2d):
+                m.weight.data.fill_(1)
+                m.bias.data.zero_()
+
+    def forward(self, x):
+        #x = self.do(x)
+        copy = x
+        out = self.conv1(x)
+        out = self.bn1(out)
+        out = self.ReLU1(out)
+        out = self.conv2(out)
+        out = self.bn2(out)
+        out = self.ReLU2(out)
+        out = self.conv3(out)
+        #if self.downsample is not None:
+        #    residual = self.downsample(x)
+        out += copy
+        #out = self.LeakyReLU(out)
         return out
 
 class CascadeBlock(nn.Module):
@@ -150,6 +185,31 @@ class MultipleCascadeBlock(nn.Module):
         step5 = self.block5(step5)
 
         return step5
+
+class MultipleBasicBlock2(nn.Module):
+
+    def __init__(self,input_feature,
+                 intermediate_feature = 128, dense = True):
+        super(MultipleBasicBlock2, self).__init__()
+        self.spatblocks = []
+        for idx in range(input_feature):
+            self.spatblocks.append(BasicBlock2(1, intermediate_feature))
+        self.tempblock = BasicBlock2(input_feature, intermediate_feature)
+        for m in self.modules():
+            if isinstance(m, nn.Conv2d):
+                n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+                m.weight.data.normal_(0, math.sqrt(2. / n))
+            elif isinstance(m, nn.BatchNorm2d):
+                m.weight.data.fill_(1)
+                m.bias.data.zero_()
+
+    def forward(self, x):
+        out = []
+        for idx in range(x.size()[1]):
+            out.append(self.spatblocks[idx](x[:,idx:idx+1,...]))
+        out = torch.cat(out,1)
+        out = self.tempblock(out)
+        return out
 
 
 class MultipleBasicBlock(nn.Module):
