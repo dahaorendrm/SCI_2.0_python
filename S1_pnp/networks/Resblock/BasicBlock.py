@@ -57,7 +57,7 @@ class BasicBlock2(nn.Module):
         self.conv2 = conv3x3(planes, round(planes/2))
         self.ReLU2 = nn.LeakyReLU(inplace=True)
         self.conv3 = conv3x3(round(planes/2),inplanes)
-        self.bn2 = nn.BatchNorm2d(planes)
+        self.bn2 = nn.BatchNorm2d(round(planes/2))
         #self.downsample = downsample
         self.stride = stride
         #self.do = nn.Dropout2d(p=0.2)
@@ -191,9 +191,18 @@ class MultipleBasicBlock2(nn.Module):
     def __init__(self,input_feature,
                  intermediate_feature = 128, dense = True):
         super(MultipleBasicBlock2, self).__init__()
-        self.spatblocks = []
-        for idx in range(input_feature):
-            self.spatblocks.append(BasicBlock2(1, intermediate_feature))
+        self.input_feature = input_feature
+        self.spatblock1 = BasicBlock2(1, intermediate_feature) if input_feature>=1 else None
+        self.spatblock2 = BasicBlock2(1, intermediate_feature) if input_feature>=2 else None
+        self.spatblock3 = BasicBlock2(1, intermediate_feature) if input_feature>=3 else None
+        self.spatblock4 = BasicBlock2(1, intermediate_feature) if input_feature>=4 else None
+        self.spatblock5 = BasicBlock2(1, intermediate_feature) if input_feature>=5 else None
+        self.spatblock6 = BasicBlock2(1, intermediate_feature) if input_feature>=6 else None
+        self.spatblock7 = BasicBlock2(1, intermediate_feature) if input_feature>=7 else None
+        self.spatblock8 = BasicBlock2(1, intermediate_feature) if input_feature>=8 else None
+        #self.spatblocks = []
+        #for idx in range(input_feature):
+        #    self.spatblocks.append(BasicBlock2(1, intermediate_feature))
         self.tempblock = BasicBlock2(input_feature, intermediate_feature)
         for m in self.modules():
             if isinstance(m, nn.Conv2d):
@@ -204,10 +213,19 @@ class MultipleBasicBlock2(nn.Module):
                 m.bias.data.zero_()
 
     def forward(self, x):
-        out = []
-        for idx in range(x.size()[1]):
-            out.append(self.spatblocks[idx](x[:,idx:idx+1,...]))
-        out = torch.cat(out,1)
+        out = x.clone()
+        out[:,0:1,...] = self.spatblock1(x[:,0:1,...]) if self.input_feature>=1 else None
+        out[:,1:2,...] = self.spatblock2(x[:,1:2,...]) if self.input_feature>=2 else None
+        out[:,2:3,...] = self.spatblock3(x[:,2:3,...]) if self.input_feature>=3 else None
+        out[:,3:4,...] = self.spatblock4(x[:,3:4,...]) if self.input_feature>=4 else None
+        out[:,4:5,...] = self.spatblock5(x[:,4:5,...]) if self.input_feature>=5 else None
+        out[:,5:6,...] = self.spatblock6(x[:,5:6,...]) if self.input_feature>=6 else None
+        out[:,6:7,...] = self.spatblock7(x[:,6:7,...]) if self.input_feature>=7 else None
+        out[:,7:8,...] = self.spatblock8(x[:,7:8,...]) if self.input_feature>=8 else None
+ 
+        #for idx in range(x.size()[1]):
+        #    out.append(self.spatblocks[idx](x[:,idx:idx+1,...]))
+        #out = torch.cat(out,1)
         out = self.tempblock(out)
         return out
 

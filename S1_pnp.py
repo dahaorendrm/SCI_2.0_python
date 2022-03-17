@@ -36,8 +36,9 @@ def train(train_dataset,val_dataset):
         # "num_blocks":4
     }
 
-
+    
     model = SpViDeCNN(hparams=hparams)
+    model.cuda()
     model.fit()
     # results
     print(f'Best IOU score is : {model.trainer_params["callbacks"][0].best_model_score}')
@@ -71,8 +72,8 @@ def test(dataset=False,savepath='./S1_pnp/results'):
         # "num_blocks":4,
         "result_path":savepath
     }
-
     model = SpViDeCNN(hparams=hparams)
+    model.cuda()
     model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S1_pnp/model-outputs/resnet2/model.pt"))
     model.test()
 
