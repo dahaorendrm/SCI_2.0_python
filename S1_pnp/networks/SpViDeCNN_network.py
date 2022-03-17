@@ -102,6 +102,7 @@ class SpViDeCNN(pl.LightningModule):
         img_n = batch['img_n'].float()
         img_n = torch.moveaxis(img_n,-1,1)
         sigma = batch['sigma'].float()
+        print('noise level'+str(sigma))
         #criterion = XEDiceLoss()
         if self.gpu:
             img_n = img_n.cuda(non_blocking=True)
@@ -259,9 +260,10 @@ class SpViDeCNN(pl.LightningModule):
     ## Convenience Methods ##
 
     def _prepare_model(self):
-        Resblock.__dict__['MultipleBasicBlock2'](inplanes=8, intermediate_feature=128)
+        
+        cnn = Resblock.__dict__['MultipleBasicBlock2'](input_feature=8, intermediate_feature=128)
 
-        return Resblock
+        return cnn
 
 
     def _get_trainer_params(self):
