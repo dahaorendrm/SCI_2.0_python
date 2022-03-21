@@ -120,6 +120,21 @@ def compressive_model(input, mask):
         # print('shape of re is '+str(mea.shape))
         return (mea,re)
 
+def save_crops(path, name, idx, gt=None, mea, re):
+    if not os.path.exists(path):
+        try:
+            os.mkdir(path)
+        except:
+            pass
+    name = '_'.join((name,'%.4d'%(idx)+'.tiff'))
+    os.mkdir(path+'/mea/') if not os.path.exists(path+'/mea') else None
+        tifffile.imwrite(path+'/mea/'+name,mea)
+    os.mkdir(path+'/img_n/') if not os.path.exists(path+'/img_n') else None
+        tifffile.imwrite(path+'/img_n/'+name,re)
+    if gt:
+        os.mkdir(path+'/gt/') if not os.path.exists(path+'/gt') else None
+        tifffile.imwrite(path+'/gt/'+name,gt)
+
 def pnp_sivicnn():
     MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
     COMP_FRAME = 24
@@ -167,21 +182,12 @@ def pnp_sivicnn():
                     crops.append(data1)
                     crops.append(data2)
                 oneset = []
-                name_list.append(str(imgidx))
-            
-                name_list.append(str(imgidx+1))
-                imgidx += 2
-        print(f'Input data max is {np.amax(img)}.')
-        #print(f'{name} data finished. There are {len(crops)} sets of data now.')
-        crops_mea = []
-        crops_img = []
-        crops_led = []
 
-        return_crops_data = pool.starmap(compressive_model, dataset) # contain (mea, gaptv_result)
-        for (mea,re) in return_crops_data:
-            crops_mea.append(mea)
-            crops_img.append(re)
-        save_crops('S1_pnp/test_data',name_list,name,crops_mea,crops_img, crops_gt=crops)
+        print(f'Input data max is {np.amax(img)}.')
+        for idx,data_1 in enumerate(dataset):
+            (mea,re) = compressive_model(*data_1)
+            save_crops('S1_pnp/test_data', name, idx, data_1[0], mea, re)
+
 if __name__ == '__main__':
     #dataset = ImgDataset('./S1_pnp/train_data')
     #train_num = round(0.7*len(dataset))
