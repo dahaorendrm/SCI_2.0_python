@@ -71,6 +71,10 @@ class ReModel:
                 model = model, device = device, sigma = sigma)
             logger.debug('fastdvd denoiser is added')
             return
+        if 'spvi' in self.denoisertype:
+            self.denoiser = denoiser.spvicnn_denoiser
+            logger.debug('spvicnn denoiser is added')
+            return
         raise error('No denoiser added.')
 
     def calculate(self,mea,modul=None,orig=None,init=None):

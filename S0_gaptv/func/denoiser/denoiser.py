@@ -7,7 +7,9 @@ from .hsi.hsicnn import HSI_SDeCNN as hsinet
 from .ffdnet.models import FFDNet as ffdnet
 from .fastdvdnet.models import FastDVDnet as fastdvdnet
 from .fastdvdnet.fastdvdnet import fastdvdnet_seqdenoise
+from .spvicnn import Resblock
 from skimage.restoration import denoise_tv_chambolle
+
 
 logger = utils.init_logger(__name__)
 
@@ -214,3 +216,28 @@ def hsicnn_denoiser(xx,model,device,it,ch_sigma,it_list, tv_weight=0.5, tv_iter=
         return np.dstack(tuple(tem))
     else:
         return denoise_tv_chambolle(xx, tv_weight , n_iter_max=tv_weight, multichannel=True)
+
+
+def spvicnn_denoiser(xx):
+    device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
+    logger.info('Device %s is used for denoiser' % (repr(device)))
+    model = Resblock.__dict__['MultipleBasicBlock2'](input_feature=8, intermediate_feature=128)
+    model.load_state_dict(torch.load('/lustre/arce/X_MA/SCI_2.0_python/S1_pnp/model-outputs/resnet2/model.pt'))
+    model.eval()
+    model.to(device)
+    for q, v in model.named_parameters():
+        v.requires_grad = False
+    nb = xx.shape[2]
+    if nb%8:
+        raise ValueError(f'The image has {nb} channels, which is not fit for spvicnn_denoiser. \
+        The number of channels has to be the multiple of 8.')
+    #logger.debug('newshape of xx is :' + repr(xx.shape))
+    tem = []
+    for ind in range(nb//8):
+        net_input = xx[:,:,ind*8:ind*8+8]
+        net_input = torch.from_numpy(np.ascontiguousarray(net_input)).permute(2, 0,1).float().unsqueeze(0)
+        net_input = net_input.to(device)
+        output = model(net_input)
+        output = output.data.squeeze().swapaxes(1,2,0).cpu().numpy()
+        tem.append(output)
+    return np.concatenate(tem,2)
