@@ -3,7 +3,12 @@ from pathlib import Path
 import numpy as np
 import torch
 import os
+import scipy.io as scio
+import multiprocessing,threading,queue
+from skimage import io as skio
+from skimage import transform as skitrans
 
+from S0_gaptv.func import utils,recon_model,result,measurement
 from S1_pnp.imgdataset import ImgDataset
 from S1_pnp.networks.SpViDeCNN_network import SpViDeCNN
 # process data
@@ -77,6 +82,27 @@ def test(dataset=False,savepath='./S1_pnp/results'):
     model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S1_pnp/model-outputs/resnet2/model.pt"))
     model.test()
 
+def X2Cube(img,B=[4, 4],skip = [4, 4],bandNumber=16):
+    '''
+    This function came with the whispers datasets
+    '''
+    # Parameters
+    M, N = img.shape
+    col_extent = N - B[1] + 1
+    row_extent = M - B[0] + 1
+    # Get Starting block indices
+    start_idx = np.arange(B[0])[:, None] * N + np.arange(B[1])
+    # Generate Depth indeces
+    didx = M * N * np.arange(1)
+    start_idx = (didx[:, None] + start_idx.ravel()).reshape((-1, B[0], B[1]))
+    # Get offsetted indices across the height and width of input array
+    offset_idx = np.arange(row_extent)[:, None] * N + np.arange(col_extent)
+    # Get all actual indices & index into input array for final output
+    out = np.take(img, start_idx.ravel()[:, None] + offset_idx[::skip[0], ::skip[1]].ravel())
+    out = np.transpose(out)
+    DataCube = out.reshape(M//4, N//4,bandNumber )
+    return DataCube
+
 def compressive_model(input, mask):
         data = (
         input,
@@ -102,7 +128,7 @@ def pnp_sivicnn():
     datalist = os.listdir(path)
     finished = []
     for idx,name in enumerate(datalist):
-        if idx>5:
+        if idx>2:
             break
         if name in finished:
             continue
@@ -113,6 +139,8 @@ def pnp_sivicnn():
         imglist = os.listdir(path/name/'HSI')
         i = 1 # There's one txt file in the folder, so we start at 1
         oneset = []
+        dataset = []
+        crops = []
         print(f'Start process data {name}.')
         while i < len(imglist):
             img = skio.imread(path/name/'HSI'/f'{i:04d}.png')
@@ -127,19 +155,24 @@ def pnp_sivicnn():
             i += 1
             if len(oneset)==COMP_FRAME:
                 img = np.stack(oneset,3)
+                ranp = np.random.uniform(0,256,4)
                 print(f'img.shape is {img.shape}.')
-                data1 = img[...,::2,:]
-                #data1 = utils.selectFrames(data1)
-                data2 = img[...,1::2,:]
-                #data2 = utils.selectFrames(data2)
-                dataset.append((data1,MASK))
-                dataset.append((data2,MASK))
+                for po in ranp:
+                    data1 = img[:,po:po+256,::2,:]
+                    #data1 = utils.selectFrames(data1)
+                    data2 = img[:,po:po+256,1::2,:]
+                    #data2 = utils.selectFrames(data2)
+                    dataset.append((data1,MASK))
+                    dataset.append((data2,MASK))
+                    crops.append(data1)
+                    crops.append(data2)
                 oneset = []
                 name_list.append(str(imgidx))
+            
                 name_list.append(str(imgidx+1))
                 imgidx += 2
-        print(f'Input data max is {np.amax(imgs)}.')
-        print(f'{name} data finished. There are {len(crops)} sets of data now.')
+        print(f'Input data max is {np.amax(img)}.')
+        #print(f'{name} data finished. There are {len(crops)} sets of data now.')
         crops_mea = []
         crops_img = []
         crops_led = []
@@ -150,14 +183,15 @@ def pnp_sivicnn():
             crops_img.append(re)
         save_crops('S1_pnp/test_data',name_list,name,crops_mea,crops_img, crops_gt=crops)
 if __name__ == '__main__':
-    dataset = ImgDataset('./S1_pnp/train_data')
-    train_num = round(0.7*len(dataset))
-    valid_num = round(0.15*len(dataset))
-    print(len(dataset))
-    if not len(dataset):
-        Error
-    train_dataset,val_dataset,test_dataset = torch.utils.data.random_split(dataset, [train_num, valid_num,len(dataset)-train_num-valid_num], generator=torch.Generator().manual_seed(8))
-    train(train_dataset,val_dataset)
+    #dataset = ImgDataset('./S1_pnp/train_data')
+    #train_num = round(0.7*len(dataset))
+    #valid_num = round(0.15*len(dataset))
+    #print(len(dataset))
+    #if not len(dataset):
+    #    Error
+    #train_dataset,val_dataset,test_dataset = torch.utils.data.random_split(dataset, [train_num, valid_num,len(dataset)-train_num-valid_num], generator=torch.Generator().manual_seed(8))
+    #train(train_dataset,val_dataset)
 
-    test_dataset.dataset.test()
-    test(test_dataset)
+    #test_dataset.dataset.test()
+    #test(test_dataset)
+    pnp_sivicnn()
