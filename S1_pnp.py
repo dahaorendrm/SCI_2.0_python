@@ -7,6 +7,7 @@ import scipy.io as scio
 import multiprocessing,threading,queue
 from skimage import io as skio
 from skimage import transform as skitrans
+import tifffile
 
 from S0_gaptv.func import utils,recon_model,result,measurement
 from S1_pnp.imgdataset import ImgDataset
@@ -111,7 +112,7 @@ def compressive_model(input, mask):
         mea = measurement.Measurement(model = 'chasti_sst', dim = 3, inputs=data, configs={'MAXV':1})
         model = recon_model.ReModel('gap','spvi')
         model.config({'lambda': 1, 'ASSESE': 1, 'ACC': False,
-                'ITERs': 10, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
+                'ITERs': 43, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
                 'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7}})
         re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
         re = np.array(re)
@@ -120,7 +121,7 @@ def compressive_model(input, mask):
         # print('shape of re is '+str(mea.shape))
         return (mea,re)
 
-def save_crops(path, name, idx, gt=None, mea, re):
+def save_crops(path, name, idx, gt, mea, re):
     if not os.path.exists(path):
         try:
             os.mkdir(path)
@@ -128,10 +129,10 @@ def save_crops(path, name, idx, gt=None, mea, re):
             pass
     name = '_'.join((name,'%.4d'%(idx)+'.tiff'))
     os.mkdir(path+'/mea/') if not os.path.exists(path+'/mea') else None
-        tifffile.imwrite(path+'/mea/'+name,mea)
+    tifffile.imwrite(path+'/mea/'+name,mea)
     os.mkdir(path+'/img_n/') if not os.path.exists(path+'/img_n') else None
-        tifffile.imwrite(path+'/img_n/'+name,re)
-    if gt:
+    tifffile.imwrite(path+'/img_n/'+name,re)
+    if gt.shape:
         os.mkdir(path+'/gt/') if not os.path.exists(path+'/gt') else None
         tifffile.imwrite(path+'/gt/'+name,gt)
 
@@ -143,7 +144,7 @@ def pnp_sivicnn():
     datalist = os.listdir(path)
     finished = []
     for idx,name in enumerate(datalist):
-        if idx>2:
+        if idx>0:
             break
         if name in finished:
             continue
@@ -170,7 +171,10 @@ def pnp_sivicnn():
             i += 1
             if len(oneset)==COMP_FRAME:
                 img = np.stack(oneset,3)
-                ranp = np.random.uniform(0,256,4)
+                min_v = np.amin(img)
+                max_v = np.amax(img)
+                img = (img-min_v)/(max_v-min_v)
+                ranp = np.random.random_integers(0,256,1)
                 print(f'img.shape is {img.shape}.')
                 for po in ranp:
                     data1 = img[:,po:po+256,::2,:]

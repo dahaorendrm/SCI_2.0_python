@@ -215,14 +215,18 @@ def hsicnn_denoiser(xx,model,device,it,ch_sigma,it_list, tv_weight=0.5, tv_iter=
             tem.append(output)
         return np.dstack(tuple(tem))
     else:
-        return denoise_tv_chambolle(xx, tv_weight , n_iter_max=tv_weight, multichannel=True)
+        return denoise_tv_chambolle(xx, tv_weight , n_iter_max=tv_iter, multichannel=True)
 
 
-def spvicnn_denoiser(xx):
-    device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
-    logger.info('Device %s is used for denoiser' % (repr(device)))
+def spvicnn_denoiser(xx,sigma,it, tv_weight=0.5, tv_iter=7):
+    if it <40:
+        return denoise_tv_chambolle(xx, tv_weight , n_iter_max=tv_iter, multichannel=True)
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    #logger.info('Device %s is used for denoiser' % (repr(device)))
     model = Resblock.__dict__['MultipleBasicBlock2'](input_feature=8, intermediate_feature=128)
-    model.load_state_dict(torch.load('/lustre/arce/X_MA/SCI_2.0_python/S1_pnp/model-outputs/resnet2/model.pt'))
+    pretrained_weight = torch.load('/lustre/arce/X_MA/SCI_2.0_python/S1_pnp/model-outputs/resnet2/model.pt')
+    pretrained_weight = {k[6:]: v for k, v in pretrained_weight.items() }
+    model.load_state_dict(pretrained_weight)
     model.eval()
     model.to(device)
     for q, v in model.named_parameters():
@@ -238,6 +242,6 @@ def spvicnn_denoiser(xx):
         net_input = torch.from_numpy(np.ascontiguousarray(net_input)).permute(2, 0,1).float().unsqueeze(0)
         net_input = net_input.to(device)
         output = model(net_input)
-        output = output.data.squeeze().swapaxes(1,2,0).cpu().numpy()
+        output = output.data.squeeze().permute(1,2,0).cpu().numpy()
         tem.append(output)
     return np.concatenate(tem,2)
