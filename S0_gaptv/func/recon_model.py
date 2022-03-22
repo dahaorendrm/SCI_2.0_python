@@ -78,6 +78,13 @@ class ReModel:
                 tv_iter = self.config_de_p['tv_iter'],
                 it_list = self.config_de_p['it_list'])
             return
+        if 'spvi_sigma' in self.denoisertype:
+            model,device = denoiser.spvicnn_sigma_denoiser_config()
+            self.denoiser = lambda x, sigma, it: denoiser.spvicnn_sigma_denoiser( x,sigma=sigma,
+                it = it, model = model, device = device, tv_weight = self.config_de_p['tv_weight'],
+                tv_iter = self.config_de_p['tv_iter'],
+                it_list = self.config_de_p['it_list'])
+            return
         raise error('No denoiser added.')
 
     def calculate(self,mea,modul=None,orig=None,init=None):

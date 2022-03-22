@@ -133,7 +133,7 @@ def compressive_model(MODEL,input,mask=None):
         mea = measurement.Measurement(model = 'chasti_sst', dim = 3, inputs=data, configs={'MAXV':1})
         model = recon_model.ReModel('gap','tv_chambolle')
         model.config({'lambda': 1, 'ASSESE': 1, 'ACC': False,
-                'ITERs': 30, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
+                'ITERs': 30, 'sigmas':10/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
                 'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7}})
         re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
         re = np.array(re)
