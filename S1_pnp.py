@@ -112,8 +112,8 @@ def compressive_model(input, mask):
         mea = measurement.Measurement(model = 'chasti_sst', dim = 3, inputs=data, configs={'MAXV':1})
         model = recon_model.ReModel('gap','spvi')
         model.config({'lambda': 1, 'ASSESE': 1, 'ACC': False,
-                'ITERs': 43, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
-                'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7}})
+                'ITERs': 50, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
+                'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7, 'it_list':[41,42,43,51,52,53]}})
         re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
         re = np.array(re)
         #re[re<0] = 0
