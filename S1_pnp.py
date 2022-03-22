@@ -111,9 +111,9 @@ def compressive_model(input, mask):
         )
         mea = measurement.Measurement(model = 'chasti_sst', dim = 3, inputs=data, configs={'MAXV':1})
         model = recon_model.ReModel('gap','spvi')
-        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': False,
-                'ITERs': 50, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
-                'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7, 'it_list':[41,42,43,51,52,53]}})
+        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
+                'ITERs': 140, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
+                'P_DENOISE':{'tv_weight': 0.7, 'tv_iter': 5, 'it_list':[121,126,131,136]}})
         re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
         re = np.array(re)
         #re[re<0] = 0
@@ -138,7 +138,7 @@ def save_crops(path, name, idx, gt, mea, re):
 
 def pnp_sivicnn():
     MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
-    COMP_FRAME = 24
+    COMP_FRAME = 48
     pool = multiprocessing.Pool(10)
     path = Path('../data/whispers/test')
     datalist = os.listdir(path)

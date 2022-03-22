@@ -221,7 +221,6 @@ def spvicnn_denoiser_config():
     device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
     logger.info('Device %s is used for denoiser' % (repr(device)))
     model = Resblock.__dict__['MultipleBasicBlock2'](input_feature=8, intermediate_feature=128)
-    model.load_state_dict(torch.load('func/denoiser/hsi/deep_denoiser.pth'))
     pretrained_weight = torch.load('/lustre/arce/X_MA/SCI_2.0_python/S1_pnp/model-outputs/resnet2/model.pt')
     pretrained_weight = {k[6:]: v for k, v in pretrained_weight.items() }
     model.load_state_dict(pretrained_weight)
