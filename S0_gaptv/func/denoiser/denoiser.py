@@ -253,3 +253,72 @@ def spvicnn_denoiser(xx,sigma,it, tv_weight=0.5, tv_iter=7,model=None, device='c
         output = output.data.squeeze().permute(1,2,0).cpu().numpy()
         tem.append(output)
     return np.concatenate(tem,2)
+
+
+def spvicnn_sigma_denoiser_config():
+    device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
+    logger.info('Device %s is used for denoiser' % (repr(device)))
+
+    inpblock = torch.nn.Sequential(*[
+        torch.nn.Conv2d(9, 128,
+                  kernel_size=3, stride=1, padding=1, bias=True),
+        torch.nn.LeakyReLU(inplace=True)
+    ])
+    for m in inpblock.modules():
+        if isinstance(m, torch.nn.Conv2d):
+            n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+            m.weight.data.normal_(0, math.sqrt(2. / n))
+        elif isinstance(m, torch.nn.BatchNorm2d):
+            m.weight.data.fill_(1)
+            m.bias.data.zero_()
+    midblock1 = Resblock.__dict__['BasicBlock'](inplanes=128, planes=128)
+    midblock2 = Resblock.__dict__['BasicBlock'](inplanes=128, planes=128)
+    endblock = torch.nn.Sequential(*[
+        torch.nn.Conv2d(128, 8,
+                  kernel_size=1, stride=1, padding=0, bias=True),
+        torch.nn.LeakyReLU(inplace=True)
+    ])
+    for m in endblock.modules():
+        if isinstance(m, torch.nn.Conv2d):
+            n = m.kernel_size[0] * m.kernel_size[1] * m.out_channels
+            m.weight.data.normal_(0, math.sqrt(2. / n))
+        elif isinstance(m, torch.nn.BatchNorm2d):
+            m.weight.data.fill_(1)
+            m.bias.data.zero_()
+    model = torch.nn.Sequential(inpblock, midblock1, midblock2, endblock)
+    pretrained_weight = torch.load('/lustre/arce/X_MA/SCI_2.0_python/S1_pnp/model-outputs/resnet/model.pt')
+    pretrained_weight = {k[6:]: v for k, v in pretrained_weight.items() }
+    model.load_state_dict(pretrained_weight)
+    model.eval()
+    for q, v in model.named_parameters():
+        v.requires_grad = False
+    return model.to(device), device
+
+def spvicnn_sigma_denoiser(xx,sigma,it, tv_weight=0.5, tv_iter=7,model=None, device='cpu', it_list=[]):
+    sigma = torch.Tensor(sigma)
+    sigma = sigma.unsqueeze(1).unsqueeze(1).unsqueeze(1)
+    sigma = sigma.repeat(1, 1, xx.shape[-2], xx.shape[-1])
+    l_it = []
+    for its in it_list:
+        if type(its) is int:
+            l_it.append(its)
+        else:
+            l_it.extend([i for i in range(*its)])
+    if it not in l_it:
+        return denoise_tv_chambolle(xx, tv_weight , n_iter_max=tv_iter, multichannel=True)
+
+    nb = xx.shape[2]
+    if nb%8:
+        raise ValueError(f'The image has {nb} channels, which is not fit for spvicnn_denoiser. \
+        The number of channels has to be the multiple of 8.')
+    #logger.debug('newshape of xx is :' + repr(xx.shape))
+    tem = []
+    for ind in range(nb//8):
+        net_input = xx[:,:,ind*8:ind*8+8]
+        net_input = torch.from_numpy(np.ascontiguousarray(net_input)).permute(2, 0,1).float().unsqueeze(0)
+        net_input = torch.cat([net_input,sigma],1)
+        net_input = net_input.to(device)
+        output = model(net_input)
+        output = output.data.squeeze().permute(1,2,0).cpu().numpy()
+        tem.append(output)
+    return np.concatenate(tem,2)
