@@ -45,6 +45,7 @@ def train(train_dataset,val_dataset):
 
 
     model = SpViDeCNN(hparams=hparams)
+    model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S1_pnp/model-outputs/resnet2/model.pt"))
     model.cuda()
     model.fit()
     # results
@@ -52,7 +53,7 @@ def train(train_dataset,val_dataset):
     # save the weights to submitssion file
     if not os.path.exists('./S1_pnp/model-outputs/resnet2'):
        os.mkdir('./S1_pnp/model-outputs/resnet2')
-    weight_path = "./S1_pnp/model-outputs/resnet2/model.pt"
+    weight_path = "./S1_pnp/model-outputs/resnet2/model2.pt"
     model = SpViDeCNN(hparams=hparams).load_from_checkpoint(model.trainer_params["callbacks"][0].best_model_path)
     torch.save(model.state_dict(), weight_path)
 
@@ -81,7 +82,7 @@ def test(dataset=False,savepath='./S1_pnp/results'):
     }
     model = SpViDeCNN(hparams=hparams)
     model.cuda()
-    model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S1_pnp/model-outputs/resnet2/model.pt"))
+    model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S1_pnp/model-outputs/resnet2/model2.pt"))
     model.test()
 
 def X2Cube(img,B=[4, 4],skip = [4, 4],bandNumber=16):
@@ -199,15 +200,15 @@ def pnp_sivicnn():
             save_crops('S1_pnp/test_data', name, idx, data_1[0], mea, re)
 
 if __name__ == '__main__':
-    #dataset = ImgDataset('./S1_pnp/train_data')
-    #train_num = round(0.7*len(dataset))
-    #valid_num = round(0.15*len(dataset))
-    #print(len(dataset))
-    #if not len(dataset):
-    #    Error
-    #train_dataset,val_dataset,test_dataset = torch.utils.data.random_split(dataset, [train_num, valid_num,len(dataset)-train_num-valid_num], generator=torch.Generator().manual_seed(8))
-    #train(train_dataset,val_dataset)
+    dataset = ImgDataset('./S1_pnp/train_data')
+    train_num = round(0.7*len(dataset))
+    valid_num = round(0.15*len(dataset))
+    print(len(dataset))
+    if not len(dataset):
+       Error
+    train_dataset,val_dataset,test_dataset = torch.utils.data.random_split(dataset, [train_num, valid_num,len(dataset)-train_num-valid_num], generator=torch.Generator().manual_seed(8))
+    train(train_dataset,val_dataset)
 
-    #test_dataset.dataset.test()
-    #test(test_dataset)
-    pnp_sivicnn()
+    test_dataset.dataset.test()
+    test(test_dataset)
+    #pnp_sivicnn()
