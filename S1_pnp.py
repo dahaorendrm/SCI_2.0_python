@@ -3,6 +3,7 @@ from pathlib import Path
 import numpy as np
 import torch
 import os
+import scipy
 import scipy.io as scio
 import multiprocessing,threading,queue
 from skimage import io as skio
@@ -111,9 +112,9 @@ def compressive_model(input, mask):
         )
         mea = measurement.Measurement(model = 'chasti_sst', dim = 3, inputs=data, configs={'MAXV':1})
         model = recon_model.ReModel('gap','spvi')
-        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': False,
-                'ITERs': 50, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi_sigma',
-                'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7, 'it_list':[41,42,43,51,52,53]}})
+        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
+                'ITERs':120, 'sigmas':5/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi_sigma',
+                'P_DENOISE':{'tv_weight': 0.5, 'tv_iter': 5, 'it_list':[40,50,60,70,80,90,100,110,119]}})
         re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
         re = np.array(re)
         #re[re<0] = 0
@@ -138,7 +139,7 @@ def save_crops(path, name, idx, gt, mea, re):
 
 def pnp_sivicnn():
     MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
-    COMP_FRAME = 24
+    COMP_FRAME = 32
     pool = multiprocessing.Pool(10)
     path = Path('../data/whispers/test')
     datalist = os.listdir(path)
@@ -165,8 +166,13 @@ def pnp_sivicnn():
             #print(f'2.max:{np.amax(img)} sum {np.sum(img)}')
             if img.shape[0]!=256:
                 img = skitrans.resize(img/511., (256,512))
+                for idx in range(img.shape[2]):
+                    img[...,idx] = scipy.signal.medfilt2d(img[...,idx], kernel_size=3)
                 oneset.append(img)
             else:
+                img = scipy.signal.medfilt2d(img, kernel_size=3)
+                for idx in range(img.shape[2]):
+                    img[...,idx] = scipy.signal.medfilt2d(img[...,idx], kernel_size=3)
                 oneset.append(img/511.)
             i += 1
             if len(oneset)==COMP_FRAME:

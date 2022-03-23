@@ -295,6 +295,8 @@ def spvicnn_sigma_denoiser_config():
     return model.to(device), device
 
 def spvicnn_sigma_denoiser(xx,sigma,it, tv_weight=0.5, tv_iter=7,model=None, device='cpu', it_list=[]):
+    xx[xx<0]=0
+    xx[xx>1]=1
     sigma = torch.Tensor(sigma)
     sigma = sigma.unsqueeze(1).unsqueeze(1).unsqueeze(1)
     sigma = sigma.repeat(1, 1, xx.shape[-2], xx.shape[-1])
