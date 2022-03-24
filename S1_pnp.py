@@ -114,8 +114,8 @@ def compressive_model(input, mask):
         mea = measurement.Measurement(model = 'chasti_sst', dim = 3, inputs=data, configs={'MAXV':1})
         model = recon_model.ReModel('gap','spvi')
         model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
-                'ITERs':120, 'sigmas':5/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi_sigma',
-                'P_DENOISE':{'tv_weight': 0.5, 'tv_iter': 5, 'it_list':[40,50,60,70,80,90,100,110,119]}})
+                'ITERs':85, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
+                'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(1,5),(10,13),(40,42),60,63,66,69,72,75,78]}})
         re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
         re = np.array(re)
         #re[re<0] = 0
@@ -200,15 +200,15 @@ def pnp_sivicnn():
             save_crops('S1_pnp/test_data', name, idx, data_1[0], mea, re)
 
 if __name__ == '__main__':
-    dataset = ImgDataset('./S1_pnp/train_data')
-    train_num = round(0.7*len(dataset))
-    valid_num = round(0.15*len(dataset))
-    print(len(dataset))
-    if not len(dataset):
-       Error
-    train_dataset,val_dataset,test_dataset = torch.utils.data.random_split(dataset, [train_num, valid_num,len(dataset)-train_num-valid_num], generator=torch.Generator().manual_seed(8))
-    train(train_dataset,val_dataset)
+    #dataset = ImgDataset('./S1_pnp/train_data')
+    #train_num = round(0.7*len(dataset))
+    #valid_num = round(0.15*len(dataset))
+    #print(len(dataset))
+    #if not len(dataset):
+    #   Error
+    #train_dataset,val_dataset,test_dataset = torch.utils.data.random_split(dataset, [train_num, valid_num,len(dataset)-train_num-valid_num], generator=torch.Generator().manual_seed(8))
+    #train(train_dataset,val_dataset)
 
-    test_dataset.dataset.test()
-    test(test_dataset)
-    #pnp_sivicnn()
+    #test_dataset.dataset.test()
+    #test(test_dataset)
+    pnp_sivicnn()
