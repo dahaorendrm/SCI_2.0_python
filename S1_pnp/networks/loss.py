@@ -38,11 +38,11 @@ class XEDiceLoss(torch.nn.Module):
         #temp_true = torch.where((true == 255), 0, true)  # cast 255 to 0 temporarily
         #print(f'pred max is {pred.max()}, true max is {true.max()}')        # Move channel to batck so the edge function still can be usedi
         ed_loss = 0
-        for idx in range(pred.size()[1]):
-            pred_t = pred[:,idx:idx+1,...]
-            true_t = true[:,idx:idx+1,...]
-            maps = self.edge(true_t)
-            ed_loss += self.xe(pred_t*maps, true_t*maps)
+        #for idx in range(pred.size()[1]):
+        #    pred_t = pred[:,idx:idx+1,...]
+        #    true_t = true[:,idx:idx+1,...]
+        #    maps = self.edge(true_t)
+        #    ed_loss += self.xe(pred_t*maps, true_t*maps)
         xe_loss = self.xe(pred, true)
         #xe_loss = xe_loss.mean()
 

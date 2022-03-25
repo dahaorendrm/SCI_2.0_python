@@ -38,13 +38,14 @@ def train(train_dataset,val_dataset):
 
 
     model = SpViDeCNN(hparams=hparams)
+    model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S1_pnp/model-outputs/resnet/model.pt"))
     model.fit()
     # results
     print(f'Best IOU score is : {model.trainer_params["callbacks"][0].best_model_score}')
     # save the weights to submitssion file
     if not os.path.exists('./S1_pnp/model-outputs/resnet'):
        os.mkdir('./S1_pnp/model-outputs/resnet')
-    weight_path = "./S1_pnp/model-outputs/resnet/model.pt"
+    weight_path = "./S1_pnp/model-outputs/resnet/model2.pt"
     model = SpViDeCNN(hparams=hparams).load_from_checkpoint(model.trainer_params["callbacks"][0].best_model_path)
     torch.save(model.state_dict(), weight_path)
 
@@ -73,7 +74,7 @@ def test(dataset=False,savepath='./S1_pnp/results'):
     }
 
     model = SpViDeCNN(hparams=hparams)
-    model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S1_pnp/model-outputs/resnet/model.pt"))
+    model.load_state_dict(torch.load("/lustre/arce/X_MA/SCI_2.0_python/S1_pnp/model-outputs/resnet/model2.pt"))
     model.test()
 
 
@@ -85,7 +86,7 @@ if __name__ == '__main__':
     if not len(dataset):
         Error
     train_dataset,val_dataset,test_dataset = torch.utils.data.random_split(dataset, [train_num, valid_num,len(dataset)-train_num-valid_num], generator=torch.Generator().manual_seed(8))
-    #train(train_dataset,val_dataset)
+    train(train_dataset,val_dataset)
 
     test_dataset.dataset.test()
     test(test_dataset)
