@@ -114,8 +114,8 @@ def compressive_model(input, mask):
         mea = measurement.Measurement(model = 'chasti_sst', dim = 3, inputs=data, configs={'MAXV':1})
         model = recon_model.ReModel('gap','spvi')
         model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
-                'ITERs':85, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
-                'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(1,5),(10,13),(40,42),60,63,66,69,72,75,78]}})
+                'ITERs':80, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
+                'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(20,50),(79,81)]}})
         re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
         re = np.array(re)
         #re[re<0] = 0
@@ -146,8 +146,8 @@ def pnp_sivicnn():
     datalist = os.listdir(path)
     finished = []
     for idx,name in enumerate(datalist):
-        if idx>0:
-            break
+        if idx!=13:
+            continue
         if name in finished:
             continue
         comp_input = []
@@ -161,6 +161,9 @@ def pnp_sivicnn():
         crops = []
         print(f'Start process data {name}.')
         while i < len(imglist):
+            if i <10:
+                i+=1
+                continue
             img = skio.imread(path/name/'HSI'/f'{i:04d}.png')
             #print(f'1.max:{np.amax(img)}')
             img = X2Cube(img)
@@ -171,10 +174,11 @@ def pnp_sivicnn():
                     img[...,idx] = scipy.signal.medfilt2d(img[...,idx], kernel_size=3)
                 oneset.append(img)
             else:
-                img = scipy.signal.medfilt2d(img, kernel_size=3)
+                #img = scipy.signal.medfilt2d(img, kernel_size=3)
+                img = img/511.
                 for idx in range(img.shape[2]):
                     img[...,idx] = scipy.signal.medfilt2d(img[...,idx], kernel_size=3)
-                oneset.append(img/511.)
+                oneset.append(img)
             i += 1
             if len(oneset)==COMP_FRAME:
                 img = np.stack(oneset,3)
@@ -197,7 +201,7 @@ def pnp_sivicnn():
         print(f'Input data max is {np.amax(img)}.')
         for idx,data_1 in enumerate(dataset):
             (mea,re) = compressive_model(*data_1)
-            save_crops('S1_pnp/test_data', name, idx, data_1[0], mea, re)
+            save_crops('S1_pnp/test_data', name, idx, crops[idx], mea, re)
 
 if __name__ == '__main__':
     #dataset = ImgDataset('./S1_pnp/train_data')
