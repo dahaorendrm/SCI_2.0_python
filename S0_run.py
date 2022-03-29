@@ -47,7 +47,7 @@ def compressive_model_pnp_exp(mea, mask, numf):
         input,
         mask #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
         )
-        mea = measurement.Measurement(model = 'chasti_sst', mea, mask, configs={'NUMF':numf, 'SCALE_DATA':1,'MAXV':1})
+        mea = measurement.Measurement(model = 'chasti_sst', mea=mea, mask=mask, configs={'NUMF':numf, 'SCALE_DATA':1,'MAXV':1})
         model = recon_model.ReModel('gap','spvi')
         model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
                 'ITERs':80, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
@@ -532,7 +532,7 @@ def test_data_generation_pnp():
 
     MODEL = 'lesti_sst'
     COMP_FRAME = 32
-    imgs = scio.loadmat('4D_Lego.mat')['img']
+    imgs = scio.loadmat('S0_gaptv/4D_Lego.mat')['img']
     print(f'Input LEGO data max is {np.amax(imgs)}.')
     #print(f'shape of imgs is {imgs.shape}')
     crops = []
@@ -554,7 +554,7 @@ def test_data_generation_pnp():
 
     MODEL = 'lesti_sst' ### (orig_leds,mea,re)
     COMP_FRAME = 24
-    imgs = scio.loadmat('blocks.mat')['img']*255
+    imgs = scio.loadmat('S0_gaptv/blocks.mat')['img']*255
     print(f'Input wood blocks data max is {np.amax(imgs)}.')
     #print(f'shape of imgs is {imgs.shape}')
     crops = []
@@ -577,5 +577,6 @@ if __name__ == '__main__':
     print(f'Start time:{datetime.datetime.now()}')
     #train_data_generation()
     #test_data_generation()
-    S1train_data_generation()
+    #S1train_data_generation()
+    test_data_generation_pnp()
     print(f'End time:{datetime.datetime.now()}')
