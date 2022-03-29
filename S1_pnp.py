@@ -10,9 +10,10 @@ from skimage import io as skio
 from skimage import transform as skitrans
 import tifffile
 
-from S0_gaptv.func import utils,recon_model,result,measurement
+from S0_gaptv.func import recon_model,result,measurement
 from S1_pnp.imgdataset import ImgDataset
 from S1_pnp.networks.SpViDeCNN_network import SpViDeCNN
+import utils
 # process data
 
 #train_dataset = ImgDataset('../S0_gaptv/data/train/')
@@ -118,8 +119,12 @@ def compressive_model(input, mask):
                 'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(20,50),(79,81)]}})
         re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
         re = np.array(re)
-        #re[re<0] = 0
+        re[re<0] = 0
+        re = re/np.amax(re)
         mea = np.array(mea.mea)
+        v_psnr = utils.calculate_psnr(re,utils.selectFrames(input))
+        v_ssim = utils.calculate_ssim(re,utils.selectFrames(input))
+        print(f'Final evaluation, PSNR:{v_psnr:2.2f}dB, SSIM:{v_ssim:.4f}.')
         # print('shape of re is '+str(mea.shape))
         return (mea,re)
 
@@ -138,7 +143,7 @@ def save_crops(path, name, idx, gt, mea, re):
         os.mkdir(path+'/gt/') if not os.path.exists(path+'/gt') else None
         tifffile.imwrite(path+'/gt/'+name,gt)
 
-def pnp_sivicnn():
+def pnp_sivicnn(savpath = 'S1_pnp/test_data'):
     MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
     COMP_FRAME = 32
     pool = multiprocessing.Pool(10)
@@ -201,7 +206,7 @@ def pnp_sivicnn():
         print(f'Input data max is {np.amax(img)}.')
         for idx,data_1 in enumerate(dataset):
             (mea,re) = compressive_model(*data_1)
-            save_crops('S1_pnp/test_data', name, idx, crops[idx], mea, re)
+            save_crops(savepath, name, idx, crops[idx], mea, re)
 
 if __name__ == '__main__':
     #dataset = ImgDataset('./S1_pnp/train_data')

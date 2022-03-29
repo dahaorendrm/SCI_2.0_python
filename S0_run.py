@@ -21,6 +21,48 @@ from pathlib import Path
 
 MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
 
+def compressive_model_pnp(input, mask):
+        data = (
+        input,
+        mask #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
+        )
+        mea = measurement.Measurement(model = 'chasti_sst', dim = 3, inputs=data, configs={'MAXV':1})
+        model = recon_model.ReModel('gap','spvi')
+        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
+                'ITERs':80, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
+                'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(20,50),(79,81)]}})
+        re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
+        re = np.array(re)
+        re[re<0] = 0
+        re = re/np.amax(re)
+        mea = np.array(mea.mea)
+        v_psnr = utils.calculate_psnr(re,utils.selectFrames(input))
+        v_ssim = utils.calculate_ssim(re,utils.selectFrames(input))
+        print(f'Final evaluation, PSNR:{v_psnr:2.2f}dB, SSIM:{v_ssim:.4f}.')
+        # print('shape of re is '+str(mea.shape))
+        return (mea,re)
+
+def compressive_model_pnp_exp(mea, mask, numf):
+        data = (
+        input,
+        mask #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
+        )
+        mea = measurement.Measurement(model = 'chasti_sst', mea, mask, configs={'NUMF':numf, 'SCALE_DATA':1,'MAXV':1})
+        model = recon_model.ReModel('gap','spvi')
+        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
+                'ITERs':80, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
+                'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(20,50),(79,81)]}})
+        re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
+        re = np.array(re)
+        re[re<0] = 0
+        re = re/np.amax(re)
+        mea = np.array(mea.mea)
+        v_psnr = utils.calculate_psnr(re,utils.selectFrames(input))
+        v_ssim = utils.calculate_ssim(re,utils.selectFrames(input))
+        print(f'Final evaluation, PSNR:{v_psnr:2.2f}dB, SSIM:{v_ssim:.4f}.')
+        # print('shape of re is '+str(mea.shape))
+        return (mea,re)
+
 def compressive_model_exp(MODEL,mea,mask,numf):
     mea = measurement.Measurement.import_exp_mea_modul(MODEL, mea, mask, configs={'NUMF':numf, 'SCALE_DATA':1, 'CUT_BAND':None})
     model = recon_model.ReModel('gap','tv_chambolle')
@@ -482,6 +524,55 @@ def S1train_data_generation():
             crops_img.append(re)
         save_crops('data/trainS1_nacc',name_list,name,crops_mea,crops_img, crops_gt=crops)
         print(f'Finish saving for data {name}!')
+
+def test_data_generation_pnp():
+    global MASK
+    mask = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
+    pool = multiprocessing.Pool()
+
+    MODEL = 'lesti_sst'
+    COMP_FRAME = 32
+    imgs = scio.loadmat('4D_Lego.mat')['img']
+    print(f'Input LEGO data max is {np.amax(imgs)}.')
+    #print(f'shape of imgs is {imgs.shape}')
+    crops = []
+    for ind in range(0,40-COMP_FRAME+1,COMP_FRAME-4):
+        #print(f'Test: index of the data range is {ind} to {ind+COMP_FRAME}')
+        crops.append(imgs[:,:,4:-2,ind:ind+COMP_FRAME])
+    comp_input = [(crop,mask) for crop in crops]
+    return_crops_data = pool.starmap(compressive_model_pnp, comp_input) # contain (original led project, mea, gaptv_result)
+    crops_mea = []
+    crops_img = []
+    crops_led = []
+    for (orig_leds,mea,re) in return_crops_data:
+        crops_mea.append(mea)
+        crops_img.append(re)
+        crops_led.append(orig_leds)
+    ### (orig_leds,mea,re)
+    save_crops('S1_pnp/data/test',0,'4D_lego',crops_mea,crops_img, crops_gt=crops, crops_led=crops_led)
+
+
+    MODEL = 'lesti_sst' ### (orig_leds,mea,re)
+    COMP_FRAME = 24
+    imgs = scio.loadmat('blocks.mat')['img']*255
+    print(f'Input wood blocks data max is {np.amax(imgs)}.')
+    #print(f'shape of imgs is {imgs.shape}')
+    crops = []
+    for ind in range(0,40-COMP_FRAME+1,COMP_FRAME-4):
+        #print(f'Test: index of the data range is {ind} to {ind+COMP_FRAME}')
+        crops.append(imgs[:,:,4:-2,ind:ind+COMP_FRAME])
+    comp_input = [(MODEL,crop,mask) for crop in crops]
+    return_crops_data = pool.starmap(compressive_model_pnp, comp_input) # contain (original led project, mea, gaptv_result)
+    crops_mea = []
+    crops_img = []
+    crops_led = []
+    for (orig_leds,mea,re) in return_crops_data:
+        crops_mea.append(mea)
+        crops_img.append(re)
+        crops_led.append(orig_leds)
+    save_crops('S1_pnp/data/test',0,'4D_blocks',crops_mea,crops_img, crops_gt=crops, crops_led=crops_led)
+
+
 if __name__ == '__main__':
     print(f'Start time:{datetime.datetime.now()}')
     #train_data_generation()

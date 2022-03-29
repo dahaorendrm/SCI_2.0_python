@@ -39,6 +39,32 @@ def S0run_test():
         tifffile.imwrite(Path('S0_gaptv/data/exp/mea')/(dataout[idx][:-4]+'.tiff'),mea)
         tifffile.imwrite(Path('S0_gaptv/data/exp/img_n')/(dataout[idx][:-4]+'.tiff'),re)
 
+def S0run_test_pnp():
+    pool = multiprocessing.Pool()
+    PATH = Path('./expdata')
+    mask = scio.loadmat(PATH/'mask.mat')['mask']
+    MODEL = 'lesti_sst'
+    numf = mask.shape[2]
+    dataset = []
+    datalist = os.listdir(PATH)
+    dataout = []
+    for idx,name in enumerate(datalist):
+        if not 'Lego0019' in name: # small test sets
+            print(name)
+            continue
+        mea = scio.loadmat(PATH/name)['img']
+        dataout.append(name)
+        dataset.append((mea,mask,numf))
+    #S0run.compressive_model_exp(MODEL,mea,mask,numf=16)
+    return_crops_data = pool.starmap(S0run.compressive_model_pnp_exp, dataset)
+    if not os.path.exists('S0_gaptv/data/exp'):
+        os.mkdir('S0_gaptv/data/exp')
+        os.mkdir('S0_gaptv/data/exp/mea')
+        os.mkdir('S0_gaptv/data/exp/img_n')
+    for idx,(mea,re) in enumerate(return_crops_data):
+        tifffile.imwrite(Path('S0_gaptv/data/exp/mea')/(dataout[idx][:-4]+'.tiff'),mea)
+        tifffile.imwrite(Path('S0_gaptv/data/exp/img_n')/(dataout[idx][:-4]+'.tiff'),re)
+
 if __name__=='__main__':
     # S0
     #S0run_test()
