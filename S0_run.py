@@ -21,12 +21,47 @@ from pathlib import Path
 
 MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
 
-def compressive_model_pnp(input, mask):
+def compressive_model_pnp(MODEL,input, mask):
+    if MODEL == 'lesti_sst':
+        BandsLed = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/BandsLed.mat')['BandsLed']
+        BandsLed = BandsLed[4:-2,:]
+        data = (
+        input,
+        mask, #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
+        BandsLed
+        )
+        #print(f'test:shape of input is {input.shape}')
+        mea = measurement.Measurement(model = MODEL, dim = 4, inputs=data, configs={'NUMF':input.shape[3], 'SCALE_DATA':1, 'CUT_BAND':None})
+        model = recon_model.ReModel('gap','tv_chambolle')
+        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': False,
+                'ITERs': 80, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
+                'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(20,50),(79,81)]}})
+        orig = np.empty_like(mea.mask)
+        index = 0
+        for i in range(mea.orig_leds.shape[3]):
+            orig[:,:,i] = mea.orig_leds[:,:,index,i]
+            if index<7: # hard coding. 8 is the number of LEDs
+                index += 1
+            else:
+                index = 0
+        re = result.Result(model, mea, modul = mea.mask, orig = orig)
+        re = np.array(re)
+        re[re<0] = 0
+        re = re/np.amax(re)
+        orig_leds = mea.orig_leds
+        orig_leds[orig_leds<0] = 0
+        orig_leds = orig_leds/np.amax(orig_leds)
+        mea = np.array(mea.mea)
+        # print('shape of re is '+str(mea.shape))
+        result__ = (orig_leds,mea,re)
+        print(f'Return result with {len(result__)} elements!')
+        return result__
+    if MODEL = 'chasti_sst':
         data = (
         input,
         mask #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
         )
-        mea = measurement.Measurement(model = 'chasti_sst', dim = 3, inputs=data, configs={'MAXV':1})
+        mea = measurement.Measurement(model = MODEL, dim = 3, inputs=data, configs={'MAXV':1})
         model = recon_model.ReModel('gap','spvi')
         model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
                 'ITERs':80, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
@@ -42,26 +77,26 @@ def compressive_model_pnp(input, mask):
         # print('shape of re is '+str(mea.shape))
         return (mea,re)
 
-def compressive_model_pnp_exp(mea, mask, numf):
-        data = (
-        input,
-        mask #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
-        )
-        mea = measurement.Measurement(model = 'chasti_sst', mea=mea, mask=mask, configs={'NUMF':numf, 'SCALE_DATA':1,'MAXV':1})
-        model = recon_model.ReModel('gap','spvi')
-        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
-                'ITERs':80, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
-                'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(20,50),(79,81)]}})
-        re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
-        re = np.array(re)
-        re[re<0] = 0
-        re = re/np.amax(re)
-        mea = np.array(mea.mea)
-        v_psnr = utils.calculate_psnr(re,utils.selectFrames(input))
-        v_ssim = utils.calculate_ssim(re,utils.selectFrames(input))
-        print(f'Final evaluation, PSNR:{v_psnr:2.2f}dB, SSIM:{v_ssim:.4f}.')
-        # print('shape of re is '+str(mea.shape))
-        return (mea,re)
+def compressive_model_pnp_exp(MODEL,mea, mask, numf):
+    data = (
+    input,
+    mask #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
+    )
+    mea = measurement.Measurement.import_exp_mea_modul(model = MODEL, mea=mea, mask=mask, configs={'NUMF':numf, 'SCALE_DATA':1,'MAXV':1})
+    model = recon_model.ReModel('gap','spvi')
+    model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
+            'ITERs':80, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
+            'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(20,50),(79,81)]}})
+    re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
+    re = np.array(re)
+    re[re<0] = 0
+    re = re/np.amax(re)
+    mea = np.array(mea.mea)
+    v_psnr = utils.calculate_psnr(re,utils.selectFrames(input))
+    v_ssim = utils.calculate_ssim(re,utils.selectFrames(input))
+    print(f'Final evaluation, PSNR:{v_psnr:2.2f}dB, SSIM:{v_ssim:.4f}.')
+    # print('shape of re is '+str(mea.shape))
+    return (mea,re)
 
 def compressive_model_exp(MODEL,mea,mask,numf):
     mea = measurement.Measurement.import_exp_mea_modul(MODEL, mea, mask, configs={'NUMF':numf, 'SCALE_DATA':1, 'CUT_BAND':None})
