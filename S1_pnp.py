@@ -251,7 +251,12 @@ def pnp_sivicnn(savpath = 'S1_pnp/test_data'):
             save_crops(savepath, name, idx, crops[idx], mea, re)
 
 def pnp_sivicnn_paper(savepath = 'S1_pnp/data_paperpnp'):
+    from scipy import signal
     MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
+    led_curve = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/BandsLed.mat')['BandsLed']
+    led_curve = led_curve[14:-16,:]
+    print(led_curve.shape)
+    led_curve = signal.resample(led_curve,16,axis=0)
     COMP_FRAME = 32
     pool = multiprocessing.Pool(10)
     path = Path('../data/whispers/test/')
@@ -287,6 +292,9 @@ def pnp_sivicnn_paper(savepath = 'S1_pnp/data_paperpnp'):
         i += 1
         if len(oneset)==COMP_FRAME:
             img = np.stack(oneset,3)
+            orig_leds = np.expand_dims(img,axis=3)              # shape:nr, nc, nl,    1
+            #led_curve = np.expand_dims(led_curve,axis=2)       # shape:        nl, nled
+            img = np.sum(orig_leds * led_curve, axis=2)         # shape:nr, nc,     nled
             min_v = np.amin(img)
             max_v = np.amax(img)
             img = (img-min_v)/(max_v-min_v)
