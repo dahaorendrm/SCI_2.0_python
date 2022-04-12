@@ -151,11 +151,11 @@ class SpecConvModel(pl.LightningModule):
 
         # Load images and labels
         x = batch["feature"].float()
-        y = batch["label"].float() if batch["label"] else False
+        y = batch["label"].float() if batch["label"].size() else False
             #y = y[:,CUT_BAND[0]:-CUT_BAND[1],...]
         if self.gpu:
             x = x.cuda(non_blocking=True)
-            y = y.cuda(non_blocking=True) if y else False
+            y = y.cuda(non_blocking=True) if y.size() else False
 
         # Forward pass & softmax
         preds = []
@@ -180,7 +180,7 @@ class SpecConvModel(pl.LightningModule):
         preds = np.squeeze(np.moveaxis(preds,1,-2))
         #print(f'shape of preds {preds.shape}, shape of y {y.shape}')
         psnr_val = 0
-        if batch["label"]:
+        if batch["label"].size():
             y = y.cpu().numpy()
             y = np.squeeze(np.moveaxis(y,1,-2))
             psnr_val = utils.calculate_psnr(preds,y)

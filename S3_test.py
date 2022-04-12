@@ -43,4 +43,4 @@ def test(datapath='./S2_flow_predict/result/re',refpath='./S0_gaptv/data/test/gt
     model.test()
 
 if __name__=='__main__':
-    test('./S2_flow_predict/result/re_withS1','./S0_gaptv/data/test/gt')
+    test('./S2_flow_predict/result/re','./S1_pnp/data/test/gt','S3_spectra_convert/result/re')

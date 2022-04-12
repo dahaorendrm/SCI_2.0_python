@@ -11,6 +11,7 @@ import PIL
 import itertools as itert
 import time
 from S0_gaptv.func import utils,recon_model,result,measurement
+import utils as UTILS
 from collections import namedtuple
 import datetime
 from pathlib import Path
@@ -33,9 +34,9 @@ def compressive_model_pnp(MODEL,input, mask):
         #print(f'test:shape of input is {input.shape}')
         mea = measurement.Measurement(model = MODEL, dim = 4, inputs=data, configs={'NUMF':input.shape[3], 'SCALE_DATA':1, 'CUT_BAND':None})
         model = recon_model.ReModel('gap','tv_chambolle')
-        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': False,
+        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
                 'ITERs': 80, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
-                'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(20,50),(79,81)]}})
+                'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 5, 'it_list':[(20,50),(79,81)]}})
         orig = np.empty_like(mea.mask)
         index = 0
         for i in range(mea.orig_leds.shape[3]):
@@ -48,15 +49,16 @@ def compressive_model_pnp(MODEL,input, mask):
         re = np.array(re)
         re[re<0] = 0
         re = re/np.amax(re)
-        orig_leds = mea.orig_leds
-        orig_leds[orig_leds<0] = 0
-        orig_leds = orig_leds/np.amax(orig_leds)
-        mea = np.array(mea.mea)
+        orig = orig/np.amax(orig)
+        v_psnr = UTILS.calculate_psnr(re,orig)
+        v_ssim = UTILS.calculate_ssim(re,orig)
+        print(f'Final evaluation, PSNR:{v_psnr:2.2f}dB, SSIM:{v_ssim:.4f}.')
         # print('shape of re is '+str(mea.shape))
-        result__ = (orig_leds,mea,re)
+        mea = np.array(mea.mea)
+        result__ = (orig,mea,re)
         print(f'Return result with {len(result__)} elements!')
         return result__
-    if MODEL = 'chasti_sst':
+    if MODEL == 'chasti_sst':
         data = (
         input,
         mask #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
@@ -71,8 +73,8 @@ def compressive_model_pnp(MODEL,input, mask):
         re[re<0] = 0
         re = re/np.amax(re)
         mea = np.array(mea.mea)
-        v_psnr = utils.calculate_psnr(re,utils.selectFrames(input))
-        v_ssim = utils.calculate_ssim(re,utils.selectFrames(input))
+        v_psnr = UTILS.calculate_psnr(re,UTILS.selectFrames(input))
+        v_ssim = UTILS.calculate_ssim(re,UTILS.selectFrames(input))
         print(f'Final evaluation, PSNR:{v_psnr:2.2f}dB, SSIM:{v_ssim:.4f}.')
         # print('shape of re is '+str(mea.shape))
         return (mea,re)
@@ -92,8 +94,8 @@ def compressive_model_pnp_exp(MODEL,mea, mask, numf):
     re[re<0] = 0
     re = re/np.amax(re)
     mea = np.array(mea.mea)
-    v_psnr = utils.calculate_psnr(re,utils.selectFrames(input))
-    v_ssim = utils.calculate_ssim(re,utils.selectFrames(input))
+    v_psnr = UTILS.calculate_psnr(re,UTILS.selectFrames(input))
+    v_ssim = UTILS.calculate_ssim(re,UTILS.selectFrames(input))
     print(f'Final evaluation, PSNR:{v_psnr:2.2f}dB, SSIM:{v_ssim:.4f}.')
     # print('shape of re is '+str(mea.shape))
     return (mea,re)
@@ -566,7 +568,7 @@ def test_data_generation_pnp():
     pool = multiprocessing.Pool()
 
     MODEL = 'lesti_sst'
-    COMP_FRAME = 32
+    COMP_FRAME = 16 
     imgs = scio.loadmat('S0_gaptv/4D_Lego.mat')['img']
     print(f'Input LEGO data max is {np.amax(imgs)}.')
     #print(f'shape of imgs is {imgs.shape}')
@@ -574,7 +576,7 @@ def test_data_generation_pnp():
     for ind in range(0,40-COMP_FRAME+1,COMP_FRAME-4):
         #print(f'Test: index of the data range is {ind} to {ind+COMP_FRAME}')
         crops.append(imgs[:,:,4:-2,ind:ind+COMP_FRAME])
-    comp_input = [(crop,mask) for crop in crops]
+    comp_input = [(MODEL,crop,mask) for crop in crops]
     return_crops_data = pool.starmap(compressive_model_pnp, comp_input) # contain (original led project, mea, gaptv_result)
     crops_mea = []
     crops_img = []

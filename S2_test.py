@@ -82,4 +82,4 @@ def test(datapath='./S1_denoiser/result',path='./S0_gaptv/data/test',savepath='.
 
 
 if __name__ == '__main__':
-    test('./S1_denoiser/result')
+    test('/lustre/arce/X_MA/SCI_2.0_python/S1_pnp/data/test/img_n/')
