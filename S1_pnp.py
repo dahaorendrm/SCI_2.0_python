@@ -107,13 +107,55 @@ def X2Cube(img,B=[4, 4],skip = [4, 4],bandNumber=16):
     DataCube = out.reshape(M//4, N//4,bandNumber )
     return DataCube
 
-def compressive_model(input, mask):
+def compressive_model_pnp(input, mask):
         data = (
         input,
         mask #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
         )
         mea = measurement.Measurement(model = 'chasti_sst', dim = 3, inputs=data, configs={'MAXV':1})
         model = recon_model.ReModel('gap','spvi')
+        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
+                'ITERs':80, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
+                'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(20,50),(79,81)]}})
+        re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
+        re = np.array(re)
+        re[re<0] = 0
+        re = re/np.amax(re)
+        mea = np.array(mea.mea)
+        v_psnr = utils.calculate_psnr(re,utils.selectFrames(input))
+        v_ssim = utils.calculate_ssim(re,utils.selectFrames(input))
+        print(f'Final evaluation, PSNR:{v_psnr:2.2f}dB, SSIM:{v_ssim:.4f}.')
+        # print('shape of re is '+str(mea.shape))
+        return (mea,re)
+
+def compressive_model_gaptv(input, mask):
+        data = (
+        input,
+        mask #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
+        )
+        mea = measurement.Measurement(model = 'chasti_sst', dim = 3, inputs=data, configs={'MAXV':1})
+        model = recon_model.ReModel('gap','tv_chambolle')
+        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
+                'ITERs':100, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
+                'P_DENOISE':{'tv_weight': 0.4, 'tv_iter': 5}})
+        re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
+        re = np.array(re)
+        re[re<0] = 0
+        re = re/np.amax(re)
+        mea = np.array(mea.mea)
+        v_psnr = utils.calculate_psnr(re,utils.selectFrames(input))
+        v_ssim = utils.calculate_ssim(re,utils.selectFrames(input))
+        print(f'Final evaluation, PSNR:{v_psnr:2.2f}dB, SSIM:{v_ssim:.4f}.')
+        # print('shape of re is '+str(mea.shape))
+        return (mea,re)
+
+def compressive_model_pnpcassi(input, mask):
+        data = (
+        input,
+        mask #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
+        )
+        mea = measurement.Measurement(model = 'chasti_sst', dim = 3, inputs=data, configs={'MAXV':1})
+        model = recon_model.ReModel('gap','hsi')
         model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
                 'ITERs':80, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
                 'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(20,50),(79,81)]}})
@@ -147,7 +189,7 @@ def pnp_sivicnn(savpath = 'S1_pnp/test_data'):
     MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
     COMP_FRAME = 32
     pool = multiprocessing.Pool(10)
-    path = Path('../data/whispers/test')
+    path = Path('../data/whispers/test/')
     datalist = os.listdir(path)
     finished = []
     for idx,name in enumerate(datalist):
@@ -206,7 +248,66 @@ def pnp_sivicnn(savpath = 'S1_pnp/test_data'):
         print(f'Input data max is {np.amax(img)}.')
         for idx,data_1 in enumerate(dataset):
             (mea,re) = compressive_model(*data_1)
-            save_crops(savepath, name, idx, crops[idx], mea, re)
+            save_crops(savepath, name+'spvi', idx, crops[idx], mea, re)
+
+def pnp_sivicnn_paper(savpath = 'S1_pnp/data_paperpnp'):
+    MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
+    COMP_FRAME = 32
+    pool = multiprocessing.Pool(10)
+    path = Path('../data/whispers/test/')
+    name = 'toy2'
+    comp_input = []
+    crops = []
+    name_list = []
+    imglist = os.listdir(path/name/'HSI')
+    i = 1 # There's one txt file in the folder, so we start at 1
+    oneset = []
+    dataset = []
+    crops = []
+    print(f'Start process data {name}.')
+    while i < len(imglist):
+        if i <77:
+            i+=1
+            continue
+        img = skio.imread(path/name/'HSI'/f'{i:04d}.png')
+        #print(f'1.max:{np.amax(img)}')
+        img = X2Cube(img)
+        #print(f'2.max:{np.amax(img)} sum {np.sum(img)}')
+        if img.shape[0]!=256:
+            img = skitrans.resize(img/511., (256,512))
+            for idx in range(img.shape[2]):
+                img[...,idx] = scipy.signal.medfilt2d(img[...,idx], kernel_size=3)
+            oneset.append(img)
+        else:
+            #img = scipy.signal.medfilt2d(img, kernel_size=3)
+            img = img/511.
+            for idx in range(img.shape[2]):
+                img[...,idx] = scipy.signal.medfilt2d(img[...,idx], kernel_size=3)
+            oneset.append(img)
+        i += 1
+        if len(oneset)==COMP_FRAME:
+            img = np.stack(oneset,3)
+            min_v = np.amin(img)
+            max_v = np.amax(img)
+            img = (img-min_v)/(max_v-min_v)
+            ranp = np.random.random_integers(0,256,1)
+            print(f'img.shape is {img.shape}.')
+            for po in ranp:
+                data1 = img[:,po:po+256,::2,:]
+                #data1 = utils.selectFrames(data1)
+                data2 = img[:,po:po+256,1::2,:]
+                #data2 = utils.selectFrames(data2)
+                dataset.append((data1,MASK))
+                dataset.append((data2,MASK))
+                crops.append(data1)
+                crops.append(data2)
+            break
+            oneset = []
+
+    print(f'Input data max is {np.amax(img)}.')
+    for idx,data_1 in enumerate(dataset):
+        (mea,re) = compressive_model_pnp(*data_1)
+        save_crops(savepath, name, idx, crops[idx], mea, re)
 
 if __name__ == '__main__':
     #dataset = ImgDataset('./S1_pnp/train_data')
