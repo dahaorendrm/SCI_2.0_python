@@ -248,7 +248,7 @@ def pnp_sivicnn(savpath = 'S1_pnp/test_data'):
         print(f'Input data max is {np.amax(img)}.')
         for idx,data_1 in enumerate(dataset):
             (mea,re) = compressive_model(*data_1)
-            save_crops(savepath, name+'spvi', idx, crops[idx], mea, re)
+            save_crops(savepath, name, idx, crops[idx], mea, re)
 
 def pnp_sivicnn_paper(savpath = 'S1_pnp/data_paperpnp'):
     MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
@@ -307,7 +307,7 @@ def pnp_sivicnn_paper(savpath = 'S1_pnp/data_paperpnp'):
     print(f'Input data max is {np.amax(img)}.')
     for idx,data_1 in enumerate(dataset):
         (mea,re) = compressive_model_pnp(*data_1)
-        save_crops(savepath, name, idx, crops[idx], mea, re)
+        save_crops(savepath, name+'spvi', idx, crops[idx], mea, re)
 
 if __name__ == '__main__':
     #dataset = ImgDataset('./S1_pnp/train_data')
