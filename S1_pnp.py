@@ -137,7 +137,7 @@ def compressive_model_gaptv(input, mask):
         model = recon_model.ReModel('gap','tv_chambolle')
         model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
                 'ITERs':100, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
-                'P_DENOISE':{'tv_weight': 0.4, 'tv_iter': 5}})
+                'P_DENOISE':{'TV_WEIGHT': 0.4, 'TV_ITER': 5}})
         re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
         re = np.array(re)
         re[re<0] = 0
@@ -250,7 +250,7 @@ def pnp_sivicnn(savpath = 'S1_pnp/test_data'):
             (mea,re) = compressive_model(*data_1)
             save_crops(savepath, name, idx, crops[idx], mea, re)
 
-def pnp_sivicnn_paper(savpath = 'S1_pnp/data_paperpnp'):
+def pnp_sivicnn_paper(savepath = 'S1_pnp/data_paperpnp'):
     MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
     COMP_FRAME = 32
     pool = multiprocessing.Pool(10)
@@ -290,7 +290,7 @@ def pnp_sivicnn_paper(savpath = 'S1_pnp/data_paperpnp'):
             min_v = np.amin(img)
             max_v = np.amax(img)
             img = (img-min_v)/(max_v-min_v)
-            ranp = np.random.random_integers(0,256,1)
+            ranp = [60]
             print(f'img.shape is {img.shape}.')
             for po in ranp:
                 data1 = img[:,po:po+256,::2,:]
@@ -306,8 +306,8 @@ def pnp_sivicnn_paper(savpath = 'S1_pnp/data_paperpnp'):
 
     print(f'Input data max is {np.amax(img)}.')
     for idx,data_1 in enumerate(dataset):
-        (mea,re) = compressive_model_pnp(*data_1)
-        save_crops(savepath, name+'spvi', idx, crops[idx], mea, re)
+        (mea,re) = compressive_model_gaptv(*data_1)
+        save_crops(savepath, name+'tv', idx, crops[idx], mea, re)
 
 if __name__ == '__main__':
     #dataset = ImgDataset('./S1_pnp/train_data')
@@ -321,4 +321,4 @@ if __name__ == '__main__':
 
     #test_dataset.dataset.test()
     #test(test_dataset)
-    pnp_sivicnn()
+    pnp_sivicnn_paper()
