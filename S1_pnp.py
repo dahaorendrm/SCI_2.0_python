@@ -115,8 +115,8 @@ def compressive_model_pnp(input, mask):
         mea = measurement.Measurement(model = 'chasti_sst', dim = 3, inputs=data, configs={'MAXV':1})
         model = recon_model.ReModel('gap','spvi')
         model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
-                'ITERs':80, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
-                'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(20,50),(79,81)]}})
+                'ITERs':75, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
+                'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(30,50),(72,74)]}})
         re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
         re = np.array(re)
         re[re<0] = 0
@@ -157,8 +157,7 @@ def compressive_model_pnpcassi(input, mask):
         mea = measurement.Measurement(model = 'chasti_sst', dim = 3, inputs=data, configs={'MAXV':1})
         model = recon_model.ReModel('gap','hsi')
         model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
-                'ITERs':80, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
-                'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(20,50),(79,81)]}})
+                'ITERs':80, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi', 'P_DENOISE':{'ch_sigma':10/255, 'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(20,50),(75,81)]}})
         re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
         re = np.array(re)
         re[re<0] = 0
@@ -176,14 +175,21 @@ def save_crops(path, name, idx, gt, mea, re):
             os.mkdir(path)
         except:
             pass
+    mdic = {}
     name = '_'.join((name,'%.4d'%(idx)+'.tiff'))
     os.mkdir(path+'/mea/') if not os.path.exists(path+'/mea') else None
     tifffile.imwrite(path+'/mea/'+name,mea)
+    #scio.savemat(path+'/mea/'+name[:-5]+'.mat',{'mea':mea})
+    mdic['mea'] = mea
     os.mkdir(path+'/img_n/') if not os.path.exists(path+'/img_n') else None
     tifffile.imwrite(path+'/img_n/'+name,re)
+    #scio.savemat(path+'/img_n/'+name[:-5]+'.mat',{'re':re})
+    mdic['re'] = re
     if gt.shape:
         os.mkdir(path+'/gt/') if not os.path.exists(path+'/gt') else None
         tifffile.imwrite(path+'/gt/'+name,gt)
+        mdic['gt'] = gt
+    scio.savemat(path+'/'+name[:-5]+'.mat',mdic)
 
 def pnp_sivicnn(savpath = 'S1_pnp/test_data'):
     MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
@@ -254,9 +260,9 @@ def pnp_sivicnn_paper(savepath = 'S1_pnp/data_paperpnp'):
     from scipy import signal
     MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
     led_curve = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/BandsLed.mat')['BandsLed']
-    led_curve = led_curve[14:-16,:]
+    led_curve = led_curve[7:-8,:]
     print(led_curve.shape)
-    led_curve = signal.resample(led_curve,16,axis=0)
+    #led_curve = signal.resample(led_curve,16,axis=0)
     COMP_FRAME = 32
     pool = multiprocessing.Pool(10)
     path = Path('../data/whispers/test/')
@@ -292,30 +298,30 @@ def pnp_sivicnn_paper(savepath = 'S1_pnp/data_paperpnp'):
         i += 1
         if len(oneset)==COMP_FRAME:
             img = np.stack(oneset,3)
-            orig_leds = np.expand_dims(img,axis=3)              # shape:nr, nc, nl,    1
-            #led_curve = np.expand_dims(led_curve,axis=2)       # shape:        nl, nled
-            img = np.sum(orig_leds * led_curve, axis=2)         # shape:nr, nc,     nled
+            orig_leds = np.expand_dims(img,axis=3)              # shape:nr, nc, nl,    1, nf
+            led_curve = np.expand_dims(led_curve,axis=2)        # shape:        nl, nled, 1
+            img = np.sum(orig_leds * led_curve, axis=2)         # shape:nr, nc,     nled, nf
             min_v = np.amin(img)
             max_v = np.amax(img)
             img = (img-min_v)/(max_v-min_v)
             ranp = [60]
             print(f'img.shape is {img.shape}.')
             for po in ranp:
-                data1 = img[:,po:po+256,::2,:]
+                data1 = img[:,po:po+256,:,:]
                 #data1 = utils.selectFrames(data1)
-                data2 = img[:,po:po+256,1::2,:]
-                #data2 = utils.selectFrames(data2)
                 dataset.append((data1,MASK))
-                dataset.append((data2,MASK))
                 crops.append(data1)
-                crops.append(data2)
             break
             oneset = []
 
     print(f'Input data max is {np.amax(img)}.')
     for idx,data_1 in enumerate(dataset):
-        (mea,re) = compressive_model_gaptv(*data_1)
-        save_crops(savepath, name+'tv', idx, crops[idx], mea, re)
+        (mea1,re1) = compressive_model_pnp(*data_1)
+        (mea2,re2) = compressive_model_pnpcassi(*data_1)
+        (mea3,re3) = compressive_model_gaptv(*data_1)
+        save_crops(savepath, name+'spvi', idx, crops[idx], mea1, re1)
+        save_crops(savepath, name+'hsi', idx, crops[idx], mea2, re2)
+        save_crops(savepath, name+'gaptv', idx, crops[idx], mea3, re3)
 
 if __name__ == '__main__':
     #dataset = ImgDataset('./S1_pnp/train_data')

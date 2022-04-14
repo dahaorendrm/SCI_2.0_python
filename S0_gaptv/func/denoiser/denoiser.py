@@ -186,7 +186,7 @@ def hsicnn_denoiser_config():
     device = torch.device('cuda:1' if torch.cuda.is_available() else 'cpu')
     logger.info('Device %s is used for denoiser' % (repr(device)))
     model = hsinet()
-    model.load_state_dict(torch.load('func/denoiser/hsi/deep_denoiser.pth'))
+    model.load_state_dict(torch.load('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/func/denoiser/hsi/deep_denoiser.pth'))
     model.eval()
     for q, v in model.named_parameters():
         v.requires_grad = False
@@ -247,6 +247,7 @@ def spvicnn_denoiser(xx,sigma,it, tv_weight=0.5, tv_iter=7,model=None, device='c
     tem = []
     for ind in range(nb//8):
         net_input = xx[:,:,ind*8:ind*8+8]
+        #net_input = net_input/np.amax(net_input-np.amin(net_input))
         net_input = torch.from_numpy(np.ascontiguousarray(net_input)).permute(2, 0,1).float().unsqueeze(0)
         net_input = net_input.to(device)
         output = model(net_input)
