@@ -6,6 +6,9 @@ temp
 **/temp
 **/checkpoints
 **/result
+**/data
+**/data_paperpnp
+**/result_paper
 **/_result
 **/model-outputs
 **/tensorboard_logs

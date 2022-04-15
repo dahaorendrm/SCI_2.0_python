@@ -92,8 +92,8 @@ def test_paper(datapath='./S1_denoiser/result',path='./S0_gaptv/data/test',savep
     data_list = os.listdir(dataPath)
 
     data_name = '4D_Lego_CF32.tiff'
-    if os.path.isdir(dataPath /  data_name):
-        continue
+    #if os.path.isdir(dataPath /  data_name):
+    #    continue
     # load data
     #if name not in data_name:
     #    continue
@@ -141,4 +141,4 @@ def test_paper(datapath='./S1_denoiser/result',path='./S0_gaptv/data/test',savep
 
 if __name__ == '__main__':
     #test('/lustre/arce/X_MA/SCI_2.0_python/S1_pnp/data/test/img_n/')
-    test_paper(savepath= './S2_flow_predict/result_paper')
+    test_paper('./S0_gaptv/data/sim/img_n','./S0_gaptv/data/sim',savepath= './S2_flow_predict/result_paper')
