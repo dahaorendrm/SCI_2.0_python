@@ -4,6 +4,7 @@ import numpy as np
 import os
 import albumentations
 import tifffile
+import scipy.io as scio
 # These transformations will be passed to our model class
 
 transformations = albumentations.Compose(
@@ -59,7 +60,7 @@ class ImgDataset(torch.utils.data.Dataset):
         if feature.ndim == 4:
             feature = np.transpose(feature, [2, 0, 1, 3])
             label = np.transpose(label, [2, 0, 1, 3]) if label is not None else False
-        else:               
+        else:
             feature = np.transpose(feature, [2, 0, 1])
             label = np.transpose(label, [2, 0, 1]) if label is not None else False
         sample = {"id": self.data[idx], "feature":feature, "label":label}
@@ -101,4 +102,36 @@ class TestDataset(torch.utils.data.Dataset):
         feature = np.transpose(feature, [2, 0, 1, 3])
         label = np.transpose(label, [2, 0, 1, 3])
         sample = {"id": self.data[idx][:4], "feature":feature, "label":label}
+        return sample
+
+class PaperDataset(torch.utils.data.Dataset):
+    """Reads in images, transforms pixel values, and serves a
+    dictionary containing chip ids, image tensors, and
+    label masks (where available).
+    """
+
+    def __init__(self, x_path):
+        self.data = [x_path]
+
+    def __len__(self):
+        return len(self.data)
+
+    def __getitem__(self, idx):
+        img = scio.loadmat(self.data[idx])['img']
+        led_curve = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/BandsLed.mat')['BandsLed']
+        gt = img[:,:,4:-3]
+        orig_leds = np.expand_dims(img,axis=3)              # shape:nr, nc, nl,    1
+        led_curve = led_curve                               # shape:        nl, nled
+        img = np.sum(orig_leds * led_curve, axis=2)         # shape:nr, nc,     nled
+
+        # Min-max normalization
+        min_norm = np.nanmin(img)
+        max_norm = np.nanmax(img)
+        img = (img - min_norm) / (max_norm - min_norm)
+
+        # Load label if available - training only
+        # Prepare sample dictionary
+        feature = np.transpose(img, [2, 0, 1, 3])
+        label = np.transpose(gt, [2, 0, 1, 3])
+        sample = {"id": 'test_paper', "feature":feature, "label":label}
         return sample
