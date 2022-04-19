@@ -117,14 +117,18 @@ class PaperDataset(torch.utils.data.Dataset):
         return len(self.data)
 
     def __getitem__(self, idx):
-        img = scio.loadmat(self.data[idx])['img']
+        img = scio.loadmat(self.data[idx])['img']/255.
+        img = (img - np.amin(img)) / (np.amax(img) - np.amin(img))
         led_curve = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/BandsLed.mat')['BandsLed']
-        gt = img[:,:,4:-3]
-        orig_leds = np.expand_dims(img,axis=3)              # shape:nr, nc, nl,    1
-        led_curve = led_curve                               # shape:        nl, nled
-        img = np.sum(orig_leds * led_curve, axis=2)         # shape:nr, nc,     nled
+        gt = np.expand_dims(img[:,:,4:-2],axis=3)
+        print(gt.shape)
+        orig_leds = np.expand_dims(img,axis=[3,4])              # shape:nr, nc, nl,    1,  1 
+        led_curve = np.expand_dims(led_curve,axis=2)            # shape:        nl, nled,  1
+        img = np.sum(orig_leds * led_curve, axis=2)             # shape:nr, nc,     nled,  1
 
         # Min-max normalization
+        import tifffile as tif
+        tif.imwrite('/lustre/arce/X_MA/SCI_2.0_python/S3_spectra_convert/result/re_paper/input.tiff',img)
         min_norm = np.nanmin(img)
         max_norm = np.nanmax(img)
         img = (img - min_norm) / (max_norm - min_norm)

@@ -5,7 +5,7 @@ import torch
 import os
 import pytorch_lightning as pl
 
-from S3_spectra_convert.ImgDataset import ImgDataset,TestDataset
+from S3_spectra_convert.ImgDataset import ImgDataset,TestDataset,PaperDataset
 from S3_spectra_convert.networks.SpecConvModel import SpecConvModel
 from S3_spectra_convert import loss,utils
 # process data
@@ -42,7 +42,7 @@ def test(datapath='./S2_flow_predict/result/re',refpath='./S0_gaptv/data/test/gt
     #trainer.test(model)
     model.test()
 
-def test_paper(savepath='S1_denoiser/result/re_paper'):
+def test_paper(savepath='./S3_spectra_convert/result/re_paper'):
     # test_dataset = TestDataset('./data/test/feature','./data/test/label')
     test_dataset = PaperDataset('/lustre/arce/X_MA/SCI_2.0_python/S3_spectra_convert/data_paperpnp/3D_Doll_center.mat')
     # set-up model

@@ -178,6 +178,7 @@ class SpecConvModel(pl.LightningModule):
         preds = torch.stack(preds,4)
         preds = preds.cpu().numpy()
         preds = np.squeeze(np.moveaxis(preds,1,-2))
+        preds = (preds-np.amin(preds))/(np.amax(preds)-np.amin(preds))
         #print(f'shape of preds {preds.shape}, shape of y {y.shape}')
         psnr_val = 0
         if batch["label"].size():
@@ -196,7 +197,7 @@ class SpecConvModel(pl.LightningModule):
         if not os.path.exists(self.resultpath):
             os.mkdir(self.resultpath)
             #os.mkdir(self.resultpath/'re')
-        tifffile.imwrite(self.resultpath/f"{batch['id'][0]}",preds)
+        tifffile.imwrite(self.resultpath/f"{batch['id'][0]}.tiff",preds)
         utils.saveintemp(preds,save_name,True,(440,680))
         #utils.saveintemp(y,'orig'+save_name)
         #np.save(f'result/{batch["id"][0]}.npy',preds.cpu().numpy()) ####name needed

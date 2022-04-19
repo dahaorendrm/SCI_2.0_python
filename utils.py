@@ -39,7 +39,7 @@ def saveintemp(data,name='test',rgb=False,specrange=(400,700)):
                 im1 = np.round(im1 * 255.0)
                 im1 = Image.fromarray(im1)
                 im1 = im1.convert("L")
-                im1 = im1.save(f"temp/{name}_{idx}.jpg")
+                im1 = im1.save(f"temp/{name}_{idx}.png", compress_level=0)
         else:
             img = np.zeros(*data.shape[0:2],3)
             for idxi in range(data.shape[0]):
@@ -49,7 +49,7 @@ def saveintemp(data,name='test',rgb=False,specrange=(400,700)):
             img = np.round(img * 255.0)
             img = Image.fromarray(img)
             img = img.convert("RGB")
-            img = img.save(f"temp/{name}.jpg")
+            img = img.save(f"temp/{name}.png", compress_level=0)
 
     elif data.ndim == 4:
         if not rgb:
@@ -59,7 +59,7 @@ def saveintemp(data,name='test',rgb=False,specrange=(400,700)):
                 im1 = np.round(im1 * 255.0)
                 im1 = Image.fromarray(im1)
                 im1 = im1.convert("L")
-                im1 = im1.save(f"temp/{name}_{idx}.jpg")
+                im1 = im1.save(f"temp/{name}_{idx}.png", compress_level=0)
         else:
             data_rgb = np.zeros((*data.shape[0:2],3,data.shape[3]))
             for indf in range(data.shape[3]):
@@ -72,7 +72,7 @@ def saveintemp(data,name='test',rgb=False,specrange=(400,700)):
                 im1 = data[...,idx]
                 im1 = np.round(im1 * 255.0)
                 im1 = Image.fromarray(im1.astype('int8'),mode='RGB')
-                im1 = im1.save(f"temp/{name}_{idx}.jpg")
+                im1 = im1.save(f"temp/{name}_{idx}.png", compress_level=0)
 
 def outputevalarray(data,ref):
     v_psnr = []
