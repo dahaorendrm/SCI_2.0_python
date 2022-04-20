@@ -1,4 +1,4 @@
-from S1_pnp import compressive_model_pnpspvi
+from S0_run import compressive_model_pnp
 import S2_test as S2run
 import S3_test as S3run
 from pathlib import Path
@@ -16,8 +16,8 @@ def S0run_block(savepath='paper/S0/spvi'): # total 30 frames
     COMP_FRAME = 32
     crops = []
     crops.append(imgs[:,:,4:-2,0:COMP_FRAME])
-    comp_input = [(crop,mask) for crop in crops]
-    return_crops_data = pool.starmap(compressive_model_pnpspvi, comp_input) # contain (original led project, mea, gaptv_result)
+    comp_input = [('lesti_sst',crop,mask) for crop in crops]
+    return_crops_data = pool.starmap(compressive_model_pnp, comp_input) # contain (original led project, mea, gaptv_result)
     if not os.path.exists(savepath):
         os.mkdir(savepath)
         os.mkdir(savepath/'mea')

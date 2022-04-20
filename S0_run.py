@@ -33,10 +33,10 @@ def compressive_model_pnp(MODEL,input, mask):
         )
         #print(f'test:shape of input is {input.shape}')
         mea = measurement.Measurement(model = MODEL, dim = 4, inputs=data, configs={'NUMF':input.shape[3], 'SCALE_DATA':1, 'CUT_BAND':None})
-        model = recon_model.ReModel('gap','tv_chambolle')
+        model = recon_model.ReModel('gap','spvi')
         model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
-                'ITERs': 80, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
-                'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 5, 'it_list':[(20,50),(79,81)]}})
+                'ITERs':75, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
+                'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(30,50),(72,74)]}})
         orig = np.empty_like(mea.mask)
         index = 0
         for i in range(mea.orig_leds.shape[3]):
@@ -568,7 +568,7 @@ def test_data_generation_pnp():
     pool = multiprocessing.Pool()
 
     MODEL = 'lesti_sst'
-    COMP_FRAME = 16 
+    COMP_FRAME = 16
     imgs = scio.loadmat('S0_gaptv/4D_Lego.mat')['img']
     print(f'Input LEGO data max is {np.amax(imgs)}.')
     #print(f'shape of imgs is {imgs.shape}')
