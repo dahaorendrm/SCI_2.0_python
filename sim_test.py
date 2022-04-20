@@ -17,7 +17,7 @@ def S0run_lego():# total 40 frames
     pool = multiprocessing.Pool()
     mask = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
     MODEL = 'lesti_sst'
-    imgs = scio.loadmat('S0_gaptv/block.mat')['img']
+    imgs = scio.loadmat('S0_gaptv/4D_Lego.mat')['img']
     imgs_reverse = np.flip(imgs,3)
     imgs = np.concatenate([imgs,imgs_reverse],3)
     print(f'Input LEGO data max is {np.amax(imgs)}.')

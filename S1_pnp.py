@@ -107,7 +107,7 @@ def X2Cube(img,B=[4, 4],skip = [4, 4],bandNumber=16):
     DataCube = out.reshape(M//4, N//4,bandNumber )
     return DataCube
 
-def compressive_model_pnp(input, mask):
+def compressive_model_pnpspvi(input, mask):
         data = (
         input,
         mask #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
@@ -191,7 +191,7 @@ def save_crops(path, name, idx, gt, mea, re):
         mdic['gt'] = gt
     scio.savemat(path+'/'+name[:-5]+'.mat',mdic)
 
-def pnp_sivicnn(savpath = 'S1_pnp/test_data'):
+def pnp_spvicnn(savpath = 'S1_pnp/test_data'):
     MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
     COMP_FRAME = 32
     pool = multiprocessing.Pool(10)
@@ -256,7 +256,7 @@ def pnp_sivicnn(savpath = 'S1_pnp/test_data'):
             (mea,re) = compressive_model(*data_1)
             save_crops(savepath, name, idx, crops[idx], mea, re)
 
-def pnp_sivicnn_paper(savepath = 'S1_pnp/data_paperpnp'):
+def pnp_spvicnn_paper(savepath = 'S1_pnp/data_paperpnp'):
     from scipy import signal
     MASK = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
     led_curve = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/BandsLed.mat')['BandsLed']
@@ -316,7 +316,7 @@ def pnp_sivicnn_paper(savepath = 'S1_pnp/data_paperpnp'):
 
     print(f'Input data max is {np.amax(img)}.')
     for idx,data_1 in enumerate(dataset):
-        (mea1,re1) = compressive_model_pnp(*data_1)
+        (mea1,re1) = compressive_model_pnpspvi(*data_1)
         (mea2,re2) = compressive_model_pnpcassi(*data_1)
         (mea3,re3) = compressive_model_gaptv(*data_1)
         save_crops(savepath, name+'spvi', idx, crops[idx], mea1, re1)
@@ -335,4 +335,4 @@ if __name__ == '__main__':
 
     #test_dataset.dataset.test()
     #test(test_dataset)
-    pnp_sivicnn_paper()
+    pnp_spvicnn_paper()
