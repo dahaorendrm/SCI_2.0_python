@@ -1,9 +1,14 @@
-from S1_pnp import compressive_model_pnpspvi
+from S1_pnpmodel import compressive_model_pnpspvi
 import S2_test as S2run
 import S3_test as S3run
 from pathlib import Path
+import multiprocessing,threading,queue
+import scipy.io as scio
+import os
+import tifffile
+import numpy as np
 
-def S0run_block(savepath='paper/S0/spvi'): # total 30 frames
+def pnp_spvicnn_paper(savepath='paper/S0/spvi'): # total 30 frames
     savepath = Path(savepath)
     pool = multiprocessing.Pool()
     mask = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
