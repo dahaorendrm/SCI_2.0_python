@@ -50,7 +50,7 @@ def compressive_model_pnp(MODEL,input, mask):
         re[re<0] = 0
         re = re/np.amax(re)
         orig = orig/np.amax(orig)
-        
+
         v_psnr = UTILS.calculate_psnr(re,orig)
         v_ssim = UTILS.calculate_ssim(re,orig)
         print(f'Final evaluation, PSNR:{v_psnr:2.2f}dB, SSIM:{v_ssim:.4f}.')
@@ -90,16 +90,16 @@ def compressive_model_pnp_exp(MODEL,mea, mask, numf):
     mea = measurement.Measurement.import_exp_mea_modul(model = MODEL, mea=mea, mask=mask, configs={'NUMF':numf, 'SCALE_DATA':1,'MAXV':1})
     model = recon_model.ReModel('gap','spvi')
     model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
-            'ITERs':80, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
-            'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(20,50),(79,81)]}})
+            'ITERs':100, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
+            'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(73,74),99]}})
     re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
     re = np.array(re)
     re[re<0] = 0
     re = re/np.amax(re)
     mea = np.array(mea.mea)
-    v_psnr = UTILS.calculate_psnr(re,UTILS.selectFrames(input))
-    v_ssim = UTILS.calculate_ssim(re,UTILS.selectFrames(input))
-    print(f'Final evaluation, PSNR:{v_psnr:2.2f}dB, SSIM:{v_ssim:.4f}.')
+    #v_psnr = UTILS.calculate_psnr(re,UTILS.selectFrames(input))
+    #v_ssim = UTILS.calculate_ssim(re,UTILS.selectFrames(input))
+    #print(f'Final evaluation, PSNR:{v_psnr:2.2f}dB, SSIM:{v_ssim:.4f}.')
     # print('shape of re is '+str(mea.shape))
     return (mea,re)
 
