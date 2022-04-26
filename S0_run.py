@@ -35,8 +35,8 @@ def compressive_model_pnp(MODEL,input, mask):
         mea = measurement.Measurement(model = MODEL, dim = 4, inputs=data, configs={'NUMF':input.shape[3], 'SCALE_DATA':1, 'CUT_BAND':None})
         model = recon_model.ReModel('gap','spvi')
         model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
-                'ITERs':75, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
-                'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(30,50),(72,74)]}})
+                'ITERs':100, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
+                'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(73,74),99]}})
         orig = np.empty_like(mea.mask)
         index = 0
         for i in range(mea.orig_leds.shape[3]):
@@ -50,12 +50,15 @@ def compressive_model_pnp(MODEL,input, mask):
         re[re<0] = 0
         re = re/np.amax(re)
         orig = orig/np.amax(orig)
+        
         v_psnr = UTILS.calculate_psnr(re,orig)
         v_ssim = UTILS.calculate_ssim(re,orig)
         print(f'Final evaluation, PSNR:{v_psnr:2.2f}dB, SSIM:{v_ssim:.4f}.')
         # print('shape of re is '+str(mea.shape))
+        orig_leds = orig
+        orig_ledsfull = mea.orig_leds/np.amax(mea.orig_leds)
         mea = np.array(mea.mea)
-        result__ = (orig,mea,re)
+        result__ = (orig_leds,orig_ledsfull,mea,re)
         print(f'Return result with {len(result__)} elements!')
         return result__
     if MODEL == 'chasti_sst':
@@ -145,9 +148,9 @@ def compressive_model(MODEL,input,mask=None):
         #print(f'test:shape of input is {input.shape}')
         mea = measurement.Measurement(model = 'lesti_sst', dim = 4, inputs=data, configs={'NUMF':input.shape[3], 'SCALE_DATA':1, 'CUT_BAND':None})
         model = recon_model.ReModel('gap','tv_chambolle')
-        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': False,
-                'ITERs': 30, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
-                'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 7}})
+        model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
+                'ITERs':170, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
+                'P_DENOISE':{'TV_WEIGHT': 0.1, 'TV_ITER': 5}})
         orig = np.empty_like(mea.mask)
         index = 0
         for i in range(mea.orig_leds.shape[3]):
@@ -160,12 +163,15 @@ def compressive_model(MODEL,input,mask=None):
         re = np.array(re)
         re[re<0] = 0
         re = re/np.amax(re)
-        orig_leds = mea.orig_leds
-        orig_leds[orig_leds<0] = 0
-        orig_leds = orig_leds/np.amax(orig_leds)
+        orig[orig<0] = 0
+        orig = orig/np.amax(orig)
+        orig_ledsfull = mea.orig_leds/np.amax(mea.orig_leds)
         mea = np.array(mea.mea)
+        v_psnr = UTILS.calculate_psnr(re,orig)
+        v_ssim = UTILS.calculate_ssim(re,orig)
+        print(f'Final evaluation, PSNR:{v_psnr:2.2f}dB, SSIM:{v_ssim:.4f}.')
         # print('shape of re is '+str(mea.shape))
-        result__ = (orig_leds,mea,re)
+        result__ = (orig,orig_ledsfull,mea,re)
         print(f'Return result with {len(result__)} elements!')
         return result__
 

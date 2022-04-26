@@ -10,6 +10,7 @@ temp
 **/data_paperpnp
 **/result_paper
 **/_result
+resultpaper
 **/model-outputs
 **/tensorboard_logs
 *.out

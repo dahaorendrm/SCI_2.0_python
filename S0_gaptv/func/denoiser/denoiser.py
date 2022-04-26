@@ -252,8 +252,10 @@ def spvicnn_denoiser(xx,sigma,it, tv_weight=0.5, tv_iter=7,model=None, device='c
         net_input = net_input.to(device)
         output = model(net_input)
         output = output.data.squeeze().permute(1,2,0).cpu().numpy()
-        output[output>1]=1
-        output[output<0]=0
+        #output[output>1]=1
+        #output = output -np.amin(output)
+        output[output<0] = 0
+        output = output/np.amax(output)
         tem.append(output)
     return np.concatenate(tem,2)
 
