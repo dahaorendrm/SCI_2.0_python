@@ -32,3 +32,4 @@ resultpaper
 *.o
 *.zip
 /expdata
+/video
