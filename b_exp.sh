@@ -3,9 +3,9 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 
-#SBATCH --cpus-per-task=10
+#SBATCH --cpus-per-task=8
 
-#SBATCH --mem=60G
+#SBATCH --mem=80G
 # SBATCH --mem-per-cpu=10G
 
 #SBATCH --job-name=lesti_S0_exp
@@ -15,6 +15,7 @@
 # SBATCH --output=ArraySCI%A-%a.out
 #SBATCH --mail-user='xmdrm@udel.edu'
 #SBATCH --mail-type=END,FAIL,TIME_LIMIT_90
+#SBATCH --gpus=1
 # SBATCH --array=4-10
 
 # export OMP_NUM_THREADS=4

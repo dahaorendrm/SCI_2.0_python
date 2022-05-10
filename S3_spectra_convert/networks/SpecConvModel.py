@@ -177,11 +177,12 @@ class SpecConvModel(pl.LightningModule):
         # Calculate validation IOU (global)
         preds = torch.stack(preds,4)
         preds = preds.cpu().numpy()
+        #print(batch["label"][0].cpu().numpy())
         preds = np.squeeze(np.moveaxis(preds,1,-2))
         preds = (preds-np.amin(preds))/(np.amax(preds)-np.amin(preds))
         #print(f'shape of preds {preds.shape}, shape of y {y.shape}')
         psnr_val = 0
-        if batch["label"].size():
+        if batch["label"][0].cpu().numpy() != False:
             y = y.cpu().numpy()
             y = np.squeeze(np.moveaxis(y,1,-2))
             psnr_val = utils.calculate_psnr(preds,y)

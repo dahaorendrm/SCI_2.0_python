@@ -32,7 +32,7 @@ def compressive_model_pnp(MODEL,input, mask):
         BandsLed
         )
         #print(f'test:shape of input is {input.shape}')
-        mea = measurement.Measurement(model = MODEL, dim = 4, inputs=data, configs={'NUMF':input.shape[3], 'SCALE_DATA':1, 'CUT_BAND':None})
+        mea = measurement.Measurement(model = MODEL, dim = 4, inputs=data, configs={'NUMF':input.shape[3], 'SCALE_DATA':1, 'CUT_BAND':None, 'MAXV':1})
         model = recon_model.ReModel('gap','spvi')
         model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
                 'ITERs':100, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
@@ -87,11 +87,11 @@ def compressive_model_pnp_exp(MODEL,mea, mask, numf):
     input,
     mask #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
     )
-    mea = measurement.Measurement.import_exp_mea_modul(model = MODEL, mea=mea, mask=mask, configs={'NUMF':numf, 'SCALE_DATA':1,'MAXV':1})
+    mea = measurement.Measurement.import_exp_mea_modul(MODEL, mea, mask, configs={'NUMF':numf, 'SCALE_DATA':1, 'CUT_BAND':None})
     model = recon_model.ReModel('gap','spvi')
     model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
-            'ITERs':100, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
-            'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[(73,74),99]}})
+            'ITERs':200, 'sigmas':30/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
+            'P_DENOISE':{'tv_weight': 0.4, 'tv_iter': 5, 'it_list':[(73,74),99,199]}})
     re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
     re = np.array(re)
     re[re<0] = 0

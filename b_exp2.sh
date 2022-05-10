@@ -3,9 +3,9 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 
-#SBATCH --cpus-per-task=10
+#SBATCH --cpus-per-task=8
 
-#SBATCH --mem=60G
+#SBATCH --mem=40G
 # SBATCH --mem-per-cpu=10G
 
 #SBATCH --job-name=lesti_S0_exp
