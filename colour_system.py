@@ -78,7 +78,7 @@ class ColourSystem:
 
         """
         if self.cmf.shape[0] != spec.shape[0]:
-            print('sth')
+            #print('sth')
             irange = (np.where(self.cmf[:,0]==range[0])[0][0], np.where(self.cmf[:,0]==range[1])[0][0]+1)
             self.cmf = self.cmf[slice(*irange),1:]
             if self.cmf.shape[0] != spec.shape[0]:
