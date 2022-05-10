@@ -16,27 +16,24 @@ def specimg2rgb(data,specrange = (440,680)):
     data = data_rgb/np.amax(data_rgb)
     return data
 
-name = '4D_color_checker'
+
+def rawvideo(name = '4D_color_checker', nfiles = 4, nframe = 24):
+
 nfiles = 4 # Number of input files
 nframe = 24
-
 if not os.path.exists('./video'):
    os.mkdir('./video')
-
 rgblist = []
 ledlist = []
 mealist = []
-
 for idx in range(nfiles):
-    mea =  tif.imread('/lustre/arce/X_MA/SCI_2.0_python/resultpaper/exp/S0/spvi/mea/'+name+f'{idx:%4d}'+'.tiff')
-    led =  tif.imread('/lustre/arce/X_MA/SCI_2.0_python/resultpaper/exp/S0/spvi/img_n/'+name+f'{idx:%4d}'+'.tiff')
-    img =  tif.imread('/lustre/arce/X_MA/SCI_2.0_python/resultpaper/exp/S3/result/'+name+f'{idx:%4d}'+'.tiff.tiff')
+    mea =  tif.imread('/lustre/arce/X_MA/SCI_2.0_python/resultpaper/exp/S0/spvi/mea/'+name+f'{idx:04d}'+'.tiff')
+    led =  tif.imread('/lustre/arce/X_MA/SCI_2.0_python/resultpaper/exp/S0/spvi/img_n/'+name+f'{idx:04d}'+'.tiff')
+    img =  tif.imread('/lustre/arce/X_MA/SCI_2.0_python/resultpaper/exp/S3/result/'+name+f'{idx:04d}'+'.tiff.tiff')
     rgblist.append(specimg2rgb(img))
     mealist.append(mea)
     ledlist.append(led)
-
 rawrergb = np.concatenate(rgblist,3)
-rawmea = np.concatenate(mealist,2)
+rawmea = np.stack(mealist,2)
 rawreled = np.concatenate(ledlist,2)
-
 scio.savemat('./video/'+name+'.mat',{'mea':rawmea,'rgb':rawrergb,'led':rawreled})
