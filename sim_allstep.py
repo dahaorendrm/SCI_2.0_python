@@ -8,6 +8,7 @@ import os
 import tifffile
 import numpy as np
 from skimage import exposure
+import time
 
 def pnp_spvicnn_paper(savepath='paper/S0/spvi'): # total 30 frames
     savepath = Path(savepath)
@@ -49,8 +50,17 @@ def pnp_spvicnn_paper(savepath='paper/S0/spvi'): # total 30 frames
 
 if __name__ == '__main__':
     ## S1
-    #pnp_spvicnn_paper('resultpaper/S0/spvi')
+    tic = time.perf_counter()
+    pnp_spvicnn_paper('resultpaper/speed/S0/spvi s')
+    toc = time.perf_counter()
+    print(f'Time of 1st step: {toc-tic:0.4f} s')
     ## S2
-    S2run.test('resultpaper/S0/spvi/img_n','resultpaper/S0/spvi','resultpaper/S2/')
+    tic = time.perf_counter()
+    S2run.test('resultpaper/speed/S0/spvi/img_n','resultpaper/speed/S0/spvi','resultpaper/speed/S2/')
+    toc = time.perf_counter()
+    print(f'Time of 2nd step: {toc-tic:0.4f} s')
     ## S3
-    S3run.test('resultpaper/S2/re','resultpaper/S0/spvi/gt', 'resultpaper/S3/result')
+    tic = time.perf_counter()
+    S3run.test('resultpaper/speed/S2/re','resultpaper/speed/S0/spvi/gt', 'resultpaper/speed/S3/result')
+    toc = time.perf_counter()
+    print(f'Time of 3rd step: {toc-tic:0.4f} s')
