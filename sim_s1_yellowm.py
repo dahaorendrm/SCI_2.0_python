@@ -335,4 +335,4 @@ if __name__ == '__main__':
 
     #test_dataset.dataset.test()
     #test(test_dataset)
-    pnp_spvicnn_paper()
+    pnp_spvicnn_paper()   # 16,24,32,40
