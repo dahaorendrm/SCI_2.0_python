@@ -182,7 +182,7 @@ class SpecConvModel(pl.LightningModule):
         preds = (preds-np.amin(preds))/(np.amax(preds)-np.amin(preds))
         #print(f'shape of preds {preds.shape}, shape of y {y.shape}')
         psnr_val = 0
-        if batch["label"][0].cpu().numpy() != False:
+        if batch["label"][0].cpu().numpy().any() != False:
             y = y.cpu().numpy()
             y = np.squeeze(np.moveaxis(y,1,-2))
             psnr_val = utils.calculate_psnr(preds,y)
