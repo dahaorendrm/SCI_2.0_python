@@ -1,7 +1,7 @@
 FOLDER = 'G:\My Drive\PHD_Research\SCI_2.0_python\video\mat\';
 SAVEPATH = 'G:\My Drive\PHD_Research\SCI_2.0_python\video\seq\';
 dataname = '4D_color_checker_motion';
-range = [23,24];
+range = [23,39);
     
 mkdir(SAVEPATH,dataname)
 for sidx=range(1)+1:(range(2)+1)
