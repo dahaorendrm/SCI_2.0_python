@@ -16,7 +16,7 @@ import S3_test as S3run
 def S0run_test(savepath='resultpaper/exp20220723/S0/gaptv'):
     savepath = Path(savepath)
     pool = multiprocessing.Pool(10)
-    PATH = Path('./expdata20220723')
+    PATH = Path('./expdata20220723_2')
     mask = scio.loadmat(PATH/'mask.mat')['mask']
     MODEL = 'lesti_sst'
     numf = mask.shape[2]
@@ -27,9 +27,10 @@ def S0run_test(savepath='resultpaper/exp20220723/S0/gaptv'):
         if 'mask' in name: # small test sets
             #print(name)
             continue
-        if idx>8:
-            continue
+        #if idx>8:
+        #    continue
         mea = scio.loadmat(PATH/name)['img']
+        mea = mea/np.amax(mea)*24*1.4
         dataout.append(name)
         dataset.append((MODEL,mea,mask,numf))
     #S0run.compressive_model_exp(MODEL,mea,mask,numf=16)
@@ -45,7 +46,7 @@ def S0run_test(savepath='resultpaper/exp20220723/S0/gaptv'):
 
 def S0run_test_pnp(savepath='resultpaper/exp20220723/S0/spvi'):
     savepath = Path(savepath)
-    pool = multiprocessing.Pool(30)
+    pool = multiprocessing.Pool(10)
     PATH = Path('./expdata20220723')
     mask = scio.loadmat(PATH/'mask.mat')['mask']
     mask = mask/np.amax(mask)
@@ -58,9 +59,10 @@ def S0run_test_pnp(savepath='resultpaper/exp20220723/S0/spvi'):
         if 'mask' in name: # small test sets
         #    print(name)
             continue
-        if idx>3:
-            continue
-        mea = scio.loadmat(PATH/name)['img']*24*1.4
+        #if idx>3:
+        #    continue
+        mea = scio.loadmat(PATH/name)['img']
+        mea = mea/np.amax(mea)*24*1.4
         dataout.append(name)
         dataset.append((MODEL,mea,mask,numf))
     #S0run.compressive_model_exp(MODEL,mea,mask,numf=16)
@@ -107,7 +109,7 @@ def pnp_spvicnn_paper(savepath='paper/S0/spvi'): # total 30 frames
 
 if __name__=='__main__':
     # S0
-    S0run_test()
+    S0run_test_pnp()
     # S2
     #S2run.test('resultpaper/exp/S0/spvi/img_n','resultpaper/exp/S0/spvi','resultpaper/exp/S2/')
     ## S3
