@@ -13,10 +13,10 @@ import S1_test as S1run
 import S2_test as S2run
 import S3_test as S3run
 # S0
-def S0run_test(savepath='resultpaper/exp/S0/spvi'):
+def S0run_test(savepath='resultpaper/exp20220723/S0/gaptv'):
     savepath = Path(savepath)
-    pool = multiprocessing.Pool()
-    PATH = Path('./expdata')
+    pool = multiprocessing.Pool(10)
+    PATH = Path('./expdata20220723')
     mask = scio.loadmat(PATH/'mask.mat')['mask']
     MODEL = 'lesti_sst'
     numf = mask.shape[2]
@@ -24,8 +24,10 @@ def S0run_test(savepath='resultpaper/exp/S0/spvi'):
     datalist = os.listdir(PATH)
     dataout = []
     for idx,name in enumerate(datalist):
-        if not 'Lego0019' in name: # small test sets
-            print(name)
+        if 'mask' in name: # small test sets
+            #print(name)
+            continue
+        if idx>8:
             continue
         mea = scio.loadmat(PATH/name)['img']
         dataout.append(name)
@@ -41,11 +43,12 @@ def S0run_test(savepath='resultpaper/exp/S0/spvi'):
         tifffile.imwrite(savepath/'img_n'/(dataout[idx][:-4]+'.tiff'),re)
 
 
-def S0run_test_pnp(savepath='resultpaper/exp/S0/spvi'):
+def S0run_test_pnp(savepath='resultpaper/exp20220723/S0/spvi'):
     savepath = Path(savepath)
     pool = multiprocessing.Pool(30)
-    PATH = Path('./expdata')
+    PATH = Path('./expdata20220723')
     mask = scio.loadmat(PATH/'mask.mat')['mask']
+    mask = mask/np.amax(mask)
     MODEL = 'lesti_sst'
     numf = mask.shape[2]
     dataset = []
@@ -55,7 +58,7 @@ def S0run_test_pnp(savepath='resultpaper/exp/S0/spvi'):
         if 'mask' in name: # small test sets
         #    print(name)
             continue
-        if idx<200 :
+        if idx>3:
             continue
         mea = scio.loadmat(PATH/name)['img']*24*1.4
         dataout.append(name)
@@ -104,8 +107,8 @@ def pnp_spvicnn_paper(savepath='paper/S0/spvi'): # total 30 frames
 
 if __name__=='__main__':
     # S0
-    #S0run_test_pnp()
+    S0run_test()
     # S2
     #S2run.test('resultpaper/exp/S0/spvi/img_n','resultpaper/exp/S0/spvi','resultpaper/exp/S2/')
     ## S3
-    S3run.test('resultpaper/exp/S2/re','resultpaper/exp/S0/spvi/gt', 'resultpaper/exp/S3/result')
+    #S3run.test('resultpaper/exp/S2/re','resultpaper/exp/S0/spvi/gt', 'resultpaper/exp/S3/result')
