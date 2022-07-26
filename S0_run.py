@@ -103,6 +103,27 @@ def compressive_model_pnp_exp(MODEL,mea, mask, numf):
     # print('shape of re is '+str(mea.shape))
     return (mea,re)
 
+def compressive_model_pnp_exp_lego(MODEL,mea, mask, numf):
+    data = (
+    input,
+    mask #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
+    )
+    mea = measurement.Measurement.import_exp_mea_modul(MODEL, mea, mask, configs={'NUMF':numf, 'SCALE_DATA':1, 'CUT_BAND':None})
+    model = recon_model.ReModel('gap','spvi')
+    model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
+            'ITERs':100, 'sigmas':20/255, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'spvi',
+            'P_DENOISE':{'tv_weight': 0.2, 'tv_iter': 5, 'it_list':[]}})
+    re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
+    re = np.array(re)
+    re[re<0] = 0
+    re = re/np.amax(re)
+    mea = np.array(mea.mea)
+    #v_psnr = UTILS.calculate_psnr(re,UTILS.selectFrames(input))
+    #v_ssim = UTILS.calculate_ssim(re,UTILS.selectFrames(input))
+    #print(f'Final evaluation, PSNR:{v_psnr:2.2f}dB, SSIM:{v_ssim:.4f}.')
+    # print('shape of re is '+str(mea.shape))
+    return (mea,re)
+
 def compressive_model_exp(MODEL,mea,mask,numf):
     mea = measurement.Measurement.import_exp_mea_modul(MODEL, mea, mask, configs={'NUMF':numf, 'SCALE_DATA':1, 'CUT_BAND':None})
     model = recon_model.ReModel('gap','tv_chambolle')
