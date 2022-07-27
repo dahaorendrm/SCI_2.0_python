@@ -66,7 +66,7 @@ def S0run_test_pnp(savepath='resultpaper/exp20220723/S0/spvi'):
         dataout.append(name)
         dataset.append((MODEL,mea,mask,numf))
     #S0run.compressive_model_exp(MODEL,mea,mask,numf=16)
-    return_crops_data = pool.starmap(S0run.compressive_model_pnp_exp, dataset)
+    return_crops_data = pool.starmap(S0run.compressive_model_pnp_exp_tune, dataset)
     if not os.path.exists(savepath):
         os.mkdir(savepath)
         os.mkdir(savepath/'mea')
@@ -111,6 +111,6 @@ if __name__=='__main__':
     # S0
     S0run_test_pnp()
     # S2
-    #S2run.test('resultpaper/exp/S0/spvi/img_n','resultpaper/exp/S0/spvi','resultpaper/exp/S2/')
+    S2run.test('resultpaper/exp20220723/S0/spvi/img_n','resultpaper/exp20220723/S0/spvi','resultpaper/exp20220723/S2/')
     ## S3
-    #S3run.test('resultpaper/exp/S2/re','resultpaper/exp/S0/spvi/gt', 'resultpaper/exp/S3/result')
+    S3run.test('resultpaper/exp20220723/S2/re','resultpaper/exp20220723/S0/spvi/gt', 'resultpaper/exp20220723/S3/result')

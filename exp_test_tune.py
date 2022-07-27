@@ -41,10 +41,10 @@ def S0run_test(savepath='resultpaper/exp2/S0/spvi'):
         tifffile.imwrite(savepath/'img_n'/(dataout[idx][:-4]+'.tiff'),re)
 
 
-def S0run_test_pnp(savepath='resultpaper/exp2/S0/spvi'):
+def S0run_test_pnp(savepath='resultpaper/exp20220723/S0/spvi_tune'):
     savepath = Path(savepath)
-    pool = multiprocessing.Pool(30)
-    PATH = Path('./expdata')
+    pool = multiprocessing.Pool(10)
+    PATH = Path('./expdata20220723')
     mask = scio.loadmat(PATH/'mask.mat')['mask']
     MODEL = 'lesti_sst'
     numf = mask.shape[2]
@@ -52,18 +52,19 @@ def S0run_test_pnp(savepath='resultpaper/exp2/S0/spvi'):
     datalist = os.listdir(PATH)
     dataout = []
     for idx,name in enumerate(datalist):
-        if not 'Lego0011' in name:
-            continue
+        #if not 'Lego0011' in name:
+        #    continue
         if 'mask' in name: # small test sets
         #    print(name)
             continue
-        #if idx<200 :
-        #    continue
-        mea = scio.loadmat(PATH/name)['img']*24*1.4
+        if idx>10 :
+            continue
+        mea = scio.loadmat(PATH/name)['img']
+        mea = mea/np.amax(mea)*24*1.4
         dataout.append(name)
         dataset.append((MODEL,mea,mask,numf))
     #S0run.compressive_model_exp(MODEL,mea,mask,numf=16)
-    return_crops_data = pool.starmap(S0run.compressive_model_pnp_exp_lego, dataset)
+    return_crops_data = pool.starmap(S0run.compressive_model_pnp_exp_tune, dataset)
     if not os.path.exists(savepath):
         os.mkdir(savepath)
         os.mkdir(savepath/'mea')

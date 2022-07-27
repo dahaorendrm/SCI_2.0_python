@@ -3,12 +3,12 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 
-#SBATCH --cpus-per-task=8
+#SBATCH --cpus-per-task=10
 
 #SBATCH --mem=80G
 # SBATCH --mem-per-cpu=10G
 
-#SBATCH --job-name=lesti_S0_exp
+#SBATCH --job-name=lesti_S0_exp_tune
 #SBATCH --partition=idle
 
 #SBATCH --time=0-10:00:00
@@ -20,4 +20,4 @@
 
 # export OMP_NUM_THREADS=4
 vpkg_require xm_pytorch/20210806-LESTI_2.0_DAIN
-python3 -u exp_test_lego.py
+python3 -u exp_test_tune.py
