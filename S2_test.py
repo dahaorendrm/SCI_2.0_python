@@ -26,7 +26,7 @@ def process(data,ref=None):
     re_ledimg_4d,v_psnr,v_ssim = flow.get_motions(data, ref)
     return re_ledimg_4d
 
-def test(datapath='./S1_denoiser/result',path='./S0_gaptv/data/test',savepath='./S2_flow_predict/result'):
+def test(datapath='./S1_denoiser/result',path='./S0_gaptv/data/test',savepath='./S2_flow_predict/result',if4d=True):
     savepath = Path(savepath)
     path = Path(path)
     # dataPath = Path(path/'img_n')
@@ -52,7 +52,7 @@ def test(datapath='./S1_denoiser/result',path='./S0_gaptv/data/test',savepath='.
             gt_orig = None
             print(f'No orig data founded asocciate with {data_name}!')
         #print(f'Shape check: data has shape of {data.shape}, orig_leds has shape of {orig_leds.shape}')
-        if '4D' in data_name:
+        if if4d:
             input = reshape_data(input,8)
         else:
             input = reshape_data(input,3)

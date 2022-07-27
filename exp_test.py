@@ -44,10 +44,10 @@ def S0run_test(savepath='resultpaper/exp20220723/S0/gaptv'):
         tifffile.imwrite(savepath/'img_n'/(dataout[idx][:-4]+'.tiff'),re)
 
 
-def S0run_test_pnp(savepath='resultpaper/exp20220723/S0/spvi'):
+def S0run_test_pnp(savepath='resultpaper/exp20220723/S0/spvi', path = './expdata20220723'):
     savepath = Path(savepath)
     pool = multiprocessing.Pool(10)
-    PATH = Path('./expdata20220723')
+    PATH = Path(path)
     mask = scio.loadmat(PATH/'mask.mat')['mask']
     mask = mask/np.amax(mask)
     MODEL = 'lesti_sst'
@@ -109,7 +109,7 @@ def pnp_spvicnn_paper(savepath='paper/S0/spvi'): # total 30 frames
 
 if __name__=='__main__':
     # S0
-    S0run_test_pnp()
+    S0run_test_pnp(path='expdata20220723_2')
     # S2
     S2run.test('resultpaper/exp20220723/S0/spvi/img_n','resultpaper/exp20220723/S0/spvi','resultpaper/exp20220723/S2/')
     ## S3
