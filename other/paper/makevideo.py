@@ -12,7 +12,7 @@ def specimg2rgb(data,specrange = (440,680)):
     for indf in range(data.shape[3]):
         for indi in range(data.shape[0]):
             for indj in range(data.shape[1]):
-                data_rgb[indi,indj,:,indf] = ColorS.spec_to_rgb(data[indi,indj,:,indf],specrange)
+                data_rgb[indi,indj,:,indf] = ColorS.spec_to_rgb(reversed(data[indi,indj,:,indf]),specrange)
     data = data_rgb/np.amax(data_rgb)
     return data
 
