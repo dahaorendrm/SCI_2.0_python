@@ -12,7 +12,7 @@ def specimg2rgb(data,specrange = (440,680)):
     for indf in range(data.shape[3]):
         for indi in range(data.shape[0]):
             for indj in range(data.shape[1]):
-                data_rgb[indi,indj,:,indf] = ColorS.spec_to_rgb(reversed(data[indi,indj,:,indf]),specrange)
+                data_rgb[indi,indj,:,indf] = ColorS.spec_to_rgb(data[indi,indj,:,indf],specrange)
     data = data_rgb/np.amax(data_rgb)
     return data
 
@@ -43,5 +43,6 @@ def matvideo(path='/lustre/arce/X_MA/SCI_2.0_python/resultpaper/exp', name = '4D
         led =             tif.imread(path+'/S0/spvi/img_n/'+name+f'{idx:04d}'+'.tiff')
         led_complete =    tif.imread(path+'/S2/re/'+name+f'{idx:04d}'+'.tiff')
         img =             tif.imread(path+'/S3/result/'+name+f'{idx:04d}'+'.tiff.tiff')
+        img = np.flip(img,2)
         rgb = specimg2rgb(img)
         scio.savemat(path+'/mat/'+name+f'{idx:04d}'+'.mat',{'mea':mea,'rgb':rgb,'led':led,'spec':img,'led_complete':led_complete})
