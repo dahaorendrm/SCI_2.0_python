@@ -1,12 +1,13 @@
 FOLDER = 'G:\My Drive\PHD_Research\SCI_2.0_python\video\mat\';
 SAVEPATH = 'G:\My Drive\PHD_Research\SCI_2.0_python\video\seq\';
-dataname = '4D_color_checker_motion';
-range = [23,24];
+dataname = '116fps_toys';
+range = [0,119];
     
 mkdir(SAVEPATH,dataname)
 for sidx=range(1)+1:(range(2)+1)
     load([FOLDER,dataname,sprintf('%04d', sidx-1),'.mat']);
     for fidx = 1:24
+        %rgb = flip(rgb,3);
         frame = makeaframe(sidx,fidx, mea,led,led_complete,spec,rgb);
         imwrite(frame,[SAVEPATH,dataname,'\',sprintf('%04d', (sidx-1)*24+fidx),'.png'],'BitDepth',16);
         % save frame        
