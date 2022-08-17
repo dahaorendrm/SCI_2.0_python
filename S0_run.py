@@ -108,8 +108,10 @@ data = (
 input,
 mask #reduce loading time scio.loadmat('lesti_mask.mat')['mask']
 )
-mea = measurement.Measurement.import_lesti_exp_mea_modul4d(MODEL, mea, mask, configs={'NUMF':numf, 'SCALE_DATA':1, 'CUT_BAND':None})
-model = recon_model.ReModel('gap','spvi')
+led_curve = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/BandsLed.mat')['BandsLed']
+led_curve = led_curve[4:-2,:]
+mea = measurement.Measurement.import_lesti_exp_mea_modul4d(MODEL, mea, mask, led_curve, configs={'NUMF':numf, 'SCALE_DATA':1, 'CUT_BAND':None})
+model = recon_model.ReModel('gap','tv_chambolle')
 model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
         'ITERs': 70, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
         'P_DENOISE':{'TV_WEIGHT': 0.4, 'TV_ITER': 5}})
