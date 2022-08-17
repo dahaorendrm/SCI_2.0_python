@@ -18,7 +18,7 @@ def test_lesti(savepath='resultpaper/lesti_compare', path = './expdata20220723')
     mask = scio.loadmat(PATH/'mask.mat')['mask']
     mask = mask/np.amax(mask)
     MODEL = 'lesti_sst'
-    numf = mask.shape[2]/8
+    numf = int(mask.shape[2]/8)
     dataset = []
     datalist = os.listdir(PATH)
     dataout = []
@@ -33,7 +33,7 @@ def test_lesti(savepath='resultpaper/lesti_compare', path = './expdata20220723')
         dataout.append(name)
         dataset.append((MODEL,mea,mask,numf))
     #S0run.compressive_model_exp(MODEL,mea,mask,numf=16)
-    return_crops_data = pool.starmap(S0run.compressive_model_gatv4d_exp, dataset)
+    return_crops_data = pool.starmap(compressive_model_gatv4d_exp, dataset)
     if not os.path.exists(savepath):
         os.mkdir(savepath)
         os.mkdir(savepath/'mea')
@@ -46,4 +46,4 @@ def test_lesti(savepath='resultpaper/lesti_compare', path = './expdata20220723')
 
 
 if __name__ == '__main__':
-  test_lesti(savepath='resultpaper/exp20220723/S0/spvi', path = './expdata20220723')
+  test_lesti(savepath='resultpaper/lesti_compare', path = './expdata20220723')

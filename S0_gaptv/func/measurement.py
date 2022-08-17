@@ -151,8 +151,16 @@ class Measurement:
         nf = configs['NUMF']
         mask_ = np.expand_dims(np.reshape(mask[:,:,:nled*nf],(256,256,nled,nf)),axis=2)
         modul = mask_ * np.expand_dims(led_curve,axis=2)  # Shape:nr,nc,nl,nled,nf
+        nr=256
+        nc=256
+        nl=led_curve.shape[0]
         modul = np.sum(modul,axis=3) # Shape:nr,nc,nl,nf
-        modul = signal.resample(modul,nled,axis=1)
+        modul = np.swapaxes(modul,2,3)
+        modul = np.reshape(modul,(nr*nc*nf,nl))
+        modul = signal.resample(modul,8,axis=1)
+        modul = np.reshape(modul,(nr,nc,nf,nled))
+        modul = np.swapaxes(modul,2,3)
+        print(modul.shape)
         mea_obj.modul = modul
         mea_obj.mea = mea
         mea_obj.orig = None
