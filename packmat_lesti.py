@@ -24,7 +24,7 @@ led_curve = led_curve[4:-2,:]
 
 nled = led_curve.shape[1]
 nf = 3
-mask_ = np.expand_dims(np.reshape(mask[:,:,:nled*nf],(256,256,nled,nf)),axis=2)
+mask_ = np.expand_dims(np.reshape(mask[:,:,:nled*nf],(256,256,nled,nf),'F'),axis=2)
 modul = mask_ * np.expand_dims(led_curve,axis=2)  # Shape:nr,nc,nl,nled,nf
 nr=256
 nc=256
