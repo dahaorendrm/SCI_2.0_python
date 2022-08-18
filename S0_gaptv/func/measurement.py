@@ -142,31 +142,31 @@ class Measurement:
         mea_obj.atfunc = lambda mea, modul : atfunc(mea,modul, mea_obj.configp["SHIFTD"])
         return mea_obj
 
-    # @classmethod
-    # def import_lesti_exp_mea_modul4d(cls, modelname, mea, mask, led_curve, configs=None):
-    #     '''This function is used to load experiment data to Measurement class.
-    #     Currently only support Juan lab data. More comming soon.'''
-    #     mea_obj = cls(modelname, configs=configs, dim=4)
-    #     nled = led_curve.shape[1]
-    #     nf = configs['NUMF']
-    #     mask_ = np.expand_dims(np.reshape(mask[:,:,:nled*nf],(256,256,nled,nf)),axis=2)
-    #     modul = mask_ * np.expand_dims(led_curve,axis=2)  # Shape:nr,nc,nl,nled,nf
-    #     nr=256
-    #     nc=256
-    #     nl=led_curve.shape[0]
-    #     modul = np.sum(modul,axis=3) # Shape:nr,nc,nl,nf
-    #     modul = np.swapaxes(modul,2,3)
-    #     modul = np.reshape(modul,(nr*nc*nf,nl))
-    #     modul = signal.resample(modul,8,axis=1)
-    #     modul = np.reshape(modul,(nr,nc,nf,nled))
-    #     modul = np.swapaxes(modul,2,3)
-    #     print(modul.shape)
-    #     mea_obj.modul = modul
-    #     mea_obj.mea = mea
-    #     mea_obj.orig = None
-    #     mea_obj.afunc = lambda orig, modul : afunc(orig,modul, mea_obj.configp["SHIFTD"])
-    #     mea_obj.atfunc = lambda mea, modul : atfunc(mea,modul, mea_obj.configp["SHIFTD"])
-    #     return mea_obj
+    @classmethod
+    def import_lesti_exp_mea_modul4d(cls, modelname, mea, mask, led_curve, configs=None):
+        '''This function is used to load experiment data to Measurement class.
+        Currently only support Juan lab data. More comming soon.'''
+        mea_obj = cls(modelname, configs=configs, dim=4)
+        nled = led_curve.shape[1]
+        nf = configs['NUMF']
+        mask_ = np.expand_dims(np.reshape(mask[:,:,:nled*nf],(256,256,nled,nf)),axis=2)
+        modul = mask_ * np.expand_dims(led_curve,axis=2)  # Shape:nr,nc,nl,nled,nf
+        nr=256
+        nc=256
+        nl=led_curve.shape[0]
+        modul = np.sum(modul,axis=3) # Shape:nr,nc,nl,nf
+        modul = np.swapaxes(modul,2,3)
+        modul = np.reshape(modul,(nr*nc*nf,nl))
+        modul = signal.resample(modul,8,axis=1)
+        modul = np.reshape(modul,(nr,nc,nf,nled))
+        modul = np.swapaxes(modul,2,3)
+        print(modul.shape)
+        mea_obj.modul = modul
+        mea_obj.mea = mea
+        mea_obj.orig = None
+        mea_obj.afunc = lambda orig, modul : afunc(orig,modul, mea_obj.configp["SHIFTD"])
+        mea_obj.atfunc = lambda mea, modul : atfunc(mea,modul, mea_obj.configp["SHIFTD"])
+        return mea_obj
 
     @classmethod
     def import_exp_mea_mask(cls, modelname, mea, mask, configs=None):

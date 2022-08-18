@@ -48,6 +48,7 @@ def test_lesti_sim(savepath='resultpaper/lesti_compare'):
     gt = tifffile.imread('/lustre/arce/X_MA/SCI_2.0_python/resultpaper/S0/spvi/gt/4D_Lego_24.tiff')
     print(gt.shape)
     mea = tifffile.imread('/lustre/arce/X_MA/SCI_2.0_python/resultpaper/S0/spvi/mea/4D_Lego_24.tiff')
+    mea = mea/np.amax(mea)*3
     mask = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
     mask = mask/np.amax(mask)
     print(mask.shape)

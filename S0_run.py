@@ -103,25 +103,25 @@ def compressive_model_pnp_exp(MODEL,mea, mask, numf):
     # print('shape of re is '+str(mea.shape))
     return (mea,re)
 
-# def compressive_model_gatv4d_exp(MODEL,mea, mask, numf):
-#
-#     led_curve = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/BandsLed.mat')['BandsLed']
-#     led_curve = led_curve[4:-2,:]
-#     mea = measurement.Measurement.import_lesti_exp_mea_modul4d(MODEL, mea, mask, led_curve, configs={'NUMF':numf, 'SCALE_DATA':1, 'CUT_BAND':None})
-#     model = recon_model.ReModel('gap','tv_chambolle')
-#     model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
-#         'ITERs': 100, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
-#         'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 5}})
-#     re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
-#     re = np.array(re)
-#     re[re<0] = 0
-#     re = re/np.amax(re)
-#     mea = np.array(mea.mea)
-# #v_psnr = UTILS.calculate_psnr(re,UTILS.selectFrames(input))
-# #v_ssim = UTILS.calculate_ssim(re,UTILS.selectFrames(input))
-# #print(f'Final evaluation, PSNR:{v_psnr:2.2f}dB, SSIM:{v_ssim:.4f}.')
-# # print('shape of re is '+str(mea.shape))
-#     return (mea,re)
+def compressive_model_gatv4d_exp(MODEL,mea, mask, numf):
+
+    led_curve = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/BandsLed.mat')['BandsLed']
+    led_curve = led_curve[4:-2,:]
+    mea = measurement.Measurement.import_lesti_exp_mea_modul4d(MODEL, mea, mask, led_curve, configs={'NUMF':numf, 'SCALE_DATA':1, 'CUT_BAND':None})
+    model = recon_model.ReModel('gap','tv_chambolle')
+    model.config({'lambda': 1, 'ASSESE': 1, 'ACC': True,
+        'ITERs': 100, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
+        'P_DENOISE':{'TV_WEIGHT': 0.2, 'TV_ITER': 5}})
+    re = result.Result(model, mea, modul = mea.modul, orig = mea.orig)
+    re = np.array(re)
+    re[re<0] = 0
+    re = re/np.amax(re)
+    mea = np.array(mea.mea)
+#v_psnr = UTILS.calculate_psnr(re,UTILS.selectFrames(input))
+#v_ssim = UTILS.calculate_ssim(re,UTILS.selectFrames(input))
+#print(f'Final evaluation, PSNR:{v_psnr:2.2f}dB, SSIM:{v_ssim:.4f}.')
+# print('shape of re is '+str(mea.shape))
+    return (mea,re)
 
 def compressive_model_pnp_exp_tune(MODEL,mea, mask, numf):
     data = (
