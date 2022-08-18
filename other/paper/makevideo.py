@@ -46,3 +46,14 @@ def matvideo(path='/lustre/arce/X_MA/SCI_2.0_python/resultpaper/exp', name = '4D
         img = np.flip(img,2)
         rgb = specimg2rgb(img)
         scio.savemat(path+'/mat/'+name+f'{idx:04d}'+'.mat',{'mea':mea,'rgb':rgb,'led':led,'spec':img,'led_complete':led_complete})
+
+def matvideo_lesti(path='/lustre/arce/X_MA/SCI_2.0_python/resultpaper/exp', name = '4D_color_checker', filerange = (0,4)):
+    if not os.path.exists(path+'/mat'):
+       os.mkdir(path+'/mat')
+    for idx in range(*filerange):
+        mea =             tif.imread(path+'/mea/'+name+f'{idx:04d}'+'.tiff')
+        led =             tif.imread(path+'/img_n/'+name+f'{idx:04d}'+'.tiff')
+        rgb = specimg2rgb(led)
+        scio.savemat(path+'/mat/'+name+f'{idx:04d}'+'.mat',{'mea':mea,'rgb':rgb,'spec':led})
+
+

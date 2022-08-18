@@ -46,30 +46,33 @@ def test_lesti(savepath='resultpaper/lesti_compare', path = './expdata20220723')
 def test_lesti_sim(savepath='resultpaper/lesti_compare'):
     savepath = Path(savepath)
     gt = tifffile.imread('/lustre/arce/X_MA/SCI_2.0_python/resultpaper/S0/spvi/gt/4D_Lego_24.tiff')
+    print(gt.shape)
     mea = tifffile.imread('/lustre/arce/X_MA/SCI_2.0_python/resultpaper/S0/spvi/mea/4D_Lego_24.tiff')
     mask = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
     mask = mask/np.amax(mask)
     print(mask.shape)
     MODEL = 'lesti_sst'
-    numf = gt.shape[3]
+    numf = 3
     dataset = []
     dataout = []
     dataout.append('4D_Lego_24')
     dataset.append((MODEL,mea,mask,numf))
     #S0run.compressive_model_exp(MODEL,mea,mask,numf=16)
     return_crops_data = compressive_model_gatv4d_exp(*dataset[0])
-    v_psnr = UTILS.calculate_psnr(return_crops_data[1],gt)
-    v_ssim = UTILS.calculate_ssim(return_crops_data[1],gt)
-    np.savetxt(savepath/'eval.txt'), ['PSNR:',v_psnr, 'SSIM:',v_ssim])
-    print(v_psnr)
-    print(v_ssim)
+    #v_psnr = UTILS.calculate_psnr(return_crops_data[1],gt)
+    #v_ssim = UTILS.calculate_ssim(return_crops_data[1],gt)
+    #np.savetxt(savepath/'4D_Lego_eval.txt', ['PSNR:',v_psnr, 'SSIM:',v_ssim])
+    #print(v_psnr)
+    #print(v_ssim)
     if not os.path.exists(savepath):
         os.mkdir(savepath)
         os.mkdir(savepath/'mea')
         os.mkdir(savepath/'img_n')
-    for idx,(mea,re) in enumerate(return_crops_data):
-        tifffile.imwrite(savepath/'mea'/(dataout[idx][:-4]+'.tiff'),mea)
-        tifffile.imwrite(savepath/'img_n'/(dataout[idx][:-4]+'.tiff'),re)
+    mea = return_crops_data[0]
+    re = return_crops_data[1]
+    idx=0
+    tifffile.imwrite(savepath/'mea'/(dataout[idx]+'.tiff'),mea)
+    tifffile.imwrite(savepath/'img_n'/(dataout[idx]+'.tiff'),re)
 
 
 
