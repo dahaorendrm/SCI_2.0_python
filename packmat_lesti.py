@@ -4,17 +4,17 @@ import scipy.io as scio
 import matplotlib.pyplot as plt
 #import pickle
 import os
-import dill
 from scipy import signal
-import Path
-
+from pathlib import Path
+import tifffile
 '''
 This code is used to pack a mat file, then used by LESTI model to do the reconstruction
 
 '''
 savepath=Path('resultpaper/lesti_compare/mat')
-mea = tifffile.imread('/lustre/arce/X_MA/SCI_2.0_python/resultpaper/S0/spvi/mea/4D_Lego_24.tiff')
 
+mea = tifffile.imread('/lustre/arce/X_MA/SCI_2.0_python/resultpaper/S0/spvi/mea/4D_Lego_24.tiff')
+mea = mea/np.amax(mea)*3
 mask = scio.loadmat('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/lesti_mask.mat')['mask']
 mask = mask/np.amax(mask)
 
