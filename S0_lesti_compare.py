@@ -79,5 +79,5 @@ def test_lesti_sim(savepath='resultpaper/lesti_compare'):
 
 
 if __name__ == '__main__':
-  #test_lesti(savepath='resultpaper/lesti_compare', path = './expdata20220723')
+  test_lesti(savepath='resultpaper/lesti_compare', path = './expdata20220723')
   test_lesti_sim()

@@ -6,6 +6,7 @@ from colour_system import cs_srgb as ColorS
 import cv2
 import sys
 import scipy.io as scio
+from PIL import Image
 
 def specimg2rgb(data,specrange = (440,680)):
     data_rgb = np.zeros((*data.shape[0:2],3,data.shape[3]))
@@ -54,6 +55,12 @@ def matvideo_lesti(path='/lustre/arce/X_MA/SCI_2.0_python/resultpaper/exp', name
         mea =             tif.imread(path+'/mea/'+name+f'{idx:04d}'+'.tiff')
         led =             tif.imread(path+'/img_n/'+name+f'{idx:04d}'+'.tiff')
         rgb = specimg2rgb(led)
+        for idxx in range(rgb.shape[3]):
+            im = rgb[:,:,:,idxx]
+            im = np.round(im * 255.0).astype(np.uint8)
+            im = Image.fromarray(im) 
+            im = im.convert("RGB")
+            im = im.save(f"temp/rgb_{idxx}.png", compress_level=0)
         scio.savemat(path+'/mat/'+name+f'{idx:04d}'+'.mat',{'mea':mea,'rgb':rgb,'spec':led})
 
 

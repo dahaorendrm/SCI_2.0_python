@@ -156,9 +156,9 @@ class Measurement:
         nl=led_curve.shape[0]
         modul = np.sum(modul,axis=3) # Shape:nr,nc,nl,nf
         modul = np.swapaxes(modul,2,3)
-        modul = np.reshape(modul,(nr*nc*nf,nl))
+        modul = np.reshape(modul,(nr*nc*nf,nl),'F')
         modul = signal.resample(modul,8,axis=1)
-        modul = np.reshape(modul,(nr,nc,nf,nled))
+        modul = np.reshape(modul,(nr,nc,nf,nled),'F')
         modul = np.swapaxes(modul,2,3)
         print(modul.shape)
         mea_obj.modul = modul
