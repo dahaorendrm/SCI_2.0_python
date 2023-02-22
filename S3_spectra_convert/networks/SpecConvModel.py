@@ -186,11 +186,13 @@ class SpecConvModel(pl.LightningModule):
             y = y.cpu().numpy()
             y = np.squeeze(np.moveaxis(y,1,-2))
             psnr_val = utils.calculate_psnr(preds,y)
-            ssim_val = utils.calculate_ssim(preds,y) # %%% switch back the dimension
+            ssim_val = utils.calculate_ssim(preds,y) # %%% switch back the dimension\
+            sam_val  = utils.SAM(preds,y)
+
             psnr_re,ssim_re = utils.outputevalarray(preds,y)
             np.savetxt(self.resultpath/'eval'/(save_name+f'_psnr_{np.mean(psnr_re):.4f}.txt'), psnr_re, fmt='%.4f')
             np.savetxt(self.resultpath/'eval'/(save_name+f'_ssim_{np.mean(ssim_re):.6f}.txt'), ssim_re, fmt='%.6f')
-            print(f"Data {batch['id'][0]}, psnr : {psnr_val:.4f}, SSIM : {ssim_val:.6f}.")
+            print(f"Data {batch['id'][0]}, psnr : {psnr_val:.4f}, SSIM : {ssim_val:.6f}, SAM : {sam_val:.6f}.")
             self.psnr_val.append(psnr_val)
             # self.ssim_val.append(ssim_val)
         #preds = torch.squeeze(preds)
