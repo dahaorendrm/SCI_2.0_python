@@ -13,6 +13,22 @@ from PIL import Image
 import itertools
 from colour_system import cs_srgb as ColorS
 
+
+def SAM(ref, est):
+    '''
+    Spectral angle mapper
+    '''
+    s_value = 0
+    count = 0
+    for idx_f in range(ref.shape[3]):
+        for idx_x in range(ref.shape[0]):
+            for idx_y in range(ref.shape[1]):
+                s_value += np.dot(np.transpose(ref[idx_x, idx_y, :, idx_f]), est[idx_x, idx_y, :, idx_f])\
+                           / np.mod(ref[idx_x, idx_y, :, idx_f]) / np.mod(est[idx_x, idx_y, :, idx_f])
+                count += 1
+    return s_value/count
+
+
 def selectFrames( gt):
     '''
     create reference label from gt to only keep desired frames
