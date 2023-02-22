@@ -19,7 +19,7 @@ def test_lesti(savepath='resultpaper/lesti_compare', path = './expdata20220723')
     mask = scio.loadmat(PATH/'mask.mat')['mask']
     mask = mask/np.amax(mask)
     MODEL = 'lesti_sst'
-    numf = int(mask.shape[2]/8)
+    numf = 3
     dataset = []
     datalist = os.listdir(PATH)
     dataout = []
@@ -27,10 +27,10 @@ def test_lesti(savepath='resultpaper/lesti_compare', path = './expdata20220723')
         if 'mask' in name: # small test sets
         #    print(name)
             continue
-        if datalist[idx]!= 'mario0010.mat':
+        if datalist[idx]!= 'mario0009.mat':
             continue
         mea = scio.loadmat(PATH/name)['img']
-        mea = mea/np.amax(mea)*24*1.4
+        mea = mea/np.amax(mea)*3
         dataout.append(name)
         dataset.append((MODEL,mea,mask,numf))
     #S0run.compressive_model_exp(MODEL,mea,mask,numf=16)
@@ -79,5 +79,5 @@ def test_lesti_sim(savepath='resultpaper/lesti_compare'):
 
 
 if __name__ == '__main__':
-  test_lesti(savepath='resultpaper/lesti_compare', path = './expdata20220723')
+  test_lesti(savepath='resultpaper/lesti_compare')#, path = './expdata20210930')
   test_lesti_sim()
