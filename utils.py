@@ -25,9 +25,13 @@ def SAM(ref, est):
         for idx_y in range(ref.shape[1]):
             # s_value += np.dot(np.transpose(ref[idx_x, idx_y, :, idx_f]), est[idx_x, idx_y, :, idx_f])\
             #            / np.linalg.mod(ref[idx_x, idx_y, :, idx_f]) / np.linalg.mod(est[idx_x, idx_y, :, idx_f])
-            s_value += np.dot(np.transpose(ref[idx_x, idx_y, :]), est[idx_x, idx_y, :])\
-                       / np.linalg.mod(ref[idx_x, idx_y, :]) / np.linalg.mod(est[idx_x, idx_y, :])
-            count += 1
+            temp = np.dot(np.transpose(ref[idx_x, idx_y, :]), est[idx_x, idx_y, :])\
+                       / np.linalg.norm(ref[idx_x, idx_y, :]) / np.linalg.norm(est[idx_x, idx_y, :])
+            #print(temp)
+            if not math.isnan(temp): 
+                s_value += temp
+                count += 1
+    print(s_value)
     return s_value/count
 
 

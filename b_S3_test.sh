@@ -3,13 +3,13 @@
 #SBATCH --nodes=1
 #SBATCH --ntasks=1
 
-#SBATCH --cpus-per-task=4
+#SBATCH --cpus-per-task=1
 
 #SBATCH --mem=40G
 # SBATCH --mem-per-cpu=10G
 
 #SBATCH --job-name=S3
-#SBATCH --partition=gpu-t4
+#SBATCH --partition=idle
 #SBATCH --gpus=1
 # SBATCH --gres=gpu:t4:1  
 #SBATCH --time=0-1:00:00
@@ -20,4 +20,4 @@
 
 # export OMP_NUM_THREADS=4
 vpkg_require xm_pytorch/20210806-LESTI_2.0_DAIN
-python3 -u test.py
+python3 -u S3_test.py
