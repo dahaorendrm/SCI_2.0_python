@@ -217,7 +217,7 @@ class DAIN_flow(torch.nn.Module):
             return losses, offsets,filters,occlusions
         else:
             cur_outputs = [cur_output,cur_output_rectified]
-        return cur_output_rectified, debug_info
+        return cur_output_rectified, debug_info, cur_offset_outputs
 
     def forward_flownets(self, model, input, time_offsets = None):
 
