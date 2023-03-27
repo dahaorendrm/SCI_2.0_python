@@ -75,7 +75,7 @@ if __name__=='__main__':
     # S0
     #S0run_test()
     #S0run_lego()
-    S0run_block()
+    #S0run_block()
     #Error()
     # S1
     if not os.path.exists('S1_denoiser/result/sim'):
@@ -86,9 +86,9 @@ if __name__=='__main__':
     # S2
     if not os.path.exists('S2_flow_predict/result/sim_wo_s1'):
         os.mkdir('S2_flow_predict/result/sim_wo_s1')
-    #S2run.test('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/data/sim/img_n','S0_gaptv/data/sim/','S2_flow_predict/result/sim_wo_s1/')
-    if not os.path.exists('S2_flow_predict/result/sim_w_s1'):
-        os.mkdir('S2_flow_predict/result/sim_w_s1')
+    S2run.test('/lustre/arce/X_MA/SCI_2.0_python/S0_gaptv/data/sim/img_n','S0_gaptv/data/sim/','S2_flow_predict/result/sim_wo_s1/')
+    if not os.path.exists('S2_flow_predict/result/sim_w_s1_MP'):
+        os.mkdir('S2_flow_predict/result/sim_w_s1_MP')
     #S2run.test('/lustre/arce/X_MA/SCI_2.0_python/S1_denoiser/result/sim','S0_gaptv/data/sim/','S2_flow_predict/result/sim_w_s1/')
     # S3
     #S3run.test('S2_flow_predict/result/sim_w_s1/re','S0_gaptv/data/sim/', 'S3_spectra_convert/result/sim_ws1')
