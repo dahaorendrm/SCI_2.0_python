@@ -95,6 +95,7 @@ class Motion:
         #     pickle.dump(origs,f)
         self.psnr = []
         self.ssim = []
+        print(output)
         output = output[0]
         if origs is not None:
             print('output_images shape'+repr(output.shape))
