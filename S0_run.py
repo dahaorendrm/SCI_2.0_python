@@ -227,7 +227,7 @@ def compressive_model(MODEL,input,mask=None):
         BandsLed
         )
         #print(f'test:shape of input is {input.shape}')
-        mea = measurement.Measurement(model = 'lesti', dim = 3, inputs=data, configs={'SCALE_DATA':1, 'CUT_BAND':None, 'MAXV':1})
+        mea = measurement.Measurement(model='lesti', dim=3, inputs=data, configs={'SCALE_DATA': 1, 'CUT_BAND': None, 'MAXV': 1})
         model = recon_model.ReModel('gap','tv_chambolle')
         model.config({'lambda': 1, 'ASSESE': 1, 'ACC': False,
                 'ITERs': 30, 'RECON_MODEL': 'GAP', 'RECON_DENOISER': 'tv_chambolle',
