@@ -221,18 +221,18 @@ class DAIN_flow2(torch.nn.Module):
             temp = self.forward_singlePath(self.initScaleNets_filter, cur_filter_input, 'filter')
             cur_filter_output = [self.forward_singlePath(self.initScaleNets_filter1, temp, name=None),
                              self.forward_singlePath(self.initScaleNets_filter2, temp, name=None)]
-        with torch.cuda.stream(s2):
+        #with torch.cuda.stream(s2):
             '''
                 STEP 2.4: Flow estimation
             '''
-            cur_offset_outputs = [
-                    self.forward_flownets(
-                    self.flownets, cur_offset_input, time_offsets=time_offsets),
-                    self.forward_flownets(
-                    self.flownets, torch.cat((cur_offset_input[:, 3:, ...],
-                                        cur_offset_input[:, 0:3, ...]), dim=1),
-                                               time_offsets=time_offsets[::-1])]
-            torch.cuda.synchronize() #synchronize s1 and s2
+        cur_offset_outputs = [
+                self.forward_flownets(
+                self.flownets, cur_offset_input, time_offsets=time_offsets),
+                self.forward_flownets(
+                self.flownets, torch.cat((cur_offset_input[:, 3:, ...],
+                                    cur_offset_input[:, 0:3, ...]), dim=1),
+                                           time_offsets=time_offsets[::-1])]
+            #torch.cuda.synchronize() #synchronize s1 and s2
         '''
             STEP 3: Flow projections
         '''
@@ -310,19 +310,19 @@ class DAIN_flow2(torch.nn.Module):
             cur_ctx_output = torch.cat((self.ctxNet(cur_filter_input),
                                                log_depth.detach()), dim=1)
 
-        with torch.cuda.stream(s2):
+        #with torch.cuda.stream(s2):
             '''
                 STEP 2.3: Kernel estimation
                 ######### maybe should from input2?
             '''
-            temp = self.forward_singlePath(self.initScaleNets_filter, torch.cat((cur_input_2,cur_input_2), dim=1), 'filter')
-            cur_filter_output = [self.forward_singlePath(self.initScaleNets_filter1, temp, name=None),
-                             self.forward_singlePath(self.initScaleNets_filter2, temp, name=None)]
-            '''
-                STEP 2.4: Flow estimation
-            '''
-            cur_offset_output = self.forward_flownets(self.flownets, cur_offset_input)
-            torch.cuda.synchronize()
+        temp = self.forward_singlePath(self.initScaleNets_filter, torch.cat((cur_input_2,cur_input_2), dim=1), 'filter')
+        cur_filter_output = [self.forward_singlePath(self.initScaleNets_filter1, temp, name=None),
+                         self.forward_singlePath(self.initScaleNets_filter2, temp, name=None)]
+        '''
+            STEP 2.4: Flow estimation
+        '''
+        cur_offset_output = self.forward_flownets(self.flownets, cur_offset_input)
+            #torch.cuda.synchronize()
         '''
             STEP 3: Estimate wrapped frames
         '''
