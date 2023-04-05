@@ -129,7 +129,6 @@ class DAIN_flow2(torch.nn.Module):
                         input0 = self.onech2threech(torch.mean(result[:,:,:indf+1,indf2],2))
                         input2 = self.onech2threech(result[:,:,indf2,indf2])
                         input0, m_map = self.forward_simplewrap(input0,input1,input2,rectify=True)
-                        #m_map_list['{0}-{1}'.format(indf2,indf)] = m_map
                         input0 = torch.squeeze(input0)
                         result[:,:,indf2,indf] = torch.mean(input0,0)
                         print(f'Generate flow from img({indf},{indf2}) to img({indf},{indf}), apply on img({indf2},{indf2})')
@@ -142,7 +141,6 @@ class DAIN_flow2(torch.nn.Module):
                         input0 = self.onech2threech(torch.mean(result[:,:,indf:,nf*(indg+1)+indf2],2))
                         input2 = self.onech2threech(result[:,:,indf2,nf*(indg+1)+indf2])
                         input0, m_map = self.forward_simplewrap(input0,input1,input2,rectify=True)
-                        #m_map_list['{0}-{1}'.format(nf*(indg+1)+indf2,nf*(indg+1)+indf)] = m_map
                         input0 = torch.squeeze(input0)
                         result[:,:,indf2,nf*(indg+1)+indf] = torch.mean(input0,0)
                         print(f'Generate flow from img({indf},{nf*(indg+1)+indf2}) to img({indf},{nf*(indg+1)+indf}), apply on img({indf2},{indf2,nf*(indg+1)+indf2})')
@@ -324,6 +322,7 @@ class DAIN_flow2(torch.nn.Module):
                 STEP 2.4: Flow estimation
             '''
             cur_offset_output = self.forward_flownets(self.flownets, cur_offset_input)
+            torch.cuda.synchronize()
         '''
             STEP 3: Estimate wrapped frames
         '''
