@@ -88,7 +88,8 @@ class Motion:
         with torch.no_grad():
             input = torch.from_numpy(input).to(self.device)
             output = self.model(input)
-        output = output.cpu().numpy()
+        output[0] = output[0].cpu().numpy()
+        output[1] = output[1].cpu().numpy()
         with open("temp/dainflow2_results.pickle",'wb') as f:
             pickle.dump(output,f)
         # with open("S2_result/dainflow2_results_ref.pickle",'wb') as f:
