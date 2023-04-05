@@ -87,12 +87,12 @@ class Motion:
     def get_dainflowmotions2(self,input,origs=None):
         with torch.no_grad():
             input = torch.from_numpy(input).to(self.device)
-            output = self.model(input)
-        output = list(output)
-        output[0] = output[0].cpu().numpy()
-        output[1] = output[1].cpu().numpy()
+            output,motion_maps = self.model(input)
+            output = output.cpu().numpy()
         with open("temp/dainflow2_results.pickle",'wb') as f:
             pickle.dump(output,f)
+        with open("temp/dainflow2_motion_maps.pickle",'wb') as f:
+            pickle.dump(motion_maps,f)
         # with open("S2_result/dainflow2_results_ref.pickle",'wb') as f:
         #     pickle.dump(origs,f)
         self.psnr = []
