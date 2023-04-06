@@ -128,7 +128,7 @@ class DAIN_flow2(torch.nn.Module):
                     for indf2 in range(indf+1,nf):
                         input0 = self.onech2threech(torch.mean(result[:,:,:indf+1,indf2],2))
                         input2 = self.onech2threech(result[:,:,indf2,indf2])
-                        #input0, m_map = self.forward_simplewrap(input0,input1,input2,rectify=True)
+                        input0, m_map = self.forward_simplewrap(input0,input1,input2,rectify=True)
                         input0 = torch.squeeze(input0)
                         result[:,:,indf2,indf] = torch.mean(input0,0)
                         print(f'Generate flow from img({indf},{indf2}) to img({indf},{indf}), apply on img({indf2},{indf2})')
@@ -140,7 +140,7 @@ class DAIN_flow2(torch.nn.Module):
                     for indf2 in range(indf):
                         input0 = self.onech2threech(torch.mean(result[:,:,indf:,nf*(indg+1)+indf2],2))
                         input2 = self.onech2threech(result[:,:,indf2,nf*(indg+1)+indf2])
-                        #input0, m_map = self.forward_simplewrap(input0,input1,input2,rectify=True)
+                        input0, m_map = self.forward_simplewrap(input0,input1,input2,rectify=True)
                         input0 = torch.squeeze(input0)
                         result[:,:,indf2,nf*(indg+1)+indf] = torch.mean(input0,0)
                         print(f'Generate flow from img({indf},{nf*(indg+1)+indf2}) to img({indf},{nf*(indg+1)+indf}), apply on img({indf2},{indf2,nf*(indg+1)+indf2})')
@@ -152,10 +152,10 @@ class DAIN_flow2(torch.nn.Module):
                     for indf2 in range(indf+1,nf):
                         input0 = self.onech2threech(torch.mean(result[:,:,:,indf2],2))
                         input2 = self.onech2threech(result[:,:,indf2,indf2])
-                        m_map = self.forward_simplewrap(input0,input1,input2,rectify=True) #input0,
+                        input0,m_map = self.forward_simplewrap(input0,input1,input2,rectify=True) #
                         m_map_list['{0}-{1}'.format(indf2,indf)] = m_map.cpu().numpy()
-                        #input0 = torch.squeeze(input0)
-                        #result[:,:,indf2,indf] = torch.mean(input0,0)
+                        input0 = torch.squeeze(input0)
+                        result[:,:,indf2,indf] = torch.mean(input0,0)
                         print(f'Generate flow from img({indf},{indf2}) to img({indf},{indf}), apply on img({indf2},{indf2})')
                         print('pre output index col='+str(indf2)+' ,row='+str(indf))
 
@@ -165,10 +165,10 @@ class DAIN_flow2(torch.nn.Module):
                     for indf2 in range(indf):
                         input0 = self.onech2threech(torch.mean(result[:,:,:,nf*(indg+1)+indf2],2))
                         input2 = self.onech2threech(result[:,:,indf2,nf*(indg+1)+indf2])
-                        m_map = self.forward_simplewrap(input0,input1,input2,rectify=True) #input0,
+                        input0,m_map = self.forward_simplewrap(input0,input1,input2,rectify=True) #
                         m_map_list['{0}-{1}'.format(nf*(indg+1)+indf2,nf*(indg+1)+indf)] = m_map.cpu().numpy()
-                        #input0 = torch.squeeze(input0)
-                        #result[:,:,indf2,nf*(indg+1)+indf] = torch.mean(input0,0)
+                        input0 = torch.squeeze(input0)
+                        result[:,:,indf2,nf*(indg+1)+indf] = torch.mean(input0,0)
                         print(f'Generate flow from img({indf},{nf*(indg+1)+indf2}) to img({indf},{nf*(indg+1)+indf}), apply on img({indf2},{indf2,nf*(indg+1)+indf2})')
                         print('post output index col='+str(indf2)+' ,row='+str(nf*(indg+1)+indf))
             
