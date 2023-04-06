@@ -109,13 +109,13 @@ class DAIN_flow2(torch.nn.Module):
                 if indg == ngroup-2:
                     result[:,:,indf, nf*(indg+1)+indf] = torch.mean(input1,0)
                 ### Step 1.2: Fill the 7 intermediate frames and put them in results
-                li_7,m_maps = self.forward_7frames(input0,input1,nf)
+                m_maps = self.forward_7frames(input0,input1,nf) #li_7,
                 m_map_list['{0}-{1}'.format(indf,indf+8)] = m_maps.cpu().numpy()
-                print('Length of li_7 is '+str(len(li_7))+' with shape '+str(li_7[0].size()))
-                for ind,item in enumerate(li_7):
-                    item = torch.squeeze(item)
-                    result[:,:, indf, nf * indg + indf + ind + 1] = torch.mean(item,0)
-                    print('li7 output index col='+str(indf)+' ,row='+str(nf * indg + indf + ind + 1))
+                #print('Length of li_7 is '+str(len(li_7))+' with shape '+str(li_7[0].size()))
+                # for ind,item in enumerate(li_7):
+                #     item = torch.squeeze(item)
+                #     result[:,:, indf, nf * indg + indf + ind + 1] = torch.mean(item,0)
+                #     print('li7 output index col='+str(indf)+' ,row='+str(nf * indg + indf + ind + 1))
             '''
             Step 2: Generate images for the edge groups
                 Flow generated from input0->input1
