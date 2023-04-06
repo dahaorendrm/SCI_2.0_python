@@ -128,7 +128,7 @@ class DAIN_flow2(torch.nn.Module):
                     for indf2 in range(indf+1,nf):
                         input0 = self.onech2threech(torch.mean(result[:,:,:indf+1,indf2],2))
                         input2 = self.onech2threech(result[:,:,indf2,indf2])
-                        input0, m_map = self.forward_simplewrap(input0,input1,input2,rectify=True)
+                        #input0, m_map = self.forward_simplewrap(input0,input1,input2,rectify=True)
                         input0 = torch.squeeze(input0)
                         result[:,:,indf2,indf] = torch.mean(input0,0)
                         print(f'Generate flow from img({indf},{indf2}) to img({indf},{indf}), apply on img({indf2},{indf2})')
@@ -140,7 +140,7 @@ class DAIN_flow2(torch.nn.Module):
                     for indf2 in range(indf):
                         input0 = self.onech2threech(torch.mean(result[:,:,indf:,nf*(indg+1)+indf2],2))
                         input2 = self.onech2threech(result[:,:,indf2,nf*(indg+1)+indf2])
-                        input0, m_map = self.forward_simplewrap(input0,input1,input2,rectify=True)
+                        #input0, m_map = self.forward_simplewrap(input0,input1,input2,rectify=True)
                         input0 = torch.squeeze(input0)
                         result[:,:,indf2,nf*(indg+1)+indf] = torch.mean(input0,0)
                         print(f'Generate flow from img({indf},{nf*(indg+1)+indf2}) to img({indf},{nf*(indg+1)+indf}), apply on img({indf2},{indf2,nf*(indg+1)+indf2})')
@@ -152,10 +152,10 @@ class DAIN_flow2(torch.nn.Module):
                     for indf2 in range(indf+1,nf):
                         input0 = self.onech2threech(torch.mean(result[:,:,:,indf2],2))
                         input2 = self.onech2threech(result[:,:,indf2,indf2])
-                        input0, m_map = self.forward_simplewrap(input0,input1,input2,rectify=True)
+                        m_map = self.forward_simplewrap(input0,input1,input2,rectify=True) #input0,
                         m_map_list['{0}-{1}'.format(indf2,indf)] = m_map.cpu().numpy()
-                        input0 = torch.squeeze(input0)
-                        result[:,:,indf2,indf] = torch.mean(input0,0)
+                        #input0 = torch.squeeze(input0)
+                        #result[:,:,indf2,indf] = torch.mean(input0,0)
                         print(f'Generate flow from img({indf},{indf2}) to img({indf},{indf}), apply on img({indf2},{indf2})')
                         print('pre output index col='+str(indf2)+' ,row='+str(indf))
 
@@ -165,10 +165,10 @@ class DAIN_flow2(torch.nn.Module):
                     for indf2 in range(indf):
                         input0 = self.onech2threech(torch.mean(result[:,:,:,nf*(indg+1)+indf2],2))
                         input2 = self.onech2threech(result[:,:,indf2,nf*(indg+1)+indf2])
-                        input0, m_map = self.forward_simplewrap(input0,input1,input2,rectify=True)
+                        m_map = self.forward_simplewrap(input0,input1,input2,rectify=True) #input0,
                         m_map_list['{0}-{1}'.format(nf*(indg+1)+indf2,nf*(indg+1)+indf)] = m_map.cpu().numpy()
-                        input0 = torch.squeeze(input0)
-                        result[:,:,indf2,nf*(indg+1)+indf] = torch.mean(input0,0)
+                        #input0 = torch.squeeze(input0)
+                        #result[:,:,indf2,nf*(indg+1)+indf] = torch.mean(input0,0)
                         print(f'Generate flow from img({indf},{nf*(indg+1)+indf2}) to img({indf},{nf*(indg+1)+indf}), apply on img({indf2},{indf2,nf*(indg+1)+indf2})')
                         print('post output index col='+str(indf2)+' ,row='+str(nf*(indg+1)+indf))
             
@@ -277,7 +277,7 @@ class DAIN_flow2(torch.nn.Module):
             rectified_temp = self.rectifyNet(rectify_input) + weighted_sum
             #rectified_temp = nn.Sigmoid()(rectified_temp)
             cur_output_rectified.append(rectified_temp)
-        return cur_output_rectified,new_cur_offset_outputs
+        return new_cur_offset_outputs #cur_output_rectified
 
     def forward_simplewrap(self,input0,input1,input2,rectify=True):
         '''
@@ -339,7 +339,7 @@ class DAIN_flow2(torch.nn.Module):
             STEP 3.2: Wrap context with flow and kernel
         '''
         ctx0_offset = FilterInterpolationModule()(cur_ctx_output,
-                                 cur_offset_output,cur_filter_output[0].detach())
+                                                  cur_offset_output,cur_filter_output[0].detach())
         '''
             STEP 3.3: Concatenation
             Interpolated frames; interpolated flow; kernel filters; context
@@ -356,7 +356,7 @@ class DAIN_flow2(torch.nn.Module):
             #print('Shape of simple rectify input'+str(rectify_input.size()))
             cur_output_rectified = self.rectifyNet(rectify_input) + ref0_offset
             # cur_output_rectified = nn.Sigmoid()(cur_output_rectified)
-            return cur_output_rectified,cur_offset_output
+            return cur_offset_output, #cur_output_rectified
         else:
             return ref0_offset
             #return cur_offset_output
