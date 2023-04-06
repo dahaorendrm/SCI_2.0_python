@@ -110,7 +110,7 @@ class DAIN_flow2(torch.nn.Module):
                     result[:,:,indf, nf*(indg+1)+indf] = torch.mean(input1,0)
                 ### Step 1.2: Fill the 7 intermediate frames and put them in results
                 m_maps = self.forward_7frames(input0,input1,nf) #li_7,
-                m_map_list['{0}-{1}'.format(indf,indf+8)] = m_maps.cpu().numpy()
+                m_map_list['{0}-{1}'.format(indf,indf+8)] = [m_maps[0].cpu().numpy(),m_maps[1].cpu().numpy()]
                 #print('Length of li_7 is '+str(len(li_7))+' with shape '+str(li_7[0].size()))
                 # for ind,item in enumerate(li_7):
                 #     item = torch.squeeze(item)
@@ -153,7 +153,7 @@ class DAIN_flow2(torch.nn.Module):
                         input0 = self.onech2threech(torch.mean(result[:,:,:,indf2],2))
                         input2 = self.onech2threech(result[:,:,indf2,indf2])
                         m_map = self.forward_simplewrap(input0,input1,input2,rectify=True) #input0,
-                        m_map_list['{0}-{1}'.format(indf2,indf)] = m_map.cpu().numpy()
+                        m_map_list['{0}-{1}'.format(indf2,indf)] = [m_maps[0].cpu().numpy(),m_maps[1].cpu().numpy()]
                         #input0 = torch.squeeze(input0)
                         #result[:,:,indf2,indf] = torch.mean(input0,0)
                         print(f'Generate flow from img({indf},{indf2}) to img({indf},{indf}), apply on img({indf2},{indf2})')
@@ -166,7 +166,7 @@ class DAIN_flow2(torch.nn.Module):
                         input0 = self.onech2threech(torch.mean(result[:,:,:,nf*(indg+1)+indf2],2))
                         input2 = self.onech2threech(result[:,:,indf2,nf*(indg+1)+indf2])
                         m_map = self.forward_simplewrap(input0,input1,input2,rectify=True) #input0,
-                        m_map_list['{0}-{1}'.format(nf*(indg+1)+indf2,nf*(indg+1)+indf)] = m_map.cpu().numpy()
+                        m_map_list['{0}-{1}'.format(nf*(indg+1)+indf2,nf*(indg+1)+indf)] = [m_maps[0].cpu().numpy(),m_maps[1].cpu().numpy()]
                         #input0 = torch.squeeze(input0)
                         #result[:,:,indf2,nf*(indg+1)+indf] = torch.mean(input0,0)
                         print(f'Generate flow from img({indf},{nf*(indg+1)+indf2}) to img({indf},{nf*(indg+1)+indf}), apply on img({indf2},{indf2,nf*(indg+1)+indf2})')
