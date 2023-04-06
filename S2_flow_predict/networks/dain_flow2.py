@@ -110,7 +110,7 @@ class DAIN_flow2(torch.nn.Module):
                     result[:,:,indf, nf*(indg+1)+indf] = torch.mean(input1,0)
                 ### Step 1.2: Fill the 7 intermediate frames and put them in results
                 m_maps = self.forward_7frames(input0,input1,nf) #li_7,
-                m_map_list['{0}-{1}'.format(indf,indf+8)] = [m_maps[0].cpu().numpy(),m_maps[1].cpu().numpy()]
+                m_map_list['{0}-{1}'.format(indf,indf+8)] = torch.tensor(m_maps, device = 'cpu').numpy()
                 #print('Length of li_7 is '+str(len(li_7))+' with shape '+str(li_7[0].size()))
                 # for ind,item in enumerate(li_7):
                 #     item = torch.squeeze(item)
