@@ -109,13 +109,13 @@ class DAIN_flow2(torch.nn.Module):
                 if indg == ngroup-2:
                     result[:,:,indf, nf*(indg+1)+indf] = torch.mean(input1,0)
                 ### Step 1.2: Fill the 7 intermediate frames and put them in results
-                m_maps = self.forward_7frames(input0,input1,nf) #li_7,
+                li_7,m_maps = self.forward_7frames(input0,input1,nf)
                 m_map_list['{0}-{1}'.format(indf,indf+8)] = [[ia.cpu().numpy(),ib.cpu().numpy()] for [ia,ib] in m_maps]
-                #print('Length of li_7 is '+str(len(li_7))+' with shape '+str(li_7[0].size()))
-                # for ind,item in enumerate(li_7):
-                #     item = torch.squeeze(item)
-                #     result[:,:, indf, nf * indg + indf + ind + 1] = torch.mean(item,0)
-                #     print('li7 output index col='+str(indf)+' ,row='+str(nf * indg + indf + ind + 1))
+                print('Length of li_7 is '+str(len(li_7))+' with shape '+str(li_7[0].size()))
+                for ind,item in enumerate(li_7):
+                    item = torch.squeeze(item)
+                    result[:,:, indf, nf * indg + indf + ind + 1] = torch.mean(item,0)
+                    print('li7 output index col='+str(indf)+' ,row='+str(nf * indg + indf + ind + 1))
             '''
             Step 2: Generate images for the edge groups
                 Flow generated from input0->input1
@@ -277,7 +277,7 @@ class DAIN_flow2(torch.nn.Module):
             rectified_temp = self.rectifyNet(rectify_input) + weighted_sum
             #rectified_temp = nn.Sigmoid()(rectified_temp)
             cur_output_rectified.append(rectified_temp)
-        return new_cur_offset_outputs #cur_output_rectified
+        return cur_output_rectified, new_cur_offset_outputs
 
     def forward_simplewrap(self,input0,input1,input2,rectify=True):
         '''
@@ -356,7 +356,7 @@ class DAIN_flow2(torch.nn.Module):
             #print('Shape of simple rectify input'+str(rectify_input.size()))
             cur_output_rectified = self.rectifyNet(rectify_input) + ref0_offset
             # cur_output_rectified = nn.Sigmoid()(cur_output_rectified)
-            return cur_offset_output, #cur_output_rectified
+            return cur_output_rectified, cur_offset_output
         else:
             return ref0_offset
             #return cur_offset_output
